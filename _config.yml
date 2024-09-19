@@ -9,21 +9,26 @@ plugins:
 #-------------------------------
 # General Site Settings
 title: Johnny Hopkins
-description: "Hi I'm Johnny, and I'm a Data Scientist.  My portfolio focuses on interesting projects I've recently undertaken, with a strong emphasis on business impact. Please visit my Github & LinkedIn pages (or download my Resume) by using the links below!"
+description: "Hi, I’m Sammy – Data Scientist and Researcher.
+My porfolio is a collection of recent data-driven projects and demos, emphasis on data analysis, visualization, basic programming, and data problem-solving. I have a PhD in Sociology, so I love to derive insights about human behavior from large public data sets like the General Social Survey and the American Community Survey.
+
+Feel free to explore my GitHub for project details, check out my LinkedIn, or download my resume below!
+
+"
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 #-------------------------------
 # About Section
 subtitle: Data Science <span style="color:#f58506"> Portfolio </span>
-location: "London, UK"
-resume_url: /docs/resume.docx
-avatar_image: /img/profile_picture.JPG
+location: "Seattle, WA"
+resume_url: docs/SamuelShawResume_Sept2024.docx
+avatar_image: img/mug%20shot.jpg
 
 #-------------------------------
 # Contact links
-linkedln: "https://linkedln.com/#" # Add your linkedln handle
-github: "https://github.com/#"  # Add your github handle
+linkedln: "https://www.linkedin.com/in/samuel-shaw77/" # Add your linkedln handle
+github: "https://github.com/SammyShaw/SammyShaw"  # Add your github handle
 
 paginate: 6
 paginate_path: "/page/:num"
