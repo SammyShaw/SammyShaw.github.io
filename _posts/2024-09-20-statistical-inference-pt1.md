@@ -1,7 +1,14 @@
+---
+layout: post
+title: "Demo: Statistical Inference Part 1"
+img: "/posts/inference-image.jpg"
+tags: [R, Statistical Inference, Simulation]
+---
+09/17/2017
+
 # Part I: Simulation
 
 ### Summary
-
 The simulation and discussion below illustrate the Law of Large Numbers
 (LLN) and the Central Limit Theorem (CLT) in action. The LLN states that
 as *n* increases, statistical estimates approach the true population’s
