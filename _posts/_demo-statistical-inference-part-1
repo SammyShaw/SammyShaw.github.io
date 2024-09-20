@@ -1,12 +1,11 @@
 ---
 layout: post
 title: "Demo: Statistical Inference Part 1"
-author: "Samuel Shaw"
-date: "9/11/2017"
-output:
-  pdf_document: default
-  html_document: default
+image: "/posts/inference-image.jpg"
+tags: [R, Statistical Inference, Demos]
 ---
+9/17/2017
+
 # Part I: Simulation
 ### Summary
 The simulation and discussion below illustrate the Law of Large Numbers (LLN) and the Central Limit Theorem (CLT) in action. The LLN states that as *n* increases, statistical estimates approach the true population's value . The CLT states that as *n* increases, the averages of variables become normally distributed (despite the shape of the original distribution). For distributions that are not normal, as *n* increases, the sample means will be normally distributed. Therefore, we can use the properties of normal distribution to make inferences about a population from a sample. 
