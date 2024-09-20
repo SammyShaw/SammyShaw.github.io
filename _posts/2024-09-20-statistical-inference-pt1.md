@@ -1,3 +1,10 @@
+---
+layout: post
+title: "Demo: Statistical Inference Part 1"
+img: "/posts/inference_image.jpg"
+tags: [R, Statistical Inference, Simulation]
+---
+
 # Part I: Simulation
 
 ### Summary
