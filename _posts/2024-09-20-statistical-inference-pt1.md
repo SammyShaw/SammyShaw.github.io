@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Demo: Statistical Inference Part 1"
-img: "/posts/inference-image.jpg"
+img: "/posts/inference_image.jpg"
 tags: [R, Statistical Inference, Simulation]
 ---
 09/17/2017
