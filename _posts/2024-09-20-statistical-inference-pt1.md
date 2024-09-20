@@ -40,7 +40,7 @@ generate and visualize the data.
          cex.main=.8, col="lightblue", xlab="40 exponential randoms", cex.lab=.8)
     lines(density(singlesample), col="magenta", lwd=3, lty=1)
     hist(Ksims, col="lightblue", breaks=20, main="Sample Distribution", 
-         cex.main=.8, xlab="Means", cex.lab=.8)
+         cex.main=.8, xlab="1000 Means", cex.lab=.8)
 
 ![](StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-1-1.png)
 
