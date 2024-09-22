@@ -121,7 +121,7 @@ of our simulated means to a theoretical normal distribution.
     yfit<-dnorm(xfit, mean=mean(Ksims),sd=sd(Ksims))
     lines(xfit, yfit, col="black", lty=2, lwd=2)
 
-![](StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+![testing 3](/StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-6-1.png)
 
 Our sample distribution appears approximately normal.
 
