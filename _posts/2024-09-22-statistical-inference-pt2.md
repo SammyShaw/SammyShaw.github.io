@@ -1,8 +1,7 @@
 ---
+post:
 title: "Statistical Inference Part 2.Rmd"
-author: "Samuel Shaw"
-date: "9/13/2017"
-output: pdf_document
+image:
 ---
 
 ## Part II: Inferential Data Analysis
@@ -13,6 +12,7 @@ In part one I discussed the Law of Large Numbers and the Central Limit Theorem a
 
 ``` r
 library(datasets)
+library(ggplot2)
 str(ToothGrowth)
 ```
 
@@ -74,7 +74,7 @@ boxplot(ToothGrowth$len~ToothGrowth$dose, col="lightblue",
 main="ToothGrowth by Dose", cex.main=.8, xlab="Dose", cex.lab=.8)
 ```
 
-![plot of chunk unnamed-chunk-21](figure/unnamed-chunk-21-1.png)
+![alt text](/img/posts/figure/unnamed-chunk-21-1.png)
 
 ### Means Comparisons using T-tests
 We can test whether or not the observed differences are due to random chance by determining the probability of those differences using t-tests. The following set of tests make use of the two-sample t.test function in R. We will set alpha = to .05 (the standard default), so we will reject the null hypothesis (that the distributions are equal) if p-values are <.05 for two-tailed tests. That is, we conclude that the relationship is statistically significant if there is a less than 5% probability that the difference is due to chance. 
@@ -131,7 +131,7 @@ ggplot(data.frame(t_vals, t_dist), aes(x = t_vals, y = t_dist)) +
 		 label = paste("t =", round(t_stat, 2)), color = "red", size = 4)
 ```
 
-![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png)
+![alt text](/img/posts/figure/unnamed-chunk-23-1.png)
 
 In the graphic illustration, the test statistic, 1.92
 
@@ -234,7 +234,4 @@ But not for high doses.
 ### Conclusion
 
 Variation in tooth length is related to the size of given dose of supplement. The greater the dose, the greater the tooth length (Hyp 2). Tooth length is also related to the type of supplement, but not at all dose sizes (Hyp 3). The tests that we conducted made use of properties associated with the central limit theorem and its assumption of normally distributed sample means. Although the *n*s were relatively small in the tests conducted, t.tests (using the t distribution) allow for greater random chance associated with smaller sample sizes.   
-
-
-## knit("C:/Users/Sam/Documents/old-projects/StatisticalInferencePart2.Rmd")
 
