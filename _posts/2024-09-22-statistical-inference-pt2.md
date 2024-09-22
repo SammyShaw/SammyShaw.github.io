@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Demo: Statistical Inference Part 2"
-image: "/posts/figure/unnamed-chunk-23-1.png"
+image: "/posts/figure/unnamed-chunk-7-1.png"
 tags: [R, Statistical Inference, Hypothesis Testing, T-test, ggplot2]
 ---
 
@@ -74,7 +74,7 @@ boxplot(ToothGrowth$len~ToothGrowth$dose, col="lightblue",
 main="ToothGrowth by Dose", cex.main=.8, xlab="Dose", cex.lab=.8)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+![alt text](/img/posts/figure/unnamed-chunk-5-1.png)
 
 ### Means Comparisons using T-tests
 We can test whether or not the observed differences are due to random chance by determining the probability of those differences using t-tests. The following set of tests make use of the two-sample t.test function in R. We will set alpha = to .05 (the standard default), so we will reject the null hypothesis (that the distributions are equal) if p-values are <.05 for two-tailed tests. That is, we conclude that the relationship is statistically significant if there is a less than 5% probability that the difference is due to chance. 
@@ -130,7 +130,7 @@ ggplot(data.frame(t_vals, t_dist), aes(x = t_vals, y = t_dist)) +
 		 label = paste("t =", round(t_stat, 2)), color = "red", size = 4)
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![alt text](/img/posts/figure/unnamed-chunk-7-1.png)
 
 In the graphic illustration, the test statistic, 1.92, is the difference in means standardized by the standard error. i.e., the means are 1.92 standard errors apart, which is not far apart enough to conclude that the difference is not found by chance. 
 
