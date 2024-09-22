@@ -1,7 +1,8 @@
 ---
-post:
-title: "Statistical Inference Part 2.Rmd"
-image:
+layout: post
+title: "Demo: Statistical Inference Part 2"
+image: "/posts/figure/unnamed-chunk-21-1.png"
+tags: [R, Statistical Inference, Hypothesis Testing, T-test, ggplot2]
 ---
 
 ## Part II: Inferential Data Analysis
