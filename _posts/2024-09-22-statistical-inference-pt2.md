@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Demo: Statistical Inference Part 2"
-image: "/posts/figure/unnamed-chunk-21-1.png"
+image: "/posts/figure/unnamed-chunk-23-1.png"
 tags: [R, Statistical Inference, Hypothesis Testing, T-test, ggplot2]
 ---
 
