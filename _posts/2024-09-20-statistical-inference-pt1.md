@@ -42,7 +42,7 @@ generate and visualize the data.
     hist(Ksims, col="lightblue", breaks=20, main="Sample Distribution", 
          cex.main=.8, xlab="1000 Means", cex.lab=.8)
 
-![alt text](/posts/StatisticalInferencePart1/figure-markdown_strict/unnamed-chunk-1-1.png)
+![alt text](/img/posts/Stat_image_files/unnamed-chunk-1-1.png)
 
 In the first graph, I show a single sample to illustrate the skew of an
 exponential distribution. The point is that the data are not normally
