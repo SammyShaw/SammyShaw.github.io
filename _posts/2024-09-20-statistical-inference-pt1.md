@@ -73,14 +73,14 @@ time.
          cex.main=.8, xlab="Means", ylab="frequency", cex.lab=.8)
     abline(v=mean(Ksims), lwd=3, col="magenta")
 
-![alt text](StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-3-1.png)
+![alt text](/img/posts/Stat_image_files/unnamed-chunk-3-1.png)
 
 Indeed, the observed sample mean is approximately the theoretical mean;
 or, we may say that ‘the estimator is consistent.’ In the figure below,
 the pink verticle line represents the sample mean; we see that it is
 drawn approximately where x = 5.
 
-## How *Vary* Convenient
+## How Vary Convenient
 
 The LLN works for other statistics too. Given that the CLT suggests that
 the sample mean is normally distributed, and given that we found that
@@ -121,7 +121,7 @@ of our simulated means to a theoretical normal distribution.
     yfit<-dnorm(xfit, mean=mean(Ksims),sd=sd(Ksims))
     lines(xfit, yfit, col="black", lty=2, lwd=2)
 
-![testing 3](/StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+![alt text](/img/posts/Stat_image_files/unnamed-chunk-6-1.png)
 
 Our sample distribution appears approximately normal.
 
