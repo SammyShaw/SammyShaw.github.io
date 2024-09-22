@@ -73,7 +73,7 @@ time.
          cex.main=.8, xlab="Means", ylab="frequency", cex.lab=.8)
     abline(v=mean(Ksims), lwd=3, col="magenta")
 
-![](StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-3-1.png)
+![alt text](StatisticalInferencePart1_files/figure-markdown_strict/unnamed-chunk-3-1.png)
 
 Indeed, the observed sample mean is approximately the theoretical mean;
 or, we may say that ‘the estimator is consistent.’ In the figure below,
