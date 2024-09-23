@@ -1,10 +1,8 @@
 ---
-title: 'Cars: MPG vs. Transmission Type'
-author: "Samuel Shaw"
-date: "10/19/2017"
-output:
-  pdf_document: default
-  html_document: default
+layout: post
+title: "Demo: Multiple Linear Modeling"
+image: "/posts/1974-line-up.jpg"
+tags: [R, OLS Regression, Model Selection]
 ---
 
 ## Summary
@@ -81,7 +79,7 @@ The milage of the 32 cars in the dataset range from 10.4 to 33.9, with an averag
 boxplot(mpg~am, data=mtcars, ylab="Miles Per Gallon", main="MPG by Transmission Type", col="pink")
 ```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
+![alt text](unnamed-chunk-13-1.png)
 
 The side-by-side box plot above demonstrates an obvious variation in milage when comparing manual to automatic transmission cars. 
 
@@ -205,7 +203,7 @@ par(mfrow=c(2,2))
 plot(best)
 ```
 
-![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
+![alt text](figure/unnamed-chunk-18-1.png)
 
 Residuals appear random and independent, normally distributed, and have no outliers. 
 
