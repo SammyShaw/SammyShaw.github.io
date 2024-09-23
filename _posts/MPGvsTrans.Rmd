@@ -1,0 +1,139 @@
+---
+title: 'Cars: MPG vs. Transmission Type'
+author: "Samuel Shaw"
+date: "10/19/2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Summary
+The following is a demonstration of multiple linear modeling using a canned dataset in R. The demo includes some recoding, exploratory data visualization, a discussion of multicolinearity and model selection, and residual analysis. 
+
+The "mtcars" dataset was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models) (R Package: datasets, Version 3.4.1).
+
+```{r}
+library(datasets)
+str(mtcars)
+```
+
+Does the distance a car can drive on a gallon of gas (MPG) depend on whether or not the car has an automatic or manual transmission? We can quantify the MPG difference in manual vs. automatic transmission vehicles, and we can do so while accounting for other confounding variables. I'll show that transmission type does correspond to a significant MPG difference, but when accounting for the vehicles weight, horsepower, and number of cylinders, the transmission effect goes away. 
+
+## Data cleaning and preparation
+A quick glance at the data shows that all variables are coded and stored numerically. Categorical variables must be recoded as factors. 
+
+```{r}
+mtcars$am<-factor(mtcars$am)
+levels(mtcars$am)<-c("Automatic", "Manual")
+mtcars$cyl<-factor(mtcars$cyl)
+levels(mtcars$cyl)<-c("4cyl", "6cyl", "8cyl")
+mtcars$vs<-factor(mtcars$vs)
+levels(mtcars$vs)<-c("V-shape", "Straight")
+mtcars$gear<-factor(mtcars$gear)
+levels(mtcars$vs)<-c("3", "4", "5")
+mtcars$carb<-factor(mtcars$carb)
+levels(mtcars$carb)<-c("1", "2", "3", "4", "5", "6", "7", "8")
+```
+
+## Miles per Gallon vs. Transmission Type
+
+```{r}
+summary(mtcars$mpg)
+table(mtcars$am)
+```
+
+The milage of the 32 cars in the dataset range from 10.4 to 33.9, with an average MPG of 20.1. Nineteen of these cars have an automatic transmission and thirteen are manual. 
+
+```{r}
+boxplot(mpg~am, data=mtcars, ylab="Miles Per Gallon", main="MPG by Transmission Type", col="pink")
+```
+
+The side-by-side box plot above demonstrates an obvious variation in milage when comparing manual to automatic transmission cars. 
+
+```{r}
+t.test(mpg~am, data=mtcars)
+```
+
+Indeed, we can infer from the t-test above that mileage is related to transmission type. The difference in means (7.24 MPG) is large enough to conclude that there is very little chance (p = .001) that the observed difference is likely to occur by noise in the data alone (c.f., 'Demo: Statistical Inference' in this portfolio). Based on bivariate statistics alone, we would reject the null hypothesis and conclude that manual transmissions get better gas mileage (in 1974 at least). 
+
+To fully assess whether transmission type is a significant determinant of gas mileage, however, we must account for possible confounding variables. That is, transmission type may be related to other factors, such as engine size, weight, or horsepower, each of which may better explain variation in gas mileage. 
+
+## Multiple Regression Analysis
+
+Standard OLS linear regression allows for testing the effect of transmission on mileage while holding other variables constant. Further, analysis of model variance allows for understanding the best model fit, and a discussion of the model's residuals will show us if the model is an appropriate analytical tool. 
+
+In fact, every other variable included in the dataset has a statistically significant relationship to a car's MPG (not shown). Below, I regress each variable on gas mileage simultaneously, so that we can see the effect of each, holding each other constant. Note: I omit the car's 1/4 mile time because this variable is, like MPG, a performance measure, so it would seem likely that they are spuriously correlated; I also omit the variable gear, because gear number is correlated with transmission type by design.
+
+```{r}
+fullmodel<-lm(mpg~am+cyl+disp+hp+drat+wt+vs+carb, data=mtcars); # i.e, full without qsec and gears
+summary(fullmodel)
+```
+
+The full model summary shows us that, controlling for other factors, the effect of transmission type on gas mileage all but dissapears. The effect is still positive (manual transmission cars get a mean 1.6 MPGs better than automatics, instead of 7.24), but it is no longer statistically significant (p = .44), and so we cannot conclude that the difference is not due to random chance. In fact, in the full model, we see very little statistically significant correlates to mpg. Only horsepower is signficantly related. A one unit increase in horsepower leads to a decrease in .06 miles to the gallon, holding every other variable constant. 
+
+### Model Selection
+
+It should not be surprising that we see few significant predictors of mpg, however, because our n is so small; we have a tiny number of cases for each indpendent variable. We can look for a better explanatory model whose least squares minimize the variance. The R function step(), below, calculates the variances of models of multiple smaller combinations of variables included in our original full model. 
+
+```{r, results=FALSE}
+best<-step(fullmodel, direction="both"); # hidden to save space
+```
+
+```{r}
+summary(best)
+```
+
+R's step() function returns the model that says (which model represents the least residual variance): Gas milage is a function of transmission type, number of cylinders, horsepower, and the vehicle's weight. Compared to the full model, we see that vehicle weight now seems to be the strongest predictor of gas mileage, while horsepower, and number of cylinders (specifically the difference between 4 and 6 cylinders) also have significant effects. Transmission type, although it is included in our model, remains statistically insignificant, and so we cannot reject the null hypothesis: we cannot conclude that manual transmission vehicles get better gas mileage. 
+
+### Residual Diagnostics
+
+```{r}
+par(mfrow=c(2,2))
+plot(best)
+```
+
+Residuals appear random and independent, normally distributed, and have no outliers. 
+
+## Conclusion
+Althought transmission type is related to gas mileage at the bivariate level, controlling for number of cylinders, vehicle's weight, and horsepower, the significant effect of transmission type goes away. We cannot be sure that manual transmission cars get better gas mileage than automatics. However, because the number of vehicles in the sample is low, our model does not contain much statistical power, and multiple regression may not be an ideal method of analysis given the sample size. Further research should seek to obtain a larger sample size (ideally 80+ cars). 
+
+### Appendix
+
+The dataset includes 32 observations and the following variables: 
+
+mpg	Miles/(US) gallon
+cyl	Number of cylinders
+disp	Displacement (cu.in.)
+hp	Gross horsepower
+drat	Rear axle ratio
+wt	Weight (1000 lbs)
+qsec	1/4 mile time
+vs	V/S
+am	Transmission (0 = automatic, 1 = manual)
+gear	Number of forward gears
+carb	Number of carburetors
+(R Package: datasets, Version 3.4.1)
+
+### Other correlations
+```{r}
+# Vehicle weight
+with(mtcars, cor.test(mpg, wt))[4:3]
+# Horsepower
+with(mtcars, cor.test(mpg, hp))[4:3]
+# Displacement
+with(mtcars, cor.test(mpg, disp))[4:3]
+# Rear axle ratio
+with(mtcars, cor.test(mpg, drat))[4:3]
+# 1/4 mile time
+with(mtcars, cor.test(mpg, qsec))[4:3]
+# V/S (shape of engine)
+t.test(mpg~vs, data=mtcars)[3]
+# Number of cylinders
+summary(lm(mpg~cyl, data=mtcars))$coef
+# Number of gears
+summary(lm(mpg~gear, data=mtcars))$coef
+# Number of carburetors
+summary(lm(mpg~carb, data=mtcars))$coef
+```
+
+
