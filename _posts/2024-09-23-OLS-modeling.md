@@ -1,10 +1,8 @@
 ---
-title: 'Cars: MPG vs. Transmission Type'
-author: "Samuel Shaw"
-date: "10/19/2017"
-output:
-  pdf_document: default
-  html_document: default
+layout: post
+title: "Demo: Multiple Linear Modeling"
+image: "/posts/1974-line-up.jpg"
+tags: [R, OLS Regression, Model Selection, Data Cleaning]
 ---
 
 ## Summary
