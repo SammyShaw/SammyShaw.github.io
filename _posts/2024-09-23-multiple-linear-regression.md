@@ -79,7 +79,7 @@ The milage of the 32 cars in the dataset range from 10.4 to 33.9, with an averag
 boxplot(mpg~am, data=mtcars, ylab="Miles Per Gallon", main="MPG by Transmission Type", col="pink")
 ```
 
-![alt text](/img/post/figure/unnamed-chunk-13-1.png)
+![alt text](/img/posts/figure/unnamed-chunk-13-1.png)
 
 The side-by-side box plot above demonstrates an obvious variation in milage when comparing manual to automatic transmission cars. 
 
@@ -203,7 +203,7 @@ par(mfrow=c(2,2))
 plot(best)
 ```
 
-![alt text](/img/post/figure/unnamed-chunk-18-1.png)
+![alt text](/img/posts/figure/unnamed-chunk-18-1.png)
 
 Residuals appear random and independent, normally distributed, and have no outliers. 
 
