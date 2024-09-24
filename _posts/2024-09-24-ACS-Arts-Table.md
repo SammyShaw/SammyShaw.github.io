@@ -230,9 +230,10 @@ write.csv(Arts_all, "Arts_all.csv")
 
 Now we're ready to viz. See you in Tableau.
 
-<iframe src="https://public.tableau.com/views/shared/CD5TNWZNH" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
+<iframe src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
 
-``` r
-# https://public.tableau.com/shared/73KNZQDPH?:display_count=n&:origin=viz_share_link
-```
+
+Or, visit my Tableau public viz here: 
+https://public.tableau.com/shared/73KNZQDPH?:display_count=n&:origin=viz_share_link
+
 
