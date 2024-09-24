@@ -234,6 +234,6 @@ Now we're ready to viz. See you in Tableau.
 
 
 Or, visit my Tableau public viz here: 
-https://public.tableau.com/shared/73KNZQDPH?:display_count=n&:origin=viz_share_link
+[Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
 
 
