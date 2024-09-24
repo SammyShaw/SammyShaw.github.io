@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Demo: Multiple Linear Modeling"
+title: "R Demo: Multiple Linear Modeling"
 image: "/posts/1974-line-up.jpg"
 tags: [R, OLS Regression, Model Selection]
 ---
