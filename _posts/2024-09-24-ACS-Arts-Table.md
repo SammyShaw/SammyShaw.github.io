@@ -9,6 +9,10 @@ tags: [Large Dataset, Data Cleaning, Visualization, Tableau]
 ## Summary
 This project illustrates 1.Getting and cleaning a large dataset, and 2. Visualization using Tableau. 
 
+If you would like to skip the coding exercise and just find out
+[Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
+You can click the link, search by artistic discipline, and order by Metro art population or *relative* metro arts population (LQ).  
+
 The American Community Survey (ACS) is a 1% survey of the U.S. population conducted annually by the U.S. Census Bureau as a complement to the decennial census. The ACS adds depth and a broader range of demographic, housing and economic data that census cannot capture.
 
 The 1% "microsamples" are available in 5-year, 5% datasets, which provide more stable population estimates. The 2022 5-year ACS, for example, is actually 5, 1-year, 1% samples combined, from 2018-2022.
@@ -232,7 +236,7 @@ Now we're ready to viz. See you in Tableau.
 
 visit my Tableau public viz here: 
 [Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
-
 You can select among artist occupations at the top left and rank order by Metro occupation size OR by LQ on the right.
 
+In the meantime, I'll be trying to embed the dashboard below...
 <iframe src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
