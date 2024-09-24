@@ -230,10 +230,9 @@ write.csv(Arts_all, "Arts_all.csv")
 
 Now we're ready to viz. See you in Tableau.
 
-<iframe src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
-
-
-Or, visit my Tableau public viz here: 
+visit my Tableau public viz here: 
 [Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
 
+You can select among artist occupations at the top left and rank order by Metro occupation size OR by LQ on the right.
 
+<iframe src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
