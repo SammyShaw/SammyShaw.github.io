@@ -239,4 +239,4 @@ visit my Tableau public viz here:
 You can select among artist occupations at the top left and rank order by Metro occupation size OR by LQ on the right.
 
 
-<iframe seamless frameborder="0" src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes&:display_count=yes&:showVizHome=no" width = '1090' height = '900'></iframe>
+<iframe seamless frameborder="0" src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes&:display_count=yes&:showVizHome=no" width = '1200' height = '900'></iframe>
