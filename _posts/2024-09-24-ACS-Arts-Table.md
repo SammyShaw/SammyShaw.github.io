@@ -9,9 +9,9 @@ tags: [Large Dataset, Data Cleaning, Visualization, Tableau]
 ## Summary
 This project illustrates 1.Getting and cleaning a large dataset, and 2. Visualization using Tableau. 
 
-If you would like to skip the coding exercise and just find out
+-- If you would like to skip the coding exercise and just find out
 [Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
-You can click the link, search by artistic discipline, and order by Metro art population or *relative* metro arts population (LQ).  
+You can click the link, or scroll to the bottom. Search by artistic discipline, and order by Metro art population or *relative* metro arts population (LQ).  
 
 The American Community Survey (ACS) is a 1% survey of the U.S. population conducted annually by the U.S. Census Bureau as a complement to the decennial census. The ACS adds depth and a broader range of demographic, housing and economic data that census cannot capture.
 
@@ -233,10 +233,9 @@ write.csv(Arts_all, "Arts_all.csv")
 ```
 
 Now we're ready to viz. See you in Tableau.
-
-visit my Tableau public viz here: 
-[Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
 You can select among artist occupations at the top left and rank order by Metro occupation size OR by LQ on the right.
 
+<iframe seamless frameborder="0" src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes&:display_count=yes&:showVizHome=no" width = '1400' height = '900'></iframe>
 
-<iframe seamless frameborder="0" src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes&:display_count=yes&:showVizHome=no" width = '1200' height = '900'></iframe>
+For a more responsive dashboard, please visit my Tableau public viz here: 
+[Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
