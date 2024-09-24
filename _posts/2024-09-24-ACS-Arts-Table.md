@@ -1,8 +1,8 @@
 ---
+layout: post
 title: "Where do Artists Live?"
-author: "Sammy Shaw"
-date: "2024-09-24"
-output: html_document
+image: "/posts/Arts_dash_snip"
+tags: [Large Dataset, Data Cleaning, Visualization, Tableau]
 ---
 
 
@@ -32,17 +32,6 @@ Beware of large file sizes! Each 1% of the U.S. population is about 3.5 million 
 
 ``` r
 ACS_2022<-read.csv("ACS PUMS/usa_00011.csv")
-```
-
-```
-## Warning in file(file, "rt"): cannot open file 'ACS PUMS/usa_00011.csv': No such file or directory
-```
-
-```
-## Error in file(file, "rt"): cannot open the connection
-```
-
-``` r
 str(ACS_2022)
 ```
 
@@ -89,23 +78,12 @@ Because I'm interested in Metro Areas and Occupations, the first step will be to
 
 The trick is to copy/paste the code book to a excel file, save as a .csv, and then merge on the numeric code. 
 
-[IMG. CODEBOOK]
+![alt text][/img/posts/IPUMS_metro_codes.png]
 
 After copy/pasting and saving as .csv...
 
 ``` r
 metro_labels<-read.csv("ACS PUMS/MET2013_Labels.csv")
-```
-
-```
-## Warning in file(file, "rt"): cannot open file 'ACS PUMS/MET2013_Labels.csv': No such file or directory
-```
-
-```
-## Error in file(file, "rt"): cannot open the connection
-```
-
-``` r
 str(metro_labels)
 ```
 
@@ -123,17 +101,6 @@ Do the same for occupation labels.
 
 ``` r
 occ_labels<-read.csv("ACS PUMS/Occ_Names.csv")
-```
-
-```
-## Warning in file(file, "rt"): cannot open file 'ACS PUMS/Occ_Names.csv': No such file or directory
-```
-
-```
-## Error in file(file, "rt"): cannot open the connection
-```
-
-``` r
 ACS_2022<-merge(ACS_2022, occ_labels, by="OCC", all.x=TRUE)
 ```
 
@@ -149,6 +116,7 @@ sum(ACS_2022$OCC==2600)
 ```
 ## [1] 17883
 ```
+
 There are 17883 cases of people who claimed Artist as their primary occupation in the 5 1% microsample surveys, 2018-2022...
 
 ``` r
@@ -161,6 +129,7 @@ sum(ACS_2022$PERWT[ACS_2022$OCC==2600])
 which theoretically represent (i.e., with person weights) 354,607 artists.
 
 But there are many arts or arts-adjacent occupations, including:
+
 2600: Artists and Related Workers
 2631: Commercial and Industrial Designers
 2632: Fashion Designers
@@ -208,12 +177,6 @@ Arts_agg<-Art_occ_dt %>%
 	)
 ```
 
-```
-## Error in `group_by()`:
-## ! Must group by variables found in `.data`.
-## ✖ Column `Metro` is not found.
-```
-
 To see whether or not a metro arts population is not simply a function of that city's size, I construct a *relative* measure that accounts for Metro size. I calculate a Location Quotient (LQ) as the relative share of each art occupation in a city vs. compared to their portion of the national work force. That is: LQ = (local occupation population/local total labor force)/(national occupation population/national total labor force).
 
 It is easily interpreted as the [X-local arts population] LQ*times* the national average. 
@@ -229,15 +192,7 @@ metro_labor_force<-ACS_2022 %>%
 	filter(OCC>0) %>%
 	group_by(Metro) %>%
 	summarize(Metro_labor_force = sum(PERWT, na.rm=TRUE))
-```
 
-```
-## Error in `group_by()`:
-## ! Must group by variables found in `.data`.
-## ✖ Column `Metro` is not found.
-```
-
-``` r
 # Include Metro labor force in our aggregated table
 Arts_agg<-merge(metro_labor_force, 
 		Arts_agg, 
@@ -256,13 +211,6 @@ Arts_relative<-Arts_agg %>%
 	       Actors = (Actors/Metro_labor_force)/(sum(Actors)/nat_tot_labor_force),  
 	       Producers_Dirs = (Producers_Dirs/Metro_labor_force)/(sum(Producers_Dirs)/nat_tot_labor_force)  
 	)
-```
-
-```
-## Error in `mutate()`:
-## ℹ In argument: `Artists = (Artists/Metro_labor_force)/(sum(Artists)/nat_tot_labor_force)`.
-## Caused by error:
-## ! object 'Metro_labor_force' not found
 ```
 
 Combine the LQs and the local arts populations
@@ -284,8 +232,6 @@ Now we're ready to viz. See you in Tableau.
 
 
 ``` r
-# library(knitr)
-# knit("All_Arts_Table.Rmd")
 # https://public.tableau.com/shared/73KNZQDPH?:display_count=n&:origin=viz_share_link
 ```
 
