@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Where do Artists Live?"
-image: "/posts/Arts_dash_snip"
+image: "/posts/Arts_dash_snip.png"
 tags: [Large Dataset, Data Cleaning, Visualization, Tableau]
 ---
 
