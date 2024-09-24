@@ -78,7 +78,7 @@ Because I'm interested in Metro Areas and Occupations, the first step will be to
 
 The trick is to copy/paste the code book to a excel file, save as a .csv, and then merge on the numeric code. 
 
-![alt text][/img/posts/IPUMS_metro_codes.png]
+![alt text](/img/posts/IPUMS_metro_codes.png)
 
 After copy/pasting and saving as .csv...
 
