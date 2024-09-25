@@ -82,9 +82,11 @@ Because I'm interested in Metro Areas and Occupations, the first step will be to
 
 The trick is to copy/paste the code book to a excel file, save as a .csv, and then merge on the numeric code. 
 
+Here is what the labels look like in the codebook: 
+
 ![alt text](/img/posts/IPUMS_metro_codes.png)
 
-After copy/pasting and saving as .csv...
+After copy/pasting the first two columns and saving as a .csv...
 
 ``` r
 metro_labels<-read.csv("ACS PUMS/MET2013_Labels.csv")
