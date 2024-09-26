@@ -190,7 +190,7 @@ It is easily interpreted as the [X-local arts population] LQ*times* the national
 
 ``` r
 # Calculate National Total Labor Force
-nat_tot_labor_force<-sum(ACS_2022$PERWT[ACS_2022$OCC>0])
+NAT_TOT_LABOR_FORCE<-sum(ACS_2022$PERWT[ACS_2022$OCC>0])
 # OCC>0 ensures that we're counting the labor force (i.e., has an occupational code), not the whole population. 
 
 # Calculate Metro labor force (a sum of workforce in each Metro)
@@ -206,16 +206,16 @@ Arts_agg<-merge(metro_labor_force,
 
 # We can get the national artist' labor force by summing the local artists in each Metro.  
 Arts_relative<-Arts_agg %>%
-	mutate(Artists = (Artists/Metro_labor_force)/(sum(Artists)/nat_tot_labor_force),
-	       Graphic_Designers = (Graphic_Designers/Metro_labor_force)/(sum(Graphic_Designers)/nat_tot_labor_force),
-	       Fashion_Designers = (Fashion_Designers/Metro_labor_force)/(sum(Fashion_Designers)/nat_tot_labor_force),
-	       Other_Designers = (Other_Designers/Metro_labor_force)/(sum(Other_Designers)/nat_tot_labor_force),
-	       Musicians = (Musicians/Metro_labor_force)/(sum(Musicians)/nat_tot_labor_force),
-	       Writers = (Writers/Metro_labor_force)/(sum(Writers)/nat_tot_labor_force),
-	       Photographers = (Photographers/Metro_labor_force)/(sum(Photographers)/nat_tot_labor_force),
-	       Dancers_Chors = (Dancers_Chors/Metro_labor_force)/(sum(Dancers_Chors)/nat_tot_labor_force),
-	       Actors = (Actors/Metro_labor_force)/(sum(Actors)/nat_tot_labor_force),  
-	       Producers_Dirs = (Producers_Dirs/Metro_labor_force)/(sum(Producers_Dirs)/nat_tot_labor_force)  
+	mutate(Artists = (Artists/Metro_labor_force)/(sum(Artists)/NAT_TOT_LABOR_FORCE),
+	       Graphic_Designers = (Graphic_Designers/Metro_labor_force)/(sum(Graphic_Designers)/NAT_TOT_LABOR_FORCE),
+	       Fashion_Designers = (Fashion_Designers/Metro_labor_force)/(sum(Fashion_Designers)/NAT_TOT_LABOR_FORCE),
+	       Other_Designers = (Other_Designers/Metro_labor_force)/(sum(Other_Designers)/NAT_TOT_LABOR_FORCE),
+	       Musicians = (Musicians/Metro_labor_force)/(sum(Musicians)/NAT_TOT_LABOR_FORCE),
+	       Writers = (Writers/Metro_labor_force)/(sum(Writers)/NAT_TOT_LABOR_FORCE),
+	       Photographers = (Photographers/Metro_labor_force)/(sum(Photographers)/NAT_TOT_LABOR_FORCE),
+	       Dancers_Chors = (Dancers_Chors/Metro_labor_force)/(sum(Dancers_Chors)/NAT_TOT_LABOR_FORCE),
+	       Actors = (Actors/Metro_labor_force)/(sum(Actors)/NAT_TOT_LABOR_FORCE),  
+	       Producers_Dirs = (Producers_Dirs/Metro_labor_force)/(sum(Producers_Dirs)/NAT_TOT_LABOR_FORCE)  
 	)
 ```
 
