@@ -2,7 +2,7 @@
 layout: post
 title: "R Demo: Statistical Inference Part 2"
 image: "/posts/figure/unnamed-chunk-7-1.png"
-tags: [R, Statistical Inference, Hypothesis Testing, T-test, ggplot2]
+tags: [R, A/B Testing, Hypothesis Testing, T-test, ggplot2]
 ---
 
 ## Part II: Inferential Data Analysis
