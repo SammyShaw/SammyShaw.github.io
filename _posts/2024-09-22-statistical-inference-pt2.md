@@ -234,6 +234,3 @@ But not for high doses.
 
 Variation in tooth length is related to the size of given dose of supplement. The greater the dose, the greater the tooth length (Hyp 2). Tooth length is also related to the type of supplement, but not at all dose sizes (Hyp 3). The tests that we conducted made use of properties associated with the central limit theorem and its assumption of normally distributed sample means. Although the *n*s were relatively small in the tests conducted, t.tests (using the t distribution) allow for greater random chance associated with smaller sample sizes.   
 
-
-knit("C:/Users/Sam/Documents/old-projects/StatisticalInferencePart2.Rmd")
-
