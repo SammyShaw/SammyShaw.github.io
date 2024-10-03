@@ -5,34 +5,29 @@ image: "/posts/Arts_dash_snip.png"
 tags: [Large Dataset, Data Cleaning, Visualization, Tableau]
 ---
 
-
 ## Summary
-This project illustrates 1.Getting and cleaning a large dataset, and 2. Visualization using Tableau. 
+This project demonstrates 1. Visualization using Tableau, and 2. Getting and cleaning a large dataset.
+One of my pet research questions is: Why and where do (some) occupations agglomerate? Or, what kinds of places attract particular jobs? Arts occupations are particularly interesting, becuase the rewards are often reputational rather than economic, and the benefits of place include the presence of markets, scenes, and the status associated with a place itself. That is, artists might locate where the action is, not where there are "jobs." On the other hand, a decade or so ago the "creative city" mantra made attracting artists an urban planning priority. 
 
--- If you would like to skip the coding exercise and just find out
+In this demonstration, we'll view artist location patterns by discipline, including their 'relative' metro distributions. In the long run, I'll want to use this data to see if the pandemic had any real effect on occupational diffusion. 
+
+### Visualization Using Tableau
+In the dashboard embedded here, users can search by artistic discipline, and order by Metro art population or *relative* metro arts population (LQ).  
+
+<iframe seamless frameborder="0" src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes&:display_count=yes&:showVizHome=no" width = '1400' height = '900'></iframe>
+
+For a more responsive dashboard, please visit my Tableau public viz here: 
 [Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
-You can click the link, or scroll to the bottom. Search by artistic discipline, and order by Metro art population or *relative* metro arts population (LQ).  
 
-The American Community Survey (ACS) is a 1% survey of the U.S. population conducted annually by the U.S. Census Bureau as a complement to the decennial census. The ACS adds depth and a broader range of demographic, housing and economic data that census cannot capture.
 
-The 1% "microsamples" are available in 5-year, 5% datasets, which provide more stable population estimates. The 2022 5-year ACS, for example, is actually 5, 1-year, 1% samples combined, from 2018-2022.
+### Getting and Cleaning a Large Dataset
+The ACS is a 1% survey of the U.S. population conducted annually by the U.S. Census Bureau as a complement to the decennial census. The ACS adds depth and a broader range of demographic, housing and economic data that the 9-question census cannot capture.
+
+The 1% "microsamples" are available in 5-year - or 5% - datasets, which provide more stable population estimates. The 2022 5-year ACS, for example, is actually 5, 1-year, 1% samples combined, from 2018-2022, but include weights only interpretable for the 5 year set. 
 
 Data are available online at census.gov, or at the more user friendly IPUMS website (https://usa.ipums.org/usa/). IPUMS stands for Integrated Public Use Microsample Series. Users can select the samples and the columns of data they want to analyze, and find all the codebooks, questionaires and other documentation there. Getting Data from IPUMS requires permission. They vet your request and then provide a downloadable zip file, usually within hours.
 
 Beware of large file sizes! Each 1% of the U.S. population is about 3.5 million cases. A 5-year dataset will contain close to 18 million rows. 
-
-
-``` r
-# setwd("C:/Dat_Sci/Datasets")
-
-# If Unzipping
-#library(utils)
-#zip_file<-"ACS PUMS/usa_00011.csv"
-#output_files<-"ACS PUMS"
-#unzip(zipfile=zip_file, exdir=output_files)
-#file.info(zip_file)
-```
-
 
 ``` r
 ACS_2022<-read.csv("ACS PUMS/usa_00011.csv")
@@ -72,13 +67,12 @@ str(ACS_2022)
 ##  $ Metro     : chr  "Not in identifiable area" "Not in identifiable area" "Baltimore-Columbia-Towson, MD" "Baltimore-Columbia-Towson, MD" ...
 ##  $ Occupation: chr  "N/A (not applicable)" "N/A (not applicable)" "N/A (not applicable)" "N/A (not applicable)" ...
 ```
-
 I Asked for a dozen or so columns, plus IPUMS gives you some extras, like DEGFIELDD (which is a detailed code of DEGFIELD (degree field)). Make sure you ask for Person- and/or Household- weights, depending on what type of analysis you want to do. 
 
-In this project I'm interested in what types of occupations tend to agglomerate (or are diffuse) in particular places. Or, perhaps, what kind of places attract particular occupations. In the long run, I'll want to use this data to see if the pandemic had any real effect occupational diffusion. 
+In this project I'm interested in what types of occupations tend to agglomerate (or are diffuse) in particular places. Or, perhaps, what kind of places attract particular occupations. In the long run, I'll want to use this data to see if the pandemic had any real effect on occupational diffusion. 
 
 ## Data Preparation
-Because I'm interested in Metro Areas and Occupations, the first step will be to add the labels to these codes. Rather than manually recoding these variables, however (There are 282 Metro codes and 500+ occupation codes), we'll recode by merging a list. 
+Because I'm interested in Metro Areas and Occupations, the first step will be to add the labels to these codes. Rather than manually recoding these variables however (There are 282 Metro codes and 500+ occupation codes), we'll recode by merging a list. 
 
 The trick is to copy/paste the code book to a excel file, save as a .csv, and then merge on the numeric code. 
 
@@ -110,9 +104,7 @@ occ_labels<-read.csv("ACS PUMS/Occ_Names.csv")
 ACS_2022<-merge(ACS_2022, occ_labels, by="OCC", all.x=TRUE)
 ```
 
-## Where are the artists (in the data)?
-I am especially interested in where artists live. Art is a "reputational career field." Its practitioners might locate where the action is, not where there are "jobs" per se. On the other hand, a decade or so ago the "creative city" mantra made attracting artists an urban planning priority. 
-
+### Where are the artists (in the data)?
 The OCC (Occupation) code for "Artists and Related Workers" is 2600
 
 ``` r
@@ -132,7 +124,7 @@ sum(ACS_2022$PERWT[ACS_2022$OCC==2600])
 ```
 ## [1] 354607
 ```
-which theoretically represent (i.e., with person weights) 354,607 artists.
+... which theoretically represent (i.e., with person weights) 354,607 artists.
 
 But there are many arts or arts-adjacent occupations, including:
 
@@ -150,9 +142,9 @@ But there are many arts or arts-adjacent occupations, including:
 2850: Writers and Authors
 2910: Photographers
 
-Of course not all arts fields are the same, and each may have a different relationship to place. The film industry is famously centered around Hollywood, while writers and/or photographers might not have a distinct occupational center. So lets include all the disciplines in our study and we'll note the differences if we see any. 
+Not all arts fields are the same, and each may have a different relationship to place. The film industry is famously centered around Hollywood, while writers and/or photographers might not have a distinct occupational center. So lets include all the disciplines in our study and you can note the differences if you see any. 
 
-## Aggregate arts occupation populations for each Metro area. 
+### Aggregate arts occupation populations for each Metro area. 
 First, I subset our arts occupations: Rows that have a specific OCC code, and all columns (for now).
 
 ``` r
@@ -160,9 +152,9 @@ Art_occ_dt<-ACS_2022[ACS_2022$OCC %in% c(2600,2631,2632,2634,2635,2640,2700,2710
 					 2740,2751,2752,2850,2910),]
 ```
 
-Next, I aggregate by summing each occupation within each Metro, being sure to use the per/person weights provided in the dataset (Note: the ACS weights are calculated for the 5-year dataset and should only be used as such. They mean little in 1% samples and nothing on their own).
+Next, I aggregate by summing each occupation within each Metro, being sure to use the per/person weights provided in the dataset (Note: the ACS weights are calculated for the 5-year dataset and should only be used as such).
 
-I will take the liberty of dividing the occupations as I want. For example, I'm grouping musicians, singers and composers, and I'm separating fashion designers and graphic designers from "other designers".
+I will take the liberty of dividing the occupation categories as I want. For example, I'm grouping musicians, singers and composers, and I'm separating fashion designers and graphic designers from "other designers".
 
 ``` r
 library(dplyr)
@@ -183,15 +175,14 @@ Arts_agg<-Art_occ_dt %>%
 	)
 ```
 
-To see whether or not a metro arts population is not simply a function of that city's size, I construct a *relative* measure that accounts for Metro size. I calculate a Location Quotient (LQ) as the relative share of each art occupation in a city vs. compared to their portion of the national work force. That is: LQ = (local occupation population/local total labor force)/(national occupation population/national total labor force).
+To see whether or not a metro artist population is not simply a function of that city's size, I construct a *relative* measure that accounts for Metro size. I calculate a Location Quotient (LQ) as the relative share of each art occupation in a city compared to their portion of the national work force. That is: LQ = (local occupation population/local total labor force)/(national occupation population/national total labor force).
 
-It is easily interpreted as the [X-local arts population] LQ*times* the national average. 
-
+The L.Q. is easily interpreted as the [X-local arts population] LQ*times* the national average. For example, there are six times the number or artists in Santa Fe, compared to the average U.S. metro area. 
 
 ``` r
 # Calculate National Total Labor Force
 NAT_TOT_LABOR_FORCE<-sum(ACS_2022$PERWT[ACS_2022$OCC>0])
-# OCC>0 ensures that we're counting the labor force (i.e., has an occupational code), not the whole population. 
+# OCC>0 ensures that we're comparing artists to others in the labor force (i.e., has an occupational code), not the whole population. 
 
 # Calculate Metro labor force (a sum of workforce in each Metro)
 metro_labor_force<-ACS_2022 %>%
@@ -234,10 +225,4 @@ setwd("C:/Dat_Sci/Data Projects/ACS_Where_Arts")
 write.csv(Arts_all, "Arts_all.csv")
 ```
 
-Now we're ready to viz. See you in Tableau.
-You can select among artist occupations at the top left and rank order by Metro occupation size OR by LQ on the right.
 
-<iframe seamless frameborder="0" src="https://public.tableau.com/views/WheredoArtistsLive/WheredoArtistsLive?:embed=yes&:display_count=yes&:showVizHome=no" width = '1400' height = '900'></iframe>
-
-For a more responsive dashboard, please visit my Tableau public viz here: 
-[Where do Artists Live?](https://public.tableau.com/app/profile/samuel.shaw2748/viz/WheredoArtistsLive/WheredoArtistsLive)
