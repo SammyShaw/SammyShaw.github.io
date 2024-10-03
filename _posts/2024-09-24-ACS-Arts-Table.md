@@ -7,6 +7,7 @@ tags: [Large Dataset, Data Cleaning, Visualization, Tableau]
 
 ## Summary
 This project demonstrates 1. Visualization using Tableau, and 2. Getting and cleaning a large dataset.
+
 One of my pet research questions is: Why and where do (some) occupations agglomerate? Or, what kinds of places attract particular jobs? Arts occupations are particularly interesting, becuase the rewards are often reputational rather than economic, and the benefits of place include the presence of markets, scenes, and the status associated with a place itself. That is, artists might locate where the action is, not where there are "jobs." On the other hand, a decade or so ago the "creative city" mantra made attracting artists an urban planning priority. 
 
 In this demonstration, we'll view artist location patterns by discipline, including their 'relative' metro distributions. In the long run, I'll want to use this data to see if the pandemic had any real effect on occupational diffusion. 
