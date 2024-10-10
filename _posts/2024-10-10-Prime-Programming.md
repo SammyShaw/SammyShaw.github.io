@@ -1,6 +1,6 @@
 ---
 layout: post
-title: R vs Python Prime Programming
+title: Prime Programming  R vs. Python
 image: "/posts/prime_poster.jpg"
 tags: [Python, R, Primes, Programming]
 ---
