@@ -1,11 +1,9 @@
-
-
-
-
-Prime Programming: R vs. Python
-================
-Sammy Shaw
-2024-10-10
+---
+layout: post
+title: Prime Programming: R vs. Python
+image: "/posts/prime_poster.jpg"
+tags: [Python, R, Primes, Programming]
+---
 
 ## Summary
 
