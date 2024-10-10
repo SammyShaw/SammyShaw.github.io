@@ -1,8 +1,8 @@
 ---
-title: "Primes.Rmd"
-author: "Sammy Shaw"
-date: "2024-10-10"
-output: html_document
+layout: post
+title: R vs. Python: Finding Prime Numbers
+image: "/posts/prime_poster.jpg"
+tags: [Python, R, Primes, Programming]
 ---
 
 ```{r setup, include=FALSE}
