@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Portfolio Under Construction
-image: "/posts/under_construction.jpg"
+title: Qualitative
+image: "/posts/mad_science.jpg.jpg"
 tags: [bricks]
 ---
 
@@ -9,14 +9,12 @@ Its all data
 
 #### Qualitative Data
 
-![alt text](/img/posts/.jpg "Art Collaboration")
+![alt text](/img/posts/mad_science.jpg "Art Collaboration")
 
-![alt text](/img/posts/.jpg "Piles of Bricks")
+![alt text](/img/posts/mad_sciene3.jpg "Dissertation")
 
-![alt text](/img/posts/.jpg "Piles of Bricks")
+![alt text](/img/posts/mad_science4.jpg "Field Notes")
 
-![alt text](/img/posts/.jpg "Piles of Bricks")
+![alt text](/img/posts/q_data1.jpg "Photo from Seattle")
 
-![alt text](/img/posts/.jpg "Piles of Bricks")
 
-![alt text](/img/posts/.jpg "Piles of Bricks")
