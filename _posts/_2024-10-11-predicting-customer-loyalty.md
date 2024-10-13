@@ -101,9 +101,9 @@ import pandas as pd
 import pickle
 
 # import required data tables
-loyalty_scores = ...
-customer_details = ...
-transactions = ...
+loyalty_scores = pd.read_excel("data/grocery_database.xlsx", sheet_name = "loyalty_scores")
+customer_details = pd.read_excel("data/grocery_database.xlsx", sheet_name = "customer_details")
+transactions = pd.read_excel("data/grocery_database.xlsx", sheet_name = "transactions")
 
 # merge loyalty score data and customer details data, at customer level
 data_for_regression = pd.merge(customer_details, loyalty_scores, how = "left", on = "customer_id")
@@ -158,11 +158,9 @@ ___
 <br>
 # Modelling Overview
 
-We will build a model that looks to accurately predict the “loyalty_score” metric for those customers that were able to be tagged, based upon the customer metrics listed above.
+If we can build a model that accuractly predicts loyalty scores for the customers for whom we have that data, then we can use this model to predict the customer loyalty score for the customers that do not. 
 
-If that can be achieved, we can use this model to predict the customer loyalty score for the customers that were unable to be tagged by the agency.
-
-As we are predicting a numeric output, we tested three regression modelling approaches, namely:
+In machine learning form, we do so by subsetting our modeling data into a training set and a test set. We will then train and test the model using the three approaches:
 
 * Linear Regression
 * Decision Tree
@@ -233,9 +231,13 @@ data_for_model.dropna(how = "any", inplace = True)
 <br>
 ##### Outliers
 
-The ability for a Linear Regression model to generalise well across *all* data can be hampered if there are outliers present.  There is no right or wrong way to deal with outliers, but it is always something worth very careful consideration - just because a value is high or low, does not necessarily mean it should not be there!
+Because Linear Regression models can be sensitive to outliers, we want to know how extreme our variations are. 
 
-In this code section, we use **.describe()** from Pandas to investigate the spread of values for each of our predictors.  The results of this can be seen in the table below.
+The table below is contructed from the output of: 
+
+```python
+outlier_investigation_output = data_for_model.describe()
+```
 
 <br>
 
@@ -250,20 +252,15 @@ In this code section, we use **.describe()** from Pandas to investigate the spre
 | max | 44.37 | 0.88 | 9878.76 | 1187.00 | 109.00 | 5.00 | 102.34 |
 
 <br>
-Based on this investigation, we see some *max* column values for several variables to be much higher than the *median* value.
-
-This is for columns *distance_from_store*, *total_sales*, and *total_items*
+We note that the *max* values are much higher than the *median* value in the columns *distance_from_store*, *total_sales*, and *total_items*.
 
 For example, the median *distance_to_store* is 1.645 miles, but the maximum is over 44 miles!
 
-Because of this, we apply some outlier removal in order to facilitate generalisation across the full dataset.
-
-We do this using the "boxplot approach" where we remove any rows where the values within those columns are outside of the interquartile range multiplied by 2.
+We'll remove these to facilitate linear generalizabilty using the "boxplot approach", removing rows where the values within those columns are outside of the interquartile range multiplied by 2.
 
 <br>
 ```python
 
-outlier_investigation = data_for_model.describe()
 outlier_columns = ["distance_from_store", "total_sales", "total_items"]
 
 # boxplot approach
@@ -288,7 +285,7 @@ for column in outlier_columns:
 
 In the next code block we do two things, we firstly split our data into an **X** object which contains only the predictor variables, and a **y** object that contains only our dependent variable.
 
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training.  In this case, we have allocated 80% of the data for training, and the remaining 20% for validation.
+Next, we split our data into training and test sets. We'll allocate 80% of the data for training, and the remaining 20% for validation.
 
 <br>
 ```python
@@ -305,15 +302,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 <br>
 ##### Categorical Predictor Variables
 
-In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
+In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and missing values have already been removed. 
 
-The Linear Regression algorithm can't deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
+For our Linear Regression model, we'll need to recode this as a numeric, "dummy" variable, of 0s and 1s. Because we only have two values in our column, we can simply recode one group = 1 and the other = 0. For variables with multiple nominal categories, we would need to add additional columns, while withholding one category as a reference group. In our case, we can think of our recode as a Male column in relation to Female. The output will be interpreted as the effect of being Male. 
 
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - one appropriate approach is to apply One Hot Encoding to the categorical column.
-
-One Hot Encoding can be thought of as a way to represent categorical variables as binary vectors, in other words, a set of *new* columns for each categorical value with either a 1 or a 0 saying whether that value is true or not for that observation.  These new columns would go into our model as input variables, and the original column is discarded.
-
-We also drop one of the new columns using the parameter *drop = "first"*.  We do this to avoid the *dummy variable trap* where our newly created encoded columns perfectly predict each other - and we run the risk of breaking the assumption that there is no multicollinearity, a requirement or at least an important consideration for some models, Linear Regression being one of them! Multicollinearity occurs when two or more input variables are *highly* correlated with each other, it is a scenario we attempt to avoid as in short, while it won't neccessarily affect the predictive accuracy of our model, it can make it difficult to trust the statistics around how well the model is performing, and how much each input variable is truly having.
+We'll use the One_Hot_Encoder function in Python's scikitlearn package to do this. And we'll do so in a way that provides a template for future recoding. 
 
 In the code, we also make sure to apply *fit_transform* to the training set, but only *transform* to the test set.  This means the One Hot Encoding logic will *learn and apply* the "rules" from the training data, but only *apply* them to the test data.  This is important in order to avoid *data leakage* where the test set *learns* information about the training data, and means we can't fully trust model performance metrics!
 
@@ -326,7 +319,7 @@ For ease, after we have applied One Hot Encoding, we turn our training and test 
 categorical_vars = ["gender"]
 
 # instantiate OHE class
-one_hot_encoder = OneHotEncoder(sparse=False, drop = "first")
+one_hot_encoder = OneHotEncoder(sparse_output=False, drop = "first")
 
 # apply OHE
 X_train_encoded = one_hot_encoder.fit_transform(X_train[categorical_vars])
@@ -349,15 +342,10 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 <br>
 ##### Feature Selection
 
-Feature Selection is the process used to select the input variables that are most important to your Machine Learning task.  It can be a very important addition or at least, consideration, in certain scenarios.  The potential benefits of Feature Selection are:
+In our data, we are only dealing with 8 independent variables, and because prediction accuracy is our goal, we might safely test all of our models with all inputs. But Feature Selection should be included as a matter of methodological rigor. Feature Selection can help us **improve model accuracy** if there is "noise" and/or multicolinearity among input variables. For Big Data analysis, selecting the right features can also help train models more **efficiently.** But my favorite reason is that Feature Selection helps us to interpret and explain what models are doing. Although in this project we're aiming for predictive accuracy over **parsimony,** at a human level we tell stories with data one variable at a time. 
 
-* **Improved Model Accuracy** - eliminating noise can help true relationships stand out
-* **Lower Computational Cost** - our model becomes faster to train, and faster to make predictions
-* **Explainability** - understanding & explaining outputs for stakeholder & customers becomes much easier
+In this project, we'll use a method called *Recursive Feature Elimination With Cross Validation (RFECV)* which starts with all input variables in a model, and then iteratively removes those with the weakest relationships with the output variable. To cross-validate, we then split the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately. This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was. From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use! RFECV is easily carried out using scikitlearn, and follows the same coding structure as other functions, so for all that is going on under the hood, it is rather convienient and easy to perform.
 
-There are many, many ways to apply Feature Selection.  These range from simple methods such as a *Correlation Matrix* showing variable relationships, to *Univariate Testing* which helps us understand statistical relationships between variables, and then to even more powerful approaches like *Recursive Feature Elimination (RFE)* which is an approach that starts with all input variables, and then iteratively removes those with the weakest relationships with the output variable.
-
-For our task we applied a variation of Reursive Feature Elimination called *Recursive Feature Elimination With Cross Validation (RFECV)* where we split the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately.  This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was.  From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
 
 <br>
 ```python
