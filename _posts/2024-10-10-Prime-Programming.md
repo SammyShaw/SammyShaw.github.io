@@ -12,8 +12,7 @@ two programming problem. Beyond simple looping and conditional
 functions, it requires some understanding of control flow, basic
 algorithms, and optimization.
 
-Although I’m not the first to demonstrate this problem (you can google
-it), the demo here serves as a benchmark in my beginning programming
+Although I’m not the first to demonstrate this problem, the demo here serves as a benchmark in my beginning programming
 journey. Honestly, this problem gave me a headache for weeks. When I did
 figure it out, I learned that my “simple” method was inefficient in
 terms of computing time. The optimal method - the Sieve of
@@ -32,18 +31,17 @@ list of prime numbers between 2 and 20 includes: \[2, 3, 5, 7, 11, 13,
 17, 19\].
 
 Each number in the returned set is proven to be a prime by dividing
-every number *i* in that set by every number lower than *i* and
-returning a whole number.
+every number *i* in that set by every number lower than *i* (starting with 2) and not getting
+a whole number. For example, 5 divided by neither 2, 3, nor 4, produces a whole number.
 
-Actually, not by *every* lower number: We already know that all numbers
-are divisible by 1, and we only need to check divisors up to the square
-root of the n, because any larger divisor would already have a
+But, we do not need to divide by *every* lower number: we only need to check divisors up to the square
+root of *i*, because any larger divisor would already have a
 corresponding lower divisor.
 
 So, we can test if a number *i* is a prime by dividing it by every whole
 number in the range 2:sqrt(*i*). Great, and we have to do that for every
 number in the range 2 through n.  
-Then, we just have to return a list of each prime in the set. Sounds
+Then, we just have to return a list of each prime number in the set. Sounds
 simple?!
 
 This means our function has to:
@@ -61,15 +59,17 @@ Ok? lets go…
 # First, a function that will test if a number is a prime by dividing it from the set [i in 2:sqrt(i)]
 
 is_prime <- function(n) {
-    if (n==2) return(TRUE)
-    for (i in 2:sqrt(n)) {
-        if (n %% i == 0) return(FALSE) # In R, %% returns a remainder after dividing. So basically were asking it rule out non-whole numbers after dividing each i through the sequence 2 through sqrt(n) 
+    if (n<2) return(FALSE)
+    if (n==2) return(TRUE) # 2 is not a prime, but the function won't work on 2 unless we explicitly name it.
+        for (i in 2:sqrt(n)) {
+            if (n %% i == 0) return(FALSE) # In R, %% returns a remainder after dividing. So basically were asking it rule out non-whole numbers after dividing     each i through the sequence 2 through sqrt(n) 
     }
     return(TRUE)
 }
 
+# Second, apply the is_prime() test to each i in 2:n. 
 r_primes<-function(n) {
-    primes<-NULL
+    primes<-NULL # initializing a an empty array that will be appended whenever a prime is found.
     for (i in 2:n) {
         if(is_prime(i)) {
             primes<-c(primes,i)
@@ -99,7 +99,7 @@ In Python, the same code structure looks like:
 def is_prime(n): 
     
     if n < 2: 
-        return False # This ensures that one and zero return False
+        return False # This ensures that one and zero return False; 
     
     if n == 2: 
         return True 
@@ -108,7 +108,7 @@ def is_prime(n):
         if n % i == 0: 
             return False 
         
-    return True # i.e., if there are no divisors other than 1 and n. 
+    return True 
 
 def py_primes(n):
     
@@ -147,7 +147,7 @@ well. In other words, instead of dividing, we simplify the problem by
 eliminating multiples. It’s easy for a human to return primes 1-20
 because we minimize the number of tests that we need to make. We can
 turn the problem requiring about 60 calculations into one that requires
-about 8. In fact, for any given set 1:n, we don’t have to loop n times
+about 4. In fact, for any given set 1:n, we don’t have to loop n times
 to figure out which numbers are primes. We can use the fact that our
 divisor becomes redunant by the time we get to the square root of n. We
 only need to eliminate multiples up to the square root of n! For example
