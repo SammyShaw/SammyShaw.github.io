@@ -11,7 +11,7 @@ Its all data
 
 ![alt text](/img/posts/mad_science.jpg "Art Collaboration")
 
-![alt text](/img/posts/mad_sciene3.jpg "Dissertation")
+![alt text](/img/posts/mad_science3.jpg "Dissertation")
 
 ![alt text](/img/posts/mad_science4.jpg "Field Notes")
 
