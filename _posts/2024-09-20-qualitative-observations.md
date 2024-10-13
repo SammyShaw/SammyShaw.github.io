@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Qualitative
+title: Qualitative Observations
 image: "/posts/mad_science.jpg.jpg"
 tags: [bricks]
 ---
