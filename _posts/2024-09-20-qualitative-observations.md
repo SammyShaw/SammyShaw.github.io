@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Qualitative Observations
-image: "/posts/mad_science.jpg.jpg"
-tags: [bricks]
+image: "/posts/mad_science2.jpg"
+tags: [Art, Qualitative]
 ---
 
 Its all data!
