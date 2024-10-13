@@ -304,7 +304,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and missing values have already been removed. 
 
-For our Linear Regression model, we'll need to recode this as a numeric, "dummy" variable, of 0s and 1s. Because we only have two values in our column, we can simply recode one group = 1 and the other = 0. For variables with multiple nominal categories, we would need to add additional columns, while withholding one category as a reference group. In our case, we can think of our recode as a Male column in relation to Female. The output will be interpreted as the effect of being Male. 
+For our Linear Regression model, we'll need to recode this as a numeric, "dummy" variable, of 0s and 1s. Because we only have two values in our column, we can simply recode one group = 1 and the other = 0. For variables with multiple nominal categories, we would need to add additional columns, while withholding one category as a reference group. In our case, we can think of our recode as a Male column in relation to Female. The output will be interpreted as the effect of being Male. But if we also had *gender* = "T" or "Q" for example, we could code T = 1, else 0, and Q = 1, else 0, both in additional columns, alongside Male, and we would still interpret these as the effect of being "T" or "Q" in relation to being Female (the reference group).
 
 We'll use the One_Hot_Encoder function in Python's scikitlearn package to do this. And we'll do so in a way that provides a template for future recoding. 
 
