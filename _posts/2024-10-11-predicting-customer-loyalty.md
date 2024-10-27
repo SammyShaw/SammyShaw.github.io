@@ -507,7 +507,7 @@ print(model.summary())
 The information from that code block can be found in the table below:
 <br>
 
-| **input_variable** | **coefficient** | **p-value** * = < 0.05, ** = < 0.01 |
+| **input_variable** | **coefficient** | **p-value**, * = < 0.05, ** = < 0.01 |
 |---|---|---|
 | intercept | 0.516 | ** |
 | distance_from_store | -0.201 | ** |
@@ -520,17 +520,19 @@ The information from that code block can be found in the table below:
 | gender_M | -0.013 |  |
 
 <br>
-The coefficient value for each of the input variables, along with that of the intercept would make up the equation for the line of best fit for this particular model (or more accurately, in this case it would be the plane of best fit, as we have multiple input variables).
+Again, because the objective here is prediction rather than interpretation, I will try not to digress too far here. However, we can use these coefficients, in conjunction with the p-values, to interpret *how* the model is making its predictions. Although not shown here, distance_from_store has the lowest p-value, and the furthest t-statistic, which flags it as the most significant predictor variable. 
 
-For each input variable, the coefficient value we see above tells us, with *everything else staying constant* how many units the output variable (loyalty score) would change with a *one unit change* in this particular input variable.
+The *distance_from_store* coefficient value of -0.201 tells us that *loyalty_score* decreases by 0.201 (or 20% as loyalty score is a percentage) for *every additional mile* that a customer lives from the store.  This makes intuitive sense, as customers who live a long way from this store, most likely live near *another* store where they might do some of their shopping as well, whereas customers who live near this store, probably do a greater proportion of their shopping at this store...and hence have a higher loyalty score.
 
-To provide an example of this - in the table above, we can see that the *distance_from_store* input variable has a coefficient value of -0.201.  This is saying that *loyalty_score* decreases by 0.201 (or 20% as loyalty score is a percentage, or at least a decimal value between 0 and 1) for *every additional mile* that a customer lives from the store.  This makes intuitive sense, as customers who live a long way from this store, most likely live near *another* store where they might do some of their shopping as well, whereas customers who live near this store, probably do a greater proportion of their shopping at this store...and hence have a higher loyalty score!
+Other variables such as total items and total sales are statistically significant, but their actual effects appear small. For example, it appears that loyalty score improves by only a tenth of a percent for each additional item a customer purchases. On the other hand, although the model returns a coefficient for gender, it is not statistically significant, and thus the effect of being in the "M" category is meaningless. 
 
 ___
 <br>
 # Decision Tree <a name="regtree-title"></a>
 
-We will again utlise the scikit-learn library within Python to model our data using a Decision Tree. The code sections below are broken up into 4 key sections:
+Next, I'll use the scikit-learn library in Python to model the data using a Decision Tree. Decision Trees work by splitting the predictor variables into branches according to how well they explain the dependent variable, and it continues to split each branch until it has predicted every value of the depenent variable, or until it is told to stop. If some of the input variables are not linearly related to the output, but may be related in a "U-shaped" curve, for example, then the decision tree will pick up on this type of relationship whereas a Linear Regression model will not. On the other hand, if all of the input are normally distributed and linearly related, then a Decision Tree would only approximate the linear relationship, and it would be less precise. We will know if it is more or less effective by comparing the adjusted R-squared metric for this and other models. 
+
+The Decision Tree code is organized in the same 4 key sections:
 
 * Data Import
 * Data Preprocessing
@@ -540,7 +542,7 @@ We will again utlise the scikit-learn library within Python to model our data us
 <br>
 ### Data Import <a name="regtree-import"></a>
 
-Since we saved our modelling data as a pickle file, we import it.  We ensure we remove the id column, and we also ensure our data is shuffled.
+Same as in the Linear Regression model, above, I import the pickel file, remove the id column, and shuffle the data. The only difference here is the use of scikitlearn's Decision Tree functionality.
 
 ```python
 
@@ -567,15 +569,10 @@ data_for_model = shuffle(data_for_model, random_state = 42)
 <br>
 ### Data Preprocessing <a name="regtree-preprocessing"></a>
 
-While Linear Regression is susceptible to the effects of outliers, and highly correlated input variables - Decision Trees are not, so the required preprocessing here is lighter. We still however will put in place logic for:
-
-* Missing values in the data
-* Encoding categorical variables to numeric form
+While Linear Regression is susceptible to the effects of outliers, and highly correlated input variables - Decision Trees are not, so the required preprocessing here is lighter. The logic of the steps below is the same as the above for Linear Regression, so my comments are limited. 
 
 <br>
 ##### Missing Values
-
-The number of missing values in the data was extremely low, so instead of applying any imputation (i.e. mean, most common value) we will just remove those rows
 
 ```python
 
@@ -587,10 +584,6 @@ data_for_model.dropna(how = "any", inplace = True)
 
 <br>
 ##### Split Out Data For Modelling
-
-In exactly the same way we did for Linear Regression, in the next code block we do two things, we firstly split our data into an **X** object which contains only the predictor variables, and a **y** object that contains only our dependent variable.
-
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training.  In this case, we have allocated 80% of the data for training, and the remaining 20% for validation.
 
 <br>
 ```python
@@ -606,12 +599,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 <br>
 ##### Categorical Predictor Variables
-
-In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
-
-Just like the Linear Regression algorithm, the Decision Tree cannot deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
-
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - we would again apply One Hot Encoding to the categorical column.
 
 <br>
 ```python
@@ -643,7 +630,7 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 <br>
 ### Model Training <a name="regtree-model-training"></a>
 
-Instantiating and training our Decision Tree model is done using the below code.  We use the *random_state* parameter to ensure we get reproducible results, and this helps us understand any improvements in performance with changes to model hyperparameters.
+Instantiating and training the Decision Tree model is done using the below code. The *random_state* parameter ensures that the results are reproducible, and this helps to understand any improvements in performance with changes to model hyperparameters.
 
 ```python
 
@@ -660,8 +647,6 @@ regressor.fit(X_train, y_train)
 
 ##### Predict On The Test Set
 
-To assess how well our model is predicting on new data - we use the trained model object (here called *regressor*) and ask it to predict the *loyalty_score* variable for the test set
-
 ```python
 
 # predict on the test set
@@ -671,8 +656,6 @@ y_pred = regressor.predict(X_test)
 
 <br>
 ##### Calculate R-Squared
-
-To calculate r-squared, we use the following code where we pass in our *predicted* outputs for the test set (y_pred), as well as the *actual* outputs for the test set (y_test)
 
 ```python
 
@@ -687,15 +670,7 @@ The resulting r-squared score from this is **0.898**
 <br>
 ##### Calculate Cross Validated R-Squared
 
-As we did when testing Linear Regression, we will again utilise Cross Validation.
-
-Instead of simply dividing our data into a single training set, and a single test set, with Cross Validation we break our data into a number of "chunks" and then iteratively train the model on all but one of the "chunks", test the model on the remaining "chunk" until each has had a chance to be the test set.
-
-The result of this is that we are provided a number of test set validation results - and we can take the average of these to give a much more robust & reliable view of how our model will perform on new, un-seen data!
-
-In the code below, we put this into place.  We again specify that we want 4 "chunks" and then we pass in our regressor object, training set, and test set.  We also specify the metric we want to assess with, in this case, we stick with r-squared.
-
-Finally, we take a mean of all four test set results.
+As with the Linear Regression, we can again cross validate the results by splitting the data into different training and test sets, training and testing the model "k" times, deriving "k" r-squared scores, and then taking the mean of the results.
 
 ```python
 
@@ -711,8 +686,6 @@ The mean cross-validated r-squared score from this is **0.871** which is slighte
 <br>
 ##### Calculate Adjusted R-Squared
 
-Just like we did with Linear Regression, we will also calculate the *Adjusted R-Squared* which compensates for the addition of input variables, and only increases if the variable improves the model above what would be obtained by probability.
-
 ```python
 
 # calculate adjusted r-squared for our test set predictions
@@ -725,13 +698,13 @@ print(adjusted_r_squared)
 The resulting *adjusted* r-squared score from this is **0.887** which as expected, is slightly lower than the score we got for r-squared on it's own.
 
 <br>
-### Decision Tree Regularisation <a name="regtree-model-regularisation"></a>
+### Decision Tree Regularization <a name="regtree-model-regularisation"></a>
 
-Decision Tree's can be prone to over-fitting, in other words, without any limits on their splitting, they will end up learning the training data perfectly.  We would much prefer our model to have a more *generalised* set of rules, as this will be more robust & reliable when making predictions on *new* data.
+Another drawback of Decision Trees is that they can "over-fit". Unless the algorithm is given some limiting parameters, it will exhaust all possible splits in the data until it has explained every case of the dependent variable. But it if learns the training data too well, it might not be able to handle real-world, unseen data. It is better to have a model that is more flexible and can make effective generalizations about unseen data. 
 
-One effective method of avoiding this over-fitting, is to apply a *max depth* to the Decision Tree, meaning we only allow it to split the data a certain number of times before it is required to stop.
+One effective method of avoiding this over-fitting, is to apply a *max depth* parameter to the Decision Tree, meaning we only allow it to split the data a certain number of times before it is required to stop.
 
-Unfortunately, we don't necessarily know the *best* number of splits to use for this - so below we will loop over a variety of values and assess which gives us the best predictive performance!
+Where to set the maximum depth, however, is not obvious. One method, shown below, loops over a variety of max-depth values, runs the model with each max depth, and assesses which gives us the best predictive performance!
 
 <br>
 ```python
@@ -756,6 +729,13 @@ max_accuracy = max(accuracy_scores)
 max_accuracy_idx = accuracy_scores.index(max_accuracy)
 optimal_depth = max_depth_list[max_accuracy_idx]
 
+```
+
+<br>
+Now we can visualize this max depth test.
+
+```python
+
 # plot accuracy by max depth
 plt.plot(max_depth_list,accuracy_scores)
 plt.scatter(optimal_depth, max_accuracy, marker = "x", color = "red")
@@ -766,19 +746,17 @@ plt.tight_layout()
 plt.show()
 
 ```
-<br>
-That code gives us the below plot - which visualises the results!
 
 <br>
 ![alt text](/img/posts/regression-tree-max-depth-plot.png "Decision Tree Max Depth Plot")
 
 <br>
-In the plot we can see that the *maximum* classification accuracy on the test set is found when applying a *max_depth* value of 7.  However, we lose very little accuracy back to a value of 4, but this would result in a simpler model, that generalised even better on new data.  We make the executive decision to re-train our Decision Tree with a maximum depth of 4!
+In the plot we can see that the *maximum* classification accuracy on the test set is found when applying a *max_depth* value of 7.  However, we lose very little accuracy back to a value of 4, but this would result in a simpler model, that generalizes even better on new data.  We make the executive decision to re-train our Decision Tree with a maximum depth of 4.
 
 <br>
-### Visualise Our Decision Tree <a name="regtree-visualise"></a>
+### Visualize Our Decision Tree <a name="regtree-visualise"></a>
 
-To see the decisions that have been made in the (re-fitted) tree, we can use the plot_tree functionality that we imported from scikit-learn.  To do this, we use the below code:
+To see the decisions that have been made in the (re-fitted) tree, we can use the plot_tree functionality that we imported from scikit-learn.
 
 <br>
 ```python
@@ -803,25 +781,24 @@ That code gives us the below plot:
 ![alt text](/img/posts/regression-tree-nodes-plot.png "Decision Tree Max Depth Plot")
 
 <br>
-This is a very powerful visual, and one that can be shown to stakeholders in the business to ensure they understand exactly what is driving the predictions.
-
-One interesting thing to note is that the *very first split* appears to be using the variable *distance from store* so it would seem that this is a very important variable when it comes to predicting loyalty!
-
+This is a very powerful visual that helps us interpret what the model is doing 'under the hood', which can be useful for stakeholders. Like in the Linear Regression Model's coefficient output, we can interpret the model's predictions, but here the findings are even more intuitive. For example, most of the variance in customer loyalty can be found by splitting the data between those who live less than or equal to 1.975 miles from the store. 
 ___
 <br>
 # Random Forest <a name="rf-title"></a>
 
-We will again utlise the scikit-learn library within Python to model our data using a Random Forest. The code sections below are broken up into 4 key sections:
+Finally, I'll use the scikit-learn library in Python to model the data using a Random Forest. Random Forest models are ensembles of many decision trees, in which the data are randomized and limited from tree to tree, thereby forcing each tree in the forest to make a slightly different prediction. The algorithm then finds a consensus among the trees to make decisions and how and where to split the data. 
+
+The code sections below are broken up into 4 key sections:
 
 * Data Import
 * Data Preprocessing
 * Model Training
 * Performance Assessment
 
+Again, because the logic is similar from section to section, my comments are truncated for brevity. 
+
 <br>
 ### Data Import <a name="rf-import"></a>
-
-Again, since we saved our modelling data as a pickle file, we import it.  We ensure we remove the id column, and we also ensure our data is shuffled.
 
 ```python
 
@@ -849,15 +826,13 @@ data_for_model = shuffle(data_for_model, random_state = 42)
 <br>
 ### Data Preprocessing <a name="rf-preprocessing"></a>
 
-While Linear Regression is susceptible to the effects of outliers, and highly correlated input variables - Random Forests, just like Decision Trees, are not, so the required preprocessing here is lighter. We still however will put in place logic for:
+Random Forests, just like Decision Trees, are not influenced by outliers, so the required preprocessing here is lighter.
 
 * Missing values in the data
 * Encoding categorical variables to numeric form
 
 <br>
 ##### Missing Values
-
-The number of missing values in the data was extremely low, so instead of applying any imputation (i.e. mean, most common value) we will just remove those rows
 
 ```python
 
@@ -869,10 +844,6 @@ data_for_model.dropna(how = "any", inplace = True)
 
 <br>
 ##### Split Out Data For Modelling
-
-In exactly the same way we did for Linear Regression, in the next code block we do two things, we firstly split our data into an **X** object which contains only the predictor variables, and a **y** object that contains only our dependent variable.
-
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training.  In this case, we have allocated 80% of the data for training, and the remaining 20% for validation.
 
 <br>
 ```python
@@ -888,12 +859,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 <br>
 ##### Categorical Predictor Variables
-
-In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
-
-Just like the Linear Regression algorithm, Random Forests cannot deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
-
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - we would again apply One Hot Encoding to the categorical column.
 
 <br>
 ```python
@@ -925,9 +890,9 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 <br>
 ### Model Training <a name="rf-model-training"></a>
 
-Instantiating and training our Random Forest model is done using the below code.  We use the *random_state* parameter to ensure we get reproducible results, and this helps us understand any improvements in performance with changes to model hyperparameters.
+Instantiating and training our Random Forest model is done using the below code.  
 
-We leave the other parameters at their default values, meaning that we will just be building 100 Decision Trees in this Random Forest.
+Other than setting the random_state to the familiar 42, all other parameters are set to their default values. Among other things, this means that our forest will be built from 100 Decision Trees.
 
 ```python
 
@@ -944,8 +909,6 @@ regressor.fit(X_train, y_train)
 
 ##### Predict On The Test Set
 
-To assess how well our model is predicting on new data - we use the trained model object (here called *regressor*) and ask it to predict the *loyalty_score* variable for the test set
-
 ```python
 
 # predict on the test set
@@ -955,8 +918,6 @@ y_pred = regressor.predict(X_test)
 
 <br>
 ##### Calculate R-Squared
-
-To calculate r-squared, we use the following code where we pass in our *predicted* outputs for the test set (y_pred), as well as the *actual* outputs for the test set (y_test)
 
 ```python
 
@@ -970,8 +931,6 @@ The resulting r-squared score from this is **0.957** - higher than both Linear R
 
 <br>
 ##### Calculate Cross Validated R-Squared
-
-As we did when testing Linear Regression & our Decision Tree, we will again utilise Cross Validation (for more info on how this works, please refer to the Linear Regression section above)
 
 ```python
 
@@ -987,8 +946,6 @@ The mean cross-validated r-squared score from this is **0.923** which agian is h
 <br>
 ##### Calculate Adjusted R-Squared
 
-Just like we did with Linear Regression & our Decision Tree, we will also calculate the *Adjusted R-Squared* which compensates for the addition of input variables, and only increases if the variable improves the model above what would be obtained by probability.
-
 ```python
 
 # calculate adjusted r-squared for our test set predictions
@@ -1003,29 +960,19 @@ The resulting *adjusted* r-squared score from this is **0.955** which as expecte
 <br>
 ### Feature Importance <a name="rf-model-feature-importance"></a>
 
-In our Linear Regression model, to understand the relationships between input variables and our ouput variable, loyalty score, we examined the coefficients.  With our Decision Tree we looked at what the earlier splits were.  These allowed us some insight into which input variables were having the most impact.
+In the Linear Regression model, to understand the relationships between input variables and our ouput variable, loyalty score, we examined the coefficients.  With our Decision Tree we looked at what the earlier splits were. These allowed us some insight into which input variables were having the most impact.
 
-Random Forests are an ensemble model, made up of many, many Decision Trees, each of which is different due to the randomness of the data being provided, and the random selection of input variables available at each potential split point.
+Because Random Forests are an ensemble of many Decision Trees, we end up with a powerful and robust model, but because of the random or different nature of all these Decision trees - the model gives us a unique insight into how important each of our input variables are to the overall model.  
 
-Because of this, we end up with a powerful and robust model, but because of the random or different nature of all these Decision trees - the model gives us a unique insight into how important each of our input variables are to the overall model.  
+So, in a Random Forest the *importance* of a feature is measured by asking *How much would accuracy decrease if a specific input variable was removed or randomized?*
 
-As we’re using random samples of data, and input variables for each Decision Tree - there are many scenarios where certain input variables are being held back and this enables us a way to compare how accurate the models predictions are if that variable is or isn’t present.
+If this decrease in accuracy is large, then we’d deem that input variable to be quite important, and if there is only a small decrease in accuracy, then we’d conclude that the variable is of less importance.
 
-So, at a high level, in a Random Forest we can measure *importance* by asking *How much would accuracy decrease if a specific input variable was removed or randomised?*
+There are a couple ways to go about this: **Feature Importance**, and **Permutation Importance** 
 
-If this decrease in performance, or accuracy, is large, then we’d deem that input variable to be quite important, and if we see only a small decrease in accuracy, then we’d conclude that the variable is of less importance.
+Feature Importance is where we find all nodes in the Decision Trees of the forest where a particular input variable is used to split the data and assess what the Mean Squared Error (for a Regression problem) was before the split was made, and compare this to the Mean Squared Error after the split was made.  We can take the *average* of these improvements across all Decision Trees in the Random Forest to get a score that tells us *how much better* we’re making the model by using that input variable. If we do this for *each* of our input variables, we can compare these scores and understand which is adding the most value to the predictive power of the model!
 
-At a high level, there are two common ways to tackle this.  The first, often just called **Feature Importance** is where we find all nodes in the Decision Trees of the forest where a particular input variable is used to split the data and assess what the Mean Squared Error (for a Regression problem) was before the split was made, and compare this to the Mean Squared Error after the split was made.  We can take the *average* of these improvements across all Decision Trees in the Random Forest to get a score that tells us *how much better* we’re making the model by using that input variable.
-
-If we do this for *each* of our input variables, we can compare these scores and understand which is adding the most value to the predictive power of the model!
-
-The other approach, often called **Permutation Importance** cleverly uses some data that has gone *unused* at when random samples are selected for each Decision Tree (this stage is called "bootstrap sampling" or "bootstrapping")
-
-These observations that were not randomly selected for each Decision Tree are known as *Out of Bag* observations and these can be used for testing the accuracy of each particular Decision Tree.
-
-For each Decision Tree, all of the *Out of Bag* observations are gathered and then passed through.  Once all of these observations have been run through the Decision Tree, we obtain an accuracy score for these predictions, which in the case of a regression problem could be Mean Squared Error or r-squared.
-
-In order to understand the *importance*, we *randomise* the values within one of the input variables - a process that essentially destroys any relationship that might exist between that input variable and the output variable - and run that updated data through the Decision Tree again, obtaining a second accuracy score.  The difference between the original accuracy and the new accuracy gives us a view on how important that particular variable is for predicting the output.
+Permutation Importance uses the data that has gone *unused* when the random samples are selected for each Decision Tree (each tree is "bootstrapped" from the training set, meaning it is sampled with replacement, so there will always be unused data in each tree. This unused data (i.e., not randomly selected) is known as *Out of Bag* observations and these can be used for testing the accuracy of each particular Decision Tree. For each Decision Tree, the *Out of Bag* observations are gathered and then passed through the same Tree models as if they were a second test set, and we can obtain an accuracy score, R-squared. Then, in order to understand the *importance* of a feature, we *randomize* the values within one of the input variables - a process that essentially destroys any relationship that might exist between that input variable and the output variable - and run that updated data through the Decision Tree again, obtaining a second accuracy score.  The difference between the original accuracy and the new accuracy gives us a view on how important that particular variable is for predicting the output.
 
 *Permutation Importance* is often preferred over *Feature Importance* which can at times inflate the importance of numerical features. Both are useful, and in most cases will give fairly similar results.
 
@@ -1065,7 +1012,7 @@ plt.show()
 
 ```
 <br>
-That code gives us the below plots - the first being for *Feature Importance* and the second for *Permutation Importance*!
+That code gives us the below plots - the first being for *Feature Importance* and the second for *Permutation Importance.*
 
 <br>
 ![alt text](/img/posts/rf-regression-feature-importance.png "Random Forest Feature Importance Plot")
@@ -1099,7 +1046,7 @@ The most important outcome for this project was predictive accuracy, rather than
 * Linear Regression = 0.853
 
 <br>
-Even though we were not specifically interested in the drivers of prediction, it was interesting to see across all three modelling approaches, that the input variable with the biggest impact on the prediction was *distance_from_store* rather than variables such as *total sales*.  This is interesting information for the business, so discovering this as we went was worthwhile.
+Even though we were not specifically interested in the drivers of prediction, it was interesting to see across all three modelling approaches, that the input variable with the biggest impact on the prediction was *distance_from_store* rather than variables such as *total sales*. This is interesting information for the business, so discovering this as we went was worthwhile. As noted above, more value may be created by getting some more detailed geographic information about customers, as well as where nearby stores are located. 
 
 <br>
 # Predicting Missing Loyalty Scores <a name="modelling-predictions"></a>
@@ -1157,8 +1104,9 @@ ___
 <br>
 # Growth & Next Steps <a name="growth-next-steps"></a>
 
-While predictive accuracy was relatively high - other modelling approaches could be tested, especially those somewhat similar to Random Forest, for example XGBoost, LightGBM to see if even more accuracy could be gained.
+While predictive accuracy was relatively high, we could continue to search for more predictive power, perhaps by:
 
-We could even look to tune the hyperparameters of the Random Forest, notably regularisation parameters such as tree depth, as well as potentially training on a higher number of Decision Trees in the Random Forest.
+* using other modelling approaches, for example XGBoost, LightGBM,
+* tuning the hyperparameters of the Random Forest, such as tree depth, as well as potentially training on a higher number of Decision Trees in the Random Forest.
 
-From a data point of view, further variables could be collected, and further feature engineering could be undertaken to ensure that we have as much useful information available for predicting customer loyalty
+Or, from a data point of view, further variables could be collected, and further feature engineering could be undertaken to ensure that we have as much useful information available for predicting customer loyalty. Since we have looked "under the hood" of each of our models and found that *distance_from_store* is the most powerful predictor, more value may be created by getting some more detailed geographic information about customers, as well as where nearby stores are located. 
