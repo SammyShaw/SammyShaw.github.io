@@ -154,6 +154,7 @@ After this data pre-processing in Python, we have a dataset for modelling that c
 
 ___
 <br>
+
 ## Modelling Overview
 
 If there is a model that accuractly predicts loyalty scores for the customers that have that data, then we can use that model to predict the customer loyalty score for the customers that do not. 
@@ -161,6 +162,7 @@ If there is a model that accuractly predicts loyalty scores for the customers th
 In supervised machine learning form, the data can be randomly subset into a training set and a test set. Then we can train and test our OLS Mulitple Linear model, Decision Tree, and Random Forest models.
 ___
 <br>
+
 ## Linear Regression <a name="linreg-title"></a>
 
 The scikit-learn library within Python contains all the functionality we need for each of these, incluing Linear Regression. The code sections below are broken up into 4 key sections:
@@ -171,6 +173,7 @@ The scikit-learn library within Python contains all the functionality we need fo
 * Performance Assessment
 
 <br>
+
 #### Data Import <a name="linreg-import"></a>
 
 Since we saved our modelling data as a pickle file, we import it.  We ensure we remove the id column, and we also ensure our data is shuffled.
@@ -199,6 +202,7 @@ data_for_model = shuffle(data_for_model, random_state = 42)
 
 ```
 <br>
+
 #### Data Preprocessing <a name="linreg-preprocessing"></a>
 
 For Linear Regression, certain data preprocessing steps need to be addressed, including:
@@ -209,6 +213,7 @@ For Linear Regression, certain data preprocessing steps need to be addressed, in
 * Multicollinearity & Feature Selection
 
 <br>
+
 ##### Missing Values
 
 The number of missing values in the data was extremely low, so instead of imputing those values, I just remove those rows.
@@ -220,8 +225,8 @@ data_for_model.isna().sum()
 data_for_model.dropna(how = "any", inplace = True)
 
 ```
-
 <br>
+
 ##### Outliers
 
 Because Linear Regression models can be sensitive to outliers, I want to know how extreme they are when compared to a normal variance. 
@@ -245,6 +250,7 @@ data_for_model.describe()
 | max | 44.37 | 0.88 | 9878.76 | 1187.00 | 109.00 | 5.00 | 102.34 |
 
 <br>
+
 Here, the *max* values are much higher than the *median* value in the columns *distance_from_store*, *total_sales*, and *total_items*.
 
 For example, the median *distance_to_store* is 1.645 miles, but the maximum is over 44 miles! and that number is well over twice the 75th percentile (a common treshold to determine outliers).  
@@ -252,6 +258,7 @@ For example, the median *distance_to_store* is 1.645 miles, but the maximum is o
 I'll remove these outliers using the "boxplot approach", removing rows where the values within those columns are outside of the interquartile range multiplied by 2.
 
 <br>
+
 ```python
 
 outlier_columns = ["distance_from_store", "total_sales", "total_items"]
@@ -274,6 +281,7 @@ for column in outlier_columns:
 ```
 
 <br>
+
 ##### Split Out Data For Modelling
 
 Next, the data must be split into an **X** object which contains only the predictor variables, and a **y** object that contains only the dependent variable.
@@ -293,6 +301,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 ```
 
 <br>
+
 ##### Categorical Predictor Variables
 
 In the dataset, there is one categorical variable *gender* which has values of "M" for Male, "F" for Female (the missing values have already been removed).  
@@ -304,6 +313,7 @@ Although there are only two categories in this particular case (i.e., we could h
 After recoding, I turn the training and test objects back into Pandas Dataframes, with the column names applied.
 
 <br>
+
 ```python
 
 # list of categorical variables that need encoding
@@ -331,14 +341,15 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 ```
 
 <br>
+
 ##### Feature Selection
 
 In our data, we are only dealing with eight independent variables, and because prediction accuracy is our goal, we might safely test all of our models with all inputs. But Feature Selection should be included as a matter of methodological rigor. Feature Selection can help us **improve model accuracy** if there is "noise" and/or multicolinearity among input variables. For Big Data analysis, selecting the right features can also help train models more **efficiently.** But my favorite reason is that Feature Selection helps us to interpret and explain what models are doing. Although in this project we're aiming for predictive accuracy over **parsimony,** at a human level it is easier to tell stories with data one variable at a time. 
 
 *Recursive Feature Elimination With Cross Validation (RFECV)* is a feature selection algorithm that starts with all input variables in a model, and then iteratively removes those with the weakest relationships to the output variable. To cross-validate, it then splits the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately. This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models are. From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use! RFECV is easily carried out using scikitlearn, and follows the same coding structure as other functions, so for all that is going on under the hood, it is rather convienient and easy to use.
 
-
 <br>
+
 ```python
 
 # instantiate RFECV & the model type to be utilised
@@ -359,6 +370,7 @@ X_test = X_test.loc[:, feature_selector.get_support()]
 ```
 
 <br>
+
 The below code then produces a plot to visualize the cross-validated accuracy with each potential number of features.
 
 ```python
@@ -374,12 +386,14 @@ plt.show()
 ```
 
 <br>
+
 So, according to the algorithm, the highest cross-validated accuracy (0.8635) is actually when all eight of our original input variables are included.  This is marginally higher than 6 included variables, and 7 included variables.  Again, because our goal is prediction over interpretation, we'll use all 8! 
 
 <br>
 ![alt text](/img/posts/lin-reg-feature-selection-plot.png "Linear Regression Feature Selection Plot")
 
 <br>
+
 #### Model Training <a name="linreg-model-training"></a>
 
 Instantiating and training the Linear Regression model is done using the below code
@@ -395,6 +409,7 @@ regressor.fit(X_train, y_train)
 ```
 
 <br>
+
 #### Model Performance Assessment <a name="linreg-model-assessment"></a>
 
 ##### Predict On The Test Set
@@ -409,6 +424,7 @@ y_pred = regressor.predict(X_test)
 ```
 
 <br>
+
 ##### Calculate R-Squared
 
 R-Squared is the proportion of variance explained (PVE) metric for regression models. It ranges from 0 to 1, and it can be interpretted as the percentage of variance in our output variable *y* that is being explained by our input variable(s) *x*. For example, If the r-squared score was 0.8, 80% of the variation of our output variable is being explained by the input variables - and something else, or some other variables must account for the other 20%.
@@ -426,6 +442,7 @@ print(r_squared)
 The resulting r-squared score from this is **0.78**
 
 <br>
+
 ##### Calculate Cross Validated R-Squared
 
 An even more powerful and reliable way to assess model performance is to use Cross Validation.
@@ -450,6 +467,7 @@ cv_scores.mean()
 The mean cross-validated r-squared score from this is **0.853**
 
 <br>
+
 ##### Calculate Adjusted R-Squared
 
 When applying Linear Regression with *multiple* input variables, the r-squared metric on it's own *can* end up being an overinflated view of goodness of fit because each input variable will have an *additive* effect on the overall r-squared score. In other words, every input variable added to the model *increases* the r-squared value, and *never decreases* it, even if the relationship is by chance.  
@@ -468,6 +486,7 @@ print(adjusted_r_squared)
 The resulting *adjusted* r-squared score from this is **0.754** which as expected, is slightly lower than the score we got for r-squared on it's own.
 
 <br>
+
 #### Model Summary Statistics <a name="linreg-model-summary"></a>
 
 Although our overall goal for this project is predictive accuracy, rather than an explcit understanding of the relationships of each of the input variables and the output variable, it is always interesting to look at the summary statistics for these.
