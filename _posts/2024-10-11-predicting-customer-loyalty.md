@@ -37,7 +37,7 @@ The overall goal here is to accurately predict the loyalty scores for the remani
 
 Because we have data on other customer information, such as their distance to the store, the types of groceries they buy, how much they spend, etc. we can use this data to train and assess a regression model that predicts the loyalty scores we already have, and we use that model to infer the remaining scores.
 <br>
-<br>
+
 #### Actions <a name="overview-actions"></a>
 
 After cleaning and processing the data, including subsetting the customers for whom we need to predict scores, I test three regression modeling approaches, namely:
@@ -50,15 +50,15 @@ After cleaning and processing the data, including subsetting the customers for w
 #### Results <a name="overview-results"></a>
 
 For each model, I assessed predictive accuracy (proportion of variance explained) and cross-validation. The Random Forest model had the highest predictive accuracy and the highest (four-fold) cross validation metrics. 
-
 <br>
+
 **Metric 1: Adjusted R-Squared (Test Set)**
 
 * Random Forest = 0.955
 * Decision Tree = 0.886
 * Linear Regression = 0.754
-
 <br>
+
 **Metric 2: R-Squared (K-Fold Cross Validation, k = 4)**
 
 * Random Forest = 0.925
@@ -71,7 +71,6 @@ As the most important outcome for this project was predictive accuracy, rather t
 #### Growth/Next Steps <a name="overview-growth"></a>
 
 Although other modelling approaches could be tested (e.g., XGBoost, LightGBM) to see if even more predictive accuracy could be gained, our model already performs well. More value may now come from understanding the nature of the key features of our model. For example, a cursory analysis suggests that a customer's distance from the store is the strongest predictor of their loyalty, so we might seek to collect data on the direction of that distance to better understand loyalty in relation to nearby competitors. 
-
 <br>
 
 #### Key Definition  <a name="overview-definition"></a>
@@ -82,7 +81,7 @@ Example 1: Customer X has a total grocery spend of $100 and all of this is spent
 
 Example 2: Customer Y has a total grocery spend of $200 but only 20% is spent with our client.  The remaining 80% is spend with competitors.  Customer Y has a *customer loyalty score* of 0.2
 <br>
-<br>
+
 ___
 
 ## Data Overview  <a name="data-overview"></a>
