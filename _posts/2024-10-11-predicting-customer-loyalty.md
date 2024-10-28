@@ -236,7 +236,6 @@ The table below is contructed from the output of:
 ```python
 data_for_model.describe()
 ```
-
 <br>
 
 | **metric** | **distance_from_store** | **credit_score** | **total_sales** | **total_items** | **transaction_count** | **product_area_count** | **average_basket_value** |
@@ -289,6 +288,7 @@ Next, the data must be split into an **X** object which contains only the predic
 Then, the data is split into training and test sets, using 80% of the data for training, and the remaining 20% for validation.
 
 <br>
+
 ```python
 
 # split data into X and y objects for modelling
