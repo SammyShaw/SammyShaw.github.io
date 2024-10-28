@@ -46,7 +46,6 @@ After cleaning and processing the data, including subsetting the customers for w
 * Decision Tree
 * Random Forest
 <br>
-<br>
 
 #### Results <a name="overview-results"></a>
 
@@ -68,13 +67,13 @@ For each model, I assessed predictive accuracy (proportion of variance explained
 
 As the most important outcome for this project was predictive accuracy, rather than understanding the drivers of loyalty, Random Forest is the model of choice for making predictions on the customers who are missing the *loyalty score* metric.
 <br>
-<br>
+
 #### Growth/Next Steps <a name="overview-growth"></a>
 
 Although other modelling approaches could be tested (e.g., XGBoost, LightGBM) to see if even more predictive accuracy could be gained, our model already performs well. More value may now come from understanding the nature of the key features of our model. For example, a cursory analysis suggests that a customer's distance from the store is the strongest predictor of their loyalty, so we might seek to collect data on the direction of that distance to better understand loyalty in relation to nearby competitors. 
 
 <br>
-<br>
+
 #### Key Definition  <a name="overview-definition"></a>
 
 The *loyalty score* metric measures the % of grocery spend (market level) that each customer allocates to the client vs. all of the competitors.  
