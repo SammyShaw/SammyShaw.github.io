@@ -214,7 +214,7 @@ For Linear Regression, certain data preprocessing steps need to be addressed, in
 
 <br>
 
-##### Missing Values
+#### Missing Values
 
 The number of missing values in the data was extremely low, so instead of imputing those values, I just remove those rows.
 
@@ -227,7 +227,7 @@ data_for_model.dropna(how = "any", inplace = True)
 ```
 <br>
 
-##### Outliers
+#### Outliers
 
 Because Linear Regression models can be sensitive to outliers, I want to know how extreme they are when compared to a normal variance. 
 
@@ -281,7 +281,7 @@ for column in outlier_columns:
 
 <br>
 
-##### Split Out Data For Modelling
+#### Split Out Data For Modelling
 
 Next, the data must be split into an **X** object which contains only the predictor variables, and a **y** object that contains only the dependent variable.
 
@@ -302,7 +302,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 <br>
 
-##### Categorical Predictor Variables
+#### Categorical Predictor Variables
 
 In the dataset, there is one categorical variable *gender* which has values of "M" for Male, "F" for Female (the missing values have already been removed).  
 
@@ -342,7 +342,7 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 
 <br>
 
-##### Feature Selection
+#### Feature Selection
 
 In our data, we are only dealing with eight independent variables, and because prediction accuracy is our goal, we might safely test all of our models with all inputs. But Feature Selection should be included as a matter of methodological rigor. Feature Selection can help us **improve model accuracy** if there is "noise" and/or multicolinearity among input variables. For Big Data analysis, selecting the right features can also help train models more **efficiently.** But my favorite reason is that Feature Selection helps us to interpret and explain what models are doing. Although in this project we're aiming for predictive accuracy over **parsimony,** at a human level it is easier to tell stories with data one variable at a time. 
 
@@ -410,9 +410,9 @@ regressor.fit(X_train, y_train)
 
 <br>
 
-#### Model Performance Assessment <a name="linreg-model-assessment"></a>
+### Model Performance Assessment <a name="linreg-model-assessment"></a>
 
-##### Predict On The Test Set
+#### Predict On The Test Set
 
 To assess how well the model is predicting on new data - use the trained model object (*regressor*) and ask it to predict the *loyalty_score* variable for the test set.
 
@@ -425,7 +425,7 @@ y_pred = regressor.predict(X_test)
 
 <br>
 
-##### Calculate R-Squared
+#### Calculate R-Squared
 
 R-Squared is the proportion of variance explained (PVE) metric for regression models. It ranges from 0 to 1, and it can be interpretted as the percentage of variance in our output variable *y* that is being explained by our input variable(s) *x*. For example, If the r-squared score was 0.8, 80% of the variation of our output variable is being explained by the input variables - and something else, or some other variables must account for the other 20%.
 
@@ -443,7 +443,7 @@ The resulting r-squared score from this is **0.78**
 
 <br>
 
-##### Calculate Cross Validated R-Squared
+#### Calculate Cross Validated R-Squared
 
 An even more powerful and reliable way to assess model performance is to use Cross Validation.
 
@@ -468,7 +468,7 @@ The mean cross-validated r-squared score from this is **0.853**
 
 <br>
 
-##### Calculate Adjusted R-Squared
+#### Calculate Adjusted R-Squared
 
 When applying Linear Regression with *multiple* input variables, the r-squared metric on it's own *can* end up being an overinflated view of goodness of fit because each input variable will have an *additive* effect on the overall r-squared score. In other words, every input variable added to the model *increases* the r-squared value, and *never decreases* it, even if the relationship is by chance.  
 
