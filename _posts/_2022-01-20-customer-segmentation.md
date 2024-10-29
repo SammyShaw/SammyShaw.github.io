@@ -5,9 +5,9 @@ image: "/posts/grocery_cart.jpg"
 tags: [Customer Segmentation, Machine Learning, Clustering, Python]
 ---
 
-In this project we use k-means clustering to segment up the customer base in order to increase business understanding, and to enhance the relevancy of targeted messaging & customer communications.
+This project uses k-means clustering to segment up a grocery chain's customer base in order to increase understanding of shopping behavior, and thereby enhance the relevancy of targeted messaging & customer communications.
 
-# Table of contents
+## Table of contents
 
 - [00. Project Overview](#overview-main)
     - [Context](#overview-context)
@@ -27,61 +27,65 @@ In this project we use k-means clustering to segment up the customer base in ord
 
 ___
 
-# Project Overview  <a name="overview-main"></a>
+## Project Overview  <a name="overview-main"></a>
 
-### Context <a name="overview-context"></a>
+#### Context <a name="overview-context"></a>
 
-The Senior Management team from our client, a supermarket chain, are disagreeing about how customers are shopping, and how lifestyle choices may affect which food areas customers are shopping into, or more interestingly, not shopping into.
+ABC Grocery would like to understand who is buying what at their stores. They wonder if lifestyle choices may affect which food areas customers are shopping into, or more interestingly, not shopping into. 
 
-They have asked us to use data, and Machine Learning to help segment up their customers based upon their engagement with each of the major food categories - aiding business understanding of the customer base, and to enhance the relevancy of targeted messaging & customer communications.
+The overall goal here is give ABC Grocery a better understanding of their customers by segmenting them based on the food categories that they typically buy, thus allowing the business to make informed advertising and customer communications decisions.
+
+Fortunately, we have data on the categories of food that customers buy, and we can employ an unsupervised Machine Learning algorithm - k-means Clustering - to distinguish types of ABC's customers by the groceries that they buy. 
+
+<br>
+
+#### Actions <a name="overview-actions"></a>
+
+After compiling the necessary data from tables in the database, I use the Pandas package in Python to aggregate transaction data across product areas from the most recent six months to a customer level. The final data for clustering is, for each customer, the percentage of sales allocated to each product area.
+
+After preparing the data, other k-means cluster analysis tasks include: 
+
+* Feature Scaling: data first needs to be standardized so that the measured distances are on the same scale for each variable.
+* Find k segments, using *Within Cluster Sum of Squares* for unsupervised learning tasks.
+* Apply the k-means algorithm onto the product area data.
+* Append the clusters to our customer base and then profile the resulting customer segments to understand what the differentiating factors were.
 
 <br>
 <br>
-### Actions <a name="overview-actions"></a>
 
-We firstly needed to compile the necessary data from sevaral tables in the database, namely the *transactions* table and the *product_areas* table.  We joined together the relevant information using Pandas, and then aggregated the transactional data across product areas, from the most recent six month to a customer level.  The final data for clustering is, for each customer, the percentage of sales allocated to each product area.
+#### Results <a name="overview-results"></a>
 
-As a starting point, we test & apply k-means clustering for this task.  We need to apply some data pre-processing, most importantly feature scaling to ensure all variables exist on the same scale - a very important consideration for distance based algorithms such as k-means.
+WCSS analysis suggests customers should be segmented into 3 clusters. These clusters ranged in size, with Cluster 0 accounting for 73.6% of the customer base, Cluster 2 accounting for 14.6%, and Cluster 1 accounting for 11.8%.
 
-As k-means is an *unsupervised learning* approach, in other words there are no labels - we use a process known as *Within Cluster Sum of Squares (WCSS)* to understand what a "good" number of clusters or segments is.
-
-Based upon this, we apply the k-means algorithm onto the product area data, append the clusters to our customer base, and then profile the resulting customer segments to understand what the differentiating factors were!
-<br>
-<br>
-
-### Results <a name="overview-results"></a>
-
-Based upon iterative testing using WCSS we settled on a customer segmentation with 3 clusters.  These clusters ranged in size, with Cluster 0 accounting for 73.6% of the customer base, Cluster 2 accounting for 14.6%, and Cluster 1 accounting for 11.8%.
-
-There were some extremely interesting findings from profiling the clusters.
+These categories yeilded interesting insights!
 
 For *Cluster 0* we saw a significant portion of spend being allocated to each of the product areas - showing customers without any particular dietary preference.  
 
-For *Cluster 1* we saw quite high proportions of spend being allocated to Fruit & Vegetables, but very little to the Dairy & Meat product areas.  It could be hypothesised that these customers are following a vegan diet.  
+For *Cluster 1* we saw quite high proportions of spend being allocated to Fruit & Vegetables, but very little to the Dairy & Meat product areas. It could be hypothesized that these customers are following a vegan diet.  
 
 Finally customers in *Cluster 2* spent significant portions within Dairy, Fruit & Vegetables, but very little in the Meat product area - so similarly, we would make an early hypothesis that these customers are more along the lines of those following a vegetarian diet.
 
-To help embed this segmentation into the business, we have proposed to call this the "You Are What You Eat" segmentation.
+To help embed this segmentation into the business, let's call this the "You Are What You Eat" segmentation.
 
 <br>
-<br>
-### Growth/Next Steps <a name="overview-growth"></a>
 
-It would be interesting to run this clustering/segmentation at a lower level of product areas, so rather than just the four areas of Meat, Dairy, Fruit, Vegetables - clustering spend across the sub-categories *below* those categories.  This would mean we could create more specific clusters, and get an even more granular understanding of dietary preferences within the customer base.
+#### Growth/Next Steps <a name="overview-growth"></a>
 
-Here we've just focused on variables that are linked directly to sales - it could be interesting to also include customer metrics such as distance to store, gender etc to give a even more well-rounded customer segmentation.
+It would be interesting to also run this segmentation task at a lower level of product areas, so rather than just the four areas of Meat, Dairy, Fruit, Vegetables - clustering spend across the sub-categories *below* (or within) those categories would mean we could create more specific clusters and get an even more granular understanding of dietary preferences within the customer base.
 
-It would be useful to test other clustering approaches such as hierarchical clustering or DBSCAN to compare the results.
-<br>
+Although I only include in this analysis the variables that are linked directly to sales - it would interesting to also include customer metrics such as distance to store, gender, etc. to give a even more nuanced understanding of customer segmentation.
+
+It may also be useful to test other clustering approaches such as hierarchical clustering or DBSCAN to compare the results.
+
 <br>
 
 ___
 
-# Data Overview  <a name="data-overview"></a>
+## Data Overview  <a name="data-overview"></a>
 
-We are primarily looking to discover segments of customers based upon their transactions within *food* based product areas so we will need to only select those.
+ABC Grocery does sell more than just food items, but for the sake of this analysis, they are only looking to discover segments of customers based upon their transactions within *food* based product areas, so we will need to only select data from those.
 
-In the code below, we:
+In the code below, I process the data as follows:
 
 * Import the required python packages & libraries
 * Import the tables from the database
@@ -101,8 +105,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # import tables from database
-transactions = ...
-product_areas = ...
+transactions = pd.read_excel("data/grocery_database.xlsx", sheet_name = "transactions")
+product_areas = pd.read_excel("data/grocery_database.xlsx", sheet_name = "product_areas")
 
 # merge product_area_name on
 transactions = pd.merge(transactions, product_areas, how = "inner", on = "product_area_id")
@@ -112,6 +116,7 @@ transactions.drop(transactions[transactions["product_area_name"] == "Non-Food"].
 
 # aggregate sales at customer level (by product area)
 transaction_summary = transactions.groupby(["customer_id", "product_area_name"])["sales_cost"].sum().reset_index()
+# Convenient table for interpretation, but our modeling data will come from the pivot table below
 
 # pivot data to place product areas as columns
 transaction_summary_pivot = transactions.pivot_table(index = "customer_id",
@@ -131,7 +136,7 @@ data_for_clustering = transaction_summary_pivot.drop(["Total"], axis = 1)
 ```
 <br>
 
-After the data pre-processing using Pandas, we have a dataset for clustering that looks like the below sample:
+After preprocessing using Pandas, the dataset for clustering looks like the below sample:
 <br>
 <br>
 
@@ -145,98 +150,86 @@ After the data pre-processing using Pandas, we have a dataset for clustering tha
 | 7 | 0.000 | 0.517 | 0.000 | 0.483  |
 
 <br>
-The data is at customer level, and we have a column for each of the highest level food product areas.  Within each of those we have the *percentage* of sales that each customer allocated to that product area over the past six months.
+The data is at the customer level, and the columns represent each of the food product areas. Within each of those we have the *percentage* of sales that each customer allocated to that product area over the past six months.
 
 ___
 <br>
-# K-Means <a name="kmeans-title"></a>
+
+## K-Means <a name="kmeans-title"></a>
 
 <br>
-### Concept Overview <a name="kmeans-overview"></a>
+
+#### Concept Overview <a name="kmeans-overview"></a>
 
 K-Means is an *unsupervised learning* algorithm, meaning that it does not look to predict known labels or values, but instead looks to isolate patterns within unlabelled data.
 
-The algorithm works in a way where it partitions data-points into distinct groups (clusters) based upon their *similarity* to each other.
+The algorithm works by partitioning data-points into distinct groups (clusters) based upon their *similarity* to each other.
 
-This similarity is most often the eucliedean (straight-line) distance between data-points in n-dimensional space.  Each variable that is included lies on one of the dimensions in space.
+This similarity is based on the distance (in this case, eucliedean, or straight-line distance) between data-points in n-dimensional space. Each variable that is included lies on one of the dimensions in space.
 
 The number of distinct groups (clusters) is determined by the value that is set for "k".
 
-The algorithm does this by iterating over four key steps, namely:
+The algorithm does this by iterating over four key steps:
 
-1. It selects "k" random points in space (these points are known as centroids)
+1. It selects "k" random points in space (or, centroids)
 2. It then assigns each of the data points to the nearest centroid (based upon euclidean distance)
 3. It then repositions the centroids to the *mean* dimension values of it's cluster
 4. It then reassigns each data-point to the nearest centroid
 
-Steps 3 & 4 continue to iterate until no data-points are reassigned to a closer centroid.
+Steps 3 & 4 continue to iterate until no data-points are reassigned to a closer centroid. In doing so, the centroids, which began as random points, end up centered within distinct groups (or clusters) of data. 
 
 <br>
 ### Data Preprocessing <a name="kmeans-preprocessing"></a>
 
-There are three vital preprocessing steps for k-means, namely:
+There are three vital preprocessing steps for k-means:
 
-* Missing values in the data
-* The effect of outliers
+* Dealing with missing values
+* Dealing with outliers
 * Feature Scaling
 
 <br>
-##### Missing Values
+#### Missing Values
 
-Missing values can cause issues for k-means, as the algorithm won't know where to plot those data-points along the dimension where the value is not present.  If we have observations with missing values, the most common options are to either remove the observations, or to use an imputer to fill-in or to estimate what those value might be.
+Missing values can cause issues for k-means, as the algorithm won't know where to plot those data-points along the dimension where the value is not present. 
 
-As we aggregated our data for each customer, we actually don't suffer from missing values so we don't need to deal with that here.
-
-<br>
-##### Outliers
-
-As k-means is a distance based algorithm, outliers can cause problems. The main issue we face is when we come to scale our input variables, a very important step for a distance based algorithm.
-
-We don’t want any variables to be “bunched up” due to a single outlier value, as this will make it hard to compare their values to the other input variables. We should always investigate outliers rigorously - however in our case where we're dealing with percentages, we thankfully don't face this issue!
+Fortunately, in this case we don't have to worry about imputing the missing values or removing those rows because we aggregated our data for each customer. 
 
 <br>
-##### Feature Scaling
 
-Again, as k-means is a distance based algorithm, in other words it is reliant on an understanding of how similar or different data points are across different dimensions in n-dimensional space, the application of Feature Scaling is extremely important.
+#### Outliers
 
-Feature Scaling is where we force the values from different columns to exist on the same scale, in order to enchance the learning capabilities of the model. There are two common approaches for this, Standardisation, and Normalisation.
+Outliers can cause problems for k-means clustering tasks. Even though we will scale the data, an outlier at one extreme of a distribution can cause the more normal values to be “bunched up," far from the outlier, and this will make it hard to compare their values to the other input variables. But in this case our data is percentages, so this won't be a problem.
 
-Standardisation rescales data to have a mean of 0, and a standard deviation of 1 - meaning most datapoints will most often fall between values of around -4 and +4.
+<br>
 
-Normalisation rescales datapoints so that they exist in a range between 0 and 1.
+#### Feature Scaling
 
-For k-means clustering, either approach is going to be *far better* than using no scaling at all.  Here, we will look to apply normalisation as this will ensure all variables will end up having the same range, fixed between 0 and 1, and therefore the k-means algorithm can judge each variable in the same context.  Standardisation *can* result in different ranges, variable to variable, and this is not so useful (although this isn't explcitly true in all scenarios).
+Normalization, rather than standardization, is the feature scaling method of choice for k-means tasks. Normalization rescales datapoints so that they exist in a range between 0 and 1.
 
-Another reason for choosing Normalisation over Standardisation is that our scaled data will *all* exist between 0 and 1, and these will then be compatible with any categorical variables that we have encoded as 1’s and 0’s (although we don't have any variables of this type in our task here).
+As our data are percentages, they are _already_ spread between 0 and 1, but we still have to normalize to make sure those spreads are proportionate between variables. If one of the product areas makes up a large proportion of customer sales, for example, this may end up dominating the clustering space. When we normalize, even product areas that make up smaller volumes will be spread proportionately between 0 and 1!
 
-In our specific task here, we are using percentages, so our values are _already_ spread between 0 and 1.  We will still apply normalisation for the following reason.  One of the product areas might commonly make up a large proportion of customer sales, and this may end up dominating the clustering space.  If we normalise all of our variables, even product areas that make up smaller volumes, will be spread proportionately between 0 and 1!
-
-The below code uses the in-built MinMaxScaler functionality from scikit-learn to apply Normalisation to all of our variables.  The reason we create a new object (here called data_for_clustering_scaled) is that we want to use the scaled data for clustering, but when profiling the clusters later on, we may want to use the actual percentages as this may make more intuitive business sense, so it's good to have both options available!
+The code below uses the MinMaxScaler functionality from scikit-learn to normalization our variables. The new data frame object (here called data_for_clustering_scaled) is the one that will actually be used in the model. The unscaled data frame (data_for_clustering) will be reserved for later profiling and interpretation, as this will make more intuitive business sense.
 
 ```python
 
 # create our scaler object
 scale_norm = MinMaxScaler()
 
-# normalise the data
+# normalize the data
 data_for_clustering_scaled = pd.DataFrame(scale_norm.fit_transform(data_for_clustering), columns = data_for_clustering.columns)
 
 ```
 
 <br>
-### Finding A Good Value For k <a name="kmeans-k-value"></a>
+#### Finding A Good Value For k <a name="kmeans-k-value"></a>
 
-At this point here, our data is ready to be fed into the k-means clustering algorithm.  Before that however, we want to understand what number of clusters we want the data split into.
+At this point, the data is ready for the k-means clustering algorithm. Before that, however, we need to know how many clusters we want the data split into.
 
-In the world of unsupervised learning, there is no *right or wrong* value for this - it really depends on the data you are dealing with, as well as the unique scenario you're utilising the algorithm for.  From our client, having a very high number of clusters might not be appropriate as it would be too hard for the business to understand the nuance of each in a way where they can apply the right strategies.
+For unsupervised learning tasks there is no right or wrong value for this. It migth depend on the data, which may be naturaly clustered in particular ways, or it may depend on the business questions at hand. For ABC Grocery, we're in an exploratory stage of understanding customer segments, so it may be best to follow the data, or aiming for a simple/small number of clusters. From there, future analysis can be used to extract more nuanced segmentation. 
 
-Finding the "right" value for k, can feel more like art than science, but there are some data driven approaches that can help us!  
+By default, the k-means algorithm within scikit-learn will uses k = 8, meaning that it will look to split the data into eight distinct clusters. But there is a way to actually ask the data, at what point does adding clusters result in diminishing returns. 
 
-The approach we will utilise here is known as *Within Cluster Sum of Squares (WCSS)* which measures the sum of the squared euclidean distances that data points lie from their closest centroid.  WCSS can help us understand the point where adding *more clusters* provides little extra benefit in terms of separating our data.
-
-By default, the k-means algorithm within scikit-learn will use k = 8 meaning that it will look to split the data into eight distinct clusters.  We want to find a better value that fits our data, and our task!
-
-In the code below we will test multiple values for k, and plot how this WCSS metric changes.  As we increase the value for k (in other words, as we increase the number or centroids or clusters) the WCSS value will always decrease.  However, these decreases will get smaller and smaller each time we add another centroid and we are looking for a point where this decrease is quite prominent *before* this point of diminishing returns.
+The *Within Cluster Sum of Squares (WCSS)* approach to deriving k measures the sum of the squared (euclidean) distances that data points lie from their closest centroid. In the code below we will test multiple values for k, and plot how this WCSS metric changes.  As the value for k increases (in other words, as we increase the number or centroids or clusters) the WCSS value will always decrease. However, these decreases will get smaller and smaller each time we add another centroid and we are looking for a point where this decrease is quite prominent *before* this point of diminishing returns.
 
 ```python
 
@@ -248,7 +241,13 @@ wcss_list = []
 for k in k_values:
     kmeans = KMeans(n_clusters = k, random_state = 42)
     kmeans.fit(data_for_clustering_scaled)
-    wcss_list.append(kmeans.inertia_)
+    wcss_list.append(kmeans.inertia_) # WCSS is also referred to as inertia
+
+```
+
+And then we can visualize the results to find a balance point were segmentation is maximized and diminishing returns are minimized.
+
+```python
 
 # plot wcss by k
 plt.plot(k_values, wcss_list)
@@ -260,18 +259,20 @@ plt.show()
 
 ```
 <br>
-That code gives us the below plot - which visualises our results!
+
 
 <br>
+
 ![alt text](/img/posts/kmeans-optimal-k-value-plot.png "K-Means Optimal k Value Plot")
 
 <br>
-Based upon the shape of the above plot - there does appear to be an elbow at k = 3.  Prior to that we see a significant drop in the WCSS score, but following the decreases are much smaller, meaning this could be a point that suggests adding *more clusters* will provide little extra benefit in terms of separating our data.  A small number of clusters can be beneficial when considering how easy it is for the business to focus on, and understand, each - so we will continue on, and fit our k-means clustering solution with k = 3.
+Based upon the shape of the above plot - there does appear to be an elbow at k = 3.  Prior to that there is a significant drop in the WCSS score, but following the decreases are much smaller, meaning this could be a point that suggests adding *more clusters* will provide little extra benefit in separating our data. A small number of clusters can be beneficial when considering how easy it is for the business to focus on, and understand, each - so we will continue on, and fit our k-means clustering solution with k = 3.
 
 <br>
+
 ### Model Fitting <a name="kmeans-model-fitting"></a>
 
-The below code will instantiate our k-means object using a value for k equal to 3.  We then fit this object to our scaled dataset to separate our data into three distinct segments or clusters.
+The below code will instantiate our k-means object using a value for k equal to 3. We then fit this object to our scaled dataset to separate our data into three distinct segments or clusters.
 
 ```python
 
@@ -283,10 +284,11 @@ kmeans.fit(data_for_clustering_scaled)
 
 ```
 
-<br>
+<br
+    
 ### Append Clusters To Customers <a name="kmeans-append-clusters"></a>
 
-With the k-means algorithm fitted to our data, we can now append those clusters to our original dataset, meaning that each customer will be tagged with the cluster number that they most closely fit into based upon their sales data over each product area.
+With the k-means algorithm fitted to the data, we can now append those clusters to our original dataset, meaning that each customer will be tagged with the cluster number that they most closely fit into based upon their sales data over each product area.
 
 In the code below we tag this cluster number onto our original dataframe.
 
@@ -300,12 +302,12 @@ data_for_clustering["cluster"] = kmeans.labels_
 <br>
 ### Cluster Profiling <a name="kmeans-cluster-profiling"></a>
 
-Once we have our data separated into distinct clusters, our client needs to understand *what is is* that is driving the separation.  This means the business can understand the customers within each, and the behaviours that make them unique.
+Once ther data is separated into distinct clusters, we can refer back to our percentages table to find out *what it is* that is driving the separation. Then ABC Grocery can understand the customers within each, and the behaviors that make them unique.
 
 <br>
 ##### Cluster Sizes
 
-In the below code we firstly assess the number of customers that fall into each cluster.
+First, let's assess the number of customers that fall into each cluster.
 
 <br>
 ```python
@@ -322,12 +324,12 @@ Running that code shows us that the three clusters are different in size, with t
 * Cluster 2: **14.6%** of customers
 * Cluster 1: **11.8%** of customers
 
-Based on these results, it does appear we do have a skew toward Cluster 0 with Cluster 1 & Cluster 2 being proportionally smaller.  This isn't right or wrong, it is simply showing up pockets of the customer base that are exhibiting different behaviours - and this is *exactly* what we want.
+Based on these results, it does appear we do have a skew toward Cluster 0 with Cluster 1 & Cluster 2 being proportionally smaller.  This isn't right or wrong, it is simply showing up pockets of the customer base that are exhibiting different behaviors - and this is *exactly* what we want.
 
 <br>
 ##### Cluster Attributes
 
-To understand what these different behaviours or characteristics are, we can look to analyse the attributes of each cluster, in terms of the variables we fed into the k-means algorithm.
+Second, let's see how these distinct groups actually shop.
 
 <br>
 ```python
@@ -346,13 +348,13 @@ That code results in the following table...
 | 2 | 36.4% | 39.4% | 2.9% | 21.3%  |
 
 <br>
-For *Cluster 0* we see a reasonably significant portion of spend being allocated to each of the product areas.  For *Cluster 1* we see quite high proportions of spend being allocated to Fruit & Vegetables, but very little to the Dairy & Meat product areas.  It could be hypothesised that these customers are following a vegan diet.  Finally customers in *Cluster 2* spend, on average, significant portions within Dairy, Fruit & Vegetables, but very little in the Meat product area - so similarly, we would make an early hypothesis that these customers are more along the lines of those following a vegetarian diet - very interesting!
+For *Cluster 0* we see roughly even portions being allocated to each of the product areas, with meat being the highest portion of their grocery spend. For *Cluster 1* we see quite high proportions of spend being allocated to Fruit & Vegetables, but very little to the Dairy & Meat product areas. It could be hypothesized that these customers are following a vegan diet. Finally customers in *Cluster 2* spend, on average, significant portions within Dairy, Fruit & Vegetables, but very little in the Meat product area - so similarly, we would make an early hypothesis that these customers are more along the lines of those following a vegetarian diet - interesting!
 
 ___
 <br>
 # Application <a name="kmeans-application"></a>
 
-Even those this is a simple solution, based upon high level product areas it will help leaders in the business, and category managers gain a clearer understanding of the customer base.
+Even though this is a simple solution, based upon high level product areas it will help leaders in the business, and category managers gain a clearer understanding of the customer base.
 
 Tracking these clusters over time would allow the client to more quickly react to dietary trends, and adjust their messaging and inventory accordingly.
 
@@ -362,8 +364,8 @@ ___
 <br>
 # Growth & Next Steps <a name="growth-next-steps"></a>
 
-It would be interesting to run this clustering/segmentation at a lower level of product areas, so rather than just the four areas of Meat, Dairy, Fruit, Vegetables - clustering spend across the sub-categories *below* those categories.  This would mean we could create more specific clusters, and get an even more granular understanding of dietary preferences within the customer base.
+It would be interesting to run this clustering/segmentation at a lower level of product areas, so rather than just the four areas of Meat, Dairy, Fruit, Vegetables - clustering spend across the sub-categories *below* those categories. This would mean we could create more specific clusters, and get an even more granular understanding of dietary preferences within the customer base. This might be especially useful for *Cluster 0* above, which contains nearly 3 out of every 4 customers. 
 
-Here we've just focused on variables that are linked directly to sales - it could be interesting to also include customer metrics such as distance to store, gender etc to give a even more well-rounded customer segmentation.
+Here we've just focused on variables that are linked directly to sales - it could be interesting to also include customer metrics such as distance to store, gender etc to give a even more well-rounded customer segmentation. For example, critical business questions might include: Are certain types of customers only coming to ABC for meat, or for produce? 
 
-It would be useful to test other clustering approaches such as hierarchical clustering or DBSCAN to compare the results.
+It might also be useful to test other clustering approaches such as hierarchical clustering or DBSCAN to compare the results.
