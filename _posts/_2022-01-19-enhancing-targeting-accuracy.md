@@ -1041,33 +1041,22 @@ These are all higher than the results from the Logistic Regression model, and ma
 
 ### Feature Importance <a name="rf-model-feature-importance"></a>
 
-Random Forests are an ensemble model, made up of many, many Decision Trees, each of which is different due to the randomness of the data being provided, and the random selection of input variables available at each potential split point.
+Because Random Forests are an ensemble of many Decision Trees, we end up with a powerful and robust model, but because of the random nature of all the trees in the forest - the model gives us a unique insight into how important each of our input variables are to the overall model.  
 
-Because of this, we end up with a powerful and robust model, but because of the random or different nature of all these Decision trees - the model gives us a unique insight into how important each of our input variables are to the overall model.  
+So, in a Random Forest the *importance* of a feature is measured by asking *How much would accuracy decrease if a specific input variable was removed or randomized?* If this decrease in accuracy is large, then we’d deem that input variable to be quite important, and if there is only a small decrease in accuracy, then we’d conclude that the variable is of less importance.
 
-As we’re using random samples of data, and input variables for each Decision Tree - there are many scenarios where certain input variables are being held back and this enables us a way to compare how accurate the models predictions are if that variable is or isn’t present.
+There are a couple ways to go about this: **Feature Importance**, and **Permutation Importance** 
 
-So, at a high level, in a Random Forest we can measure *importance* by asking *How much would accuracy decrease if a specific input variable was removed or randomised?*
+*Feature Importance* is where we find all nodes in the Decision Trees of the forest where a particular input variable is used to split the data and assess what the accuracy scores (for a classification problem) were before the split was made, and compare this to the scores after the split was made.  We can take the *average* of these improvements across all Decision Trees in the Random Forest to get a score that tells us *how much better* we’re making the model by using that input variable. If we do this for *each* of our input variables, we can compare these scores and understand which is adding the most value to the predictive power of the model!
 
-If this decrease in performance, or accuracy, is large, then we’d deem that input variable to be quite important, and if we see only a small decrease in accuracy, then we’d conclude that the variable is of less importance.
+*Permutation Importance* uses the data that has gone *unused* when the random samples are selected for each Decision Tree (each tree is "bootstrapped" from the training set, meaning it is sampled with replacement, so there will always be unused data in each tree. This unused data (i.e., not randomly selected) is known as *Out of Bag* observations and these can be used for testing the accuracy of each particular Decision Tree. For each Decision Tree, the *Out of Bag* observations are gathered and then passed through the same Tree models as if they were a second test set, and we can obtain an accuracy score. Then, in order to understand the *importance* of a feature, we *randomize* the values within one of the input variables - a process that essentially destroys any relationship that might exist between that input variable and the output variable - and run that updated data through the Decision Tree again, obtaining a second accuracy score. The difference between the original accuracy and the new accuracy gives us a view on how important that particular variable is for predicting the output.
 
-At a high level, there are two common ways to tackle this.  The first, often just called **Feature Importance** is where we find all nodes in the Decision Trees of the forest where a particular input variable is used to split the data and assess what the gini impurity score (for a Classification problem) was before the split was made, and compare this to the gini impurity score after the split was made.  We can take the *average* of these improvements across all Decision Trees in the Random Forest to get a score that tells us *how much better* we’re making the model by using that input variable.
-
-If we do this for *each* of our input variables, we can compare these scores and understand which is adding the most value to the predictive power of the model!
-
-The other approach, often called **Permutation Importance** cleverly uses some data that has gone *unused* at when random samples are selected for each Decision Tree (this stage is called "bootstrap sampling" or "bootstrapping")
-
-These observations that were not randomly selected for each Decision Tree are known as *Out of Bag* observations and these can be used for testing the accuracy of each particular Decision Tree.
-
-For each Decision Tree, all of the *Out of Bag* observations are gathered and then passed through.  Once all of these observations have been run through the Decision Tree, we obtain a classification accuracy score for these predictions.
-
-In order to understand the *importance*, we *randomise* the values within one of the input variables - a process that essentially destroys any relationship that might exist between that input variable and the output variable - and run that updated data through the Decision Tree again, obtaining a second accuracy score.  The difference between the original accuracy and the new accuracy gives us a view on how important that particular variable is for predicting the output.
-
-*Permutation Importance* is often preferred over *Feature Importance* which can at times inflate the importance of numerical features. Both are useful, and in most cases will give fairly similar results.
+Permutation Importance is often preferred over Feature Importance which can at times inflate the importance of numerical features. Both are useful, and in most cases will give fairly similar results.
 
 Let's put them both in place, and plot the results...
 
 <br>
+
 ```python
 
 # calculate feature importance
@@ -1101,39 +1090,33 @@ plt.show()
 
 ```
 <br>
+
 That code gives us the below plots - the first being for *Feature Importance* and the second for *Permutation Importance*!
 
 <br>
+
 ![alt text](/img/posts/rf-classification-feature-importance.png "Random Forest Feature Importance Plot")
 <br>
 <br>
+
 ![alt text](/img/posts/rf-classification-permutation-importance.png "Random Forest Permutation Importance Plot")
 
 <br>
 The overall story from both approaches is very similar, in that by far, the most important or impactful input variables are *distance_from_store* and *transaction_count*
 
-Surprisingly, *average_basket_size* was not as important as hypothesised.
-
 There are slight differences in the order or "importance" for the remaining variables but overall they have provided similar findings.
-
 ___
 <br>
-# K Nearest Neighbours <a name="knn-title"></a>
 
-We utlise the scikit-learn library within Python to model our data using KNN. The code sections below are broken up into 5 key sections:
+## K Nearest Neighbours <a name="knn-title"></a>
 
-* Data Import
-* Data Preprocessing
-* Model Training
-* Performance Assessment
-* Optimal Value For K
+K nearest neighbors 
+
+
 
 <br>
+
 ### Data Import <a name="knn-import"></a>
-
-Again, since we saved our modelling data as a pickle file, we import it. We ensure we remove the id column, and we also ensure our data is shuffled.
-
-As with the other approaches, we also investigate the class balance of our dependent variable - which is important when assessing classification accuracy.
 
 ```python
 
@@ -1163,9 +1146,7 @@ data_for_model["signup_flag"].value_counts(normalize = True)
 
 ```
 <br>
-From the last step in the above code, we see that **69% of customers did not sign up and 31% did**.  This tells us that while the data isn't perfectly balanced at 50:50, it isn't *too* imbalanced either.  Because of this, and as you will see, we make sure to not rely on classification accuracy alone when assessing results - also analysing Precision, Recall, and F1-Score.
 
-<br>
 ### Data Preprocessing <a name="knn-preprocessing"></a>
 
 For KNN, as it is a distance based algorithm, we have certain data preprocessing steps that need to be addressed, including:
@@ -1177,7 +1158,8 @@ For KNN, as it is a distance based algorithm, we have certain data preprocessing
 * Feature Selection
 
 <br>
-##### Missing Values
+
+#### Missing Values
 
 The number of missing values in the data was extremely low, so instead of applying any imputation (i.e. mean, most common value) we will just remove those rows
 
@@ -1190,7 +1172,8 @@ data_for_model.dropna(how = "any", inplace = True)
 ```
 
 <br>
-##### Outliers
+
+#### Outliers
 
 As KNN is a distance based algorithm, you could argue that if a data point is a long way away, then it will simply never be selected as one of the neighbours - and this is true - but outliers can still cause us problems here.  The main issue we face is when we come to scale our input variables, a very important step for a distance based algorithm.
 
@@ -1222,6 +1205,7 @@ Because of this, we apply some outlier removal in order to facilitate generalisa
 We do this using the "boxplot approach" where we remove any rows where the values within those columns are outside of the interquartile range multiplied by 2.
 
 <br>
+
 ```python
 
 outlier_investigation = data_for_model.describe()
@@ -1245,13 +1229,15 @@ for column in outlier_columns:
 ```
 
 <br>
-##### Split Out Data For Modelling
+
+#### Split Out Data For Modelling
 
 In exactly the same way we've done for the other three models, in the next code block we do two things, we firstly split our data into an X object which contains only the predictor variables, and a y object that contains only our dependent variable.
 
 Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training. In this case, we have allocated 80% of the data for training, and the remaining 20% for validation. Again, we make sure to add in the stratify parameter to ensure that both our training and test sets have the same proportion of customers who did, and did not, sign up for the delivery club - meaning we can be more confident in our assessment of predictive performance.
 
 <br>
+
 ```python
 
 # split data into X and y objects for modelling
@@ -1264,23 +1250,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 ```
 
 <br>
-##### Categorical Predictor Variables
 
-As we saw when applying the other algorithms, in our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
-
-The KNN algorithm can't deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
-
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - one appropriate approach is to apply One Hot Encoding to the categorical column.
-
-One Hot Encoding can be thought of as a way to represent categorical variables as binary vectors, in other words, a set of *new* columns for each categorical value with either a 1 or a 0 saying whether that value is true or not for that observation.  These new columns would go into our model as input variables, and the original column is discarded.
-
-We also drop one of the new columns using the parameter *drop = "first"*.  We do this to avoid the *dummy variable trap* where our newly created encoded columns perfectly predict each other - and we run the risk of breaking the assumption that there is no multicollinearity, a requirement or at least an important consideration for some models, Linear Regression being one of them! Multicollinearity occurs when two or more input variables are *highly* correlated with each other, it is a scenario we attempt to avoid as in short, while it won't neccessarily affect the predictive accuracy of our model, it can make it difficult to trust the statistics around how well the model is performing, and how much each input variable is truly having.
-
-In the code, we also make sure to apply *fit_transform* to the training set, but only *transform* to the test set.  This means the One Hot Encoding logic will *learn and apply* the "rules" from the training data, but only *apply* them to the test data.  This is important in order to avoid *data leakage* where the test set *learns* information about the training data, and means we can't fully trust model performance metrics!
-
-For ease, after we have applied One Hot Encoding, we turn our training and test objects back into Pandas Dataframes, with the column names applied.
+#### Categorical Predictor Variables
 
 <br>
+
 ```python
 
 # list of categorical variables that need encoding
@@ -1308,17 +1282,18 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 ```
 
 <br>
-##### Feature Scaling
+
+#### Feature Scaling
 
 As KNN is a *distance based* algorithm, in other words it is reliant on an understanding of how similar or different data points are across different dimensions in n-dimensional space, the application of *Feature Scaling* is extremely important.
 
-Feature Scaling is where we force the values from different columns to exist on the same scale, in order to enchance the learning capabilities of the model. There are two common approaches for this, Standardisation, and Normalisation.
+Feature Scaling is where we force the values from different columns to exist on the same scale, in order to enchance the learning capabilities of the model. There are two common approaches for this, Standardization, and Normalization.
 
-Standardisation rescales data to have a mean of 0, and a standard deviation of 1 - meaning most datapoints will most often fall between values of around -4 and +4.
+Standardization rescales data to have a mean of 0, and a standard deviation of 1 - meaning most datapoints will most often fall between values of around -4 and +4.
 
-Normalisation rescales datapoints so that they exist in a range between 0 and 1.
+Normalization rescales datapoints so that they exist in a range between 0 and 1.
 
-The below code uses the in-built *MinMaxScaler* functionality from scikit-learn to apply Normalisation to all of our input variables.  The reason we choose Normalisation over Standardisation is that our scaled data will all exist between 0 and 1, and these will then be compatible with any categorical variables that we have encoded as 1's and 0's. 
+The below code uses the in-built *MinMaxScaler* functionality from scikit-learn to apply Normalisation to all of our input variables.  The reason we choose Normalization over Standardization is that our scaled data will all exist between 0 and 1, and these will then be compatible with any categorical variables that we have encoded as 1's and 0's. 
 
 In the code, we also make sure to apply *fit_transform* to the training set, but only *transform* to the test set. This means the scaling logic will learn and apply the scaling "rules" from the training data, but only apply them to the test data (or any other data we predict on in the future). This is important in order to avoid data leakage where the test set learns information about the training data, and means we can’t fully trust model performance metrics!
 
@@ -1337,7 +1312,8 @@ X_test = pd.DataFrame(scale_norm.transform(X_test), columns = X_test.columns)
 ```
 
 <br>
-##### Feature Selection
+
+#### Feature Selection
 
 As we discussed when applying Logistic Regression above - Feature Selection is the process used to select the input variables that are most important to your Machine Learning task.  For more information around this, please see that section above.
 
@@ -1348,6 +1324,7 @@ Having a high number of input variables also means the algorithm has to process 
 For our task here we are again going to apply *Recursive Feature Elimination With Cross Validation (RFECV)* which is an approach that starts with all input variables, and then iteratively removes those with the weakest relationships with the output variable.  RFECV does this using Cross Validation, so splits the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately.  This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was.  From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
 
 <br>
+
 ```python
 
 # instantiate RFECV & the model type to be utilised
@@ -1369,6 +1346,7 @@ X_test = X_test.loc[:, feature_selector.get_support()]
 ```
 
 <br>
+
 The below code then produces a plot that visualises the cross-validated classification accuracy with each potential number of features
 
 ```python
@@ -1384,14 +1362,17 @@ plt.show()
 ```
 
 <br>
+
 This creates the below plot, which shows us that the highest cross-validated classification accuracy (0.9472) is when we include six of our original input variables - although there isn't much difference in predictive performance between using three variables through to eight variables - and this syncs with what we saw in the Random Forest section above where only three of the input variables scored highly when assessing Feature Importance & Permutation Importance.
 
 The variables that have been dropped are *total_items* and *credit score* - we will continue on with the remaining six!
 
 <br>
+
 ![alt text](/img/posts/knn-feature-selection-plot.png "KNN Feature Selection Plot")
 
 <br>
+
 ### Model Training <a name="knn-model-training"></a>
 
 Instantiating and training our KNN model is done using the below code.  At this stage we will just use the default parameters, meaning that the algorithm:
@@ -1410,13 +1391,10 @@ clf.fit(X_train, y_train)
 ```
 
 <br>
+
 ### Model Performance Assessment <a name="knn-model-assessment"></a>
 
-##### Predict On The Test Set
-
-To assess how well our model is predicting on new data - we use the trained model object (here called *clf*) and ask it to predict the *signup_flag* variable for the test set.
-
-In the code below we create one object to hold the binary 1/0 predictions, and another to hold the actual prediction probabilities for the positive class (which is based upon the majority class within the k nearest neighbours)
+#### Predict On The Test Set
 
 ```python
 
@@ -1427,11 +1405,8 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 ```
 
 <br>
-##### Confusion Matrix
 
-As we've seen with all models so far, our Confusion Matrix provides us a visual way to understand how our predictions match up against the actual values for those test set observations.
-
-The below code creates the Confusion Matrix using the *confusion_matrix* functionality from within scikit-learn and then plots it using matplotlib.
+#### Confusion Matrix
 
 ```python
 
@@ -1452,23 +1427,18 @@ plt.show()
 ```
 
 <br>
+
 ![alt text](/img/posts/knn-confusion-matrix.png "KNN Confusion Matrix")
 
 <br>
-The aim is to have a high proportion of observations falling into the top left cell (predicted non-signup and actual non-signup) and the bottom right cell (predicted signup and actual signup).
-
-The results here are interesting - all of the errors are where the model incorrectly classified *delivery club* signups as non-signups - the model made no errors when classifying non-signups non-signups.
-
-Since the proportion of signups in our data was around 30:70 we will next analyse not only Classification Accuracy, but also Precision, Recall, and F1-Score which will help us assess how well our model has performed in reality.
 
 <br>
-##### Classification Performance Metrics
+
+#### Classification Performance Metrics
 <br>
 **Accuracy, Precision, Recall, F1-Score**
 
-For details on these performance metrics, please see the above section on Logistic Regression.  Using all four of these metrics in combination gives a really good overview of the performance of a classification model, and gives us an understanding of the different scenarios & considerations!
-
-In the code below, we utilise in-built functionality from scikit-learn to calculate these four metrics.
+For details on these performance metrics, please see the above section on Logistic Regression. 
 
 ```python
 
@@ -1486,16 +1456,16 @@ f1_score(y_test, y_pred_class)
 
 ```
 <br>
-Running this code gives us:
 
 * Classification Accuracy = **0.936** meaning we correctly predicted the class of 93.6% of test set observations
 * Precision = **1.00** meaning that for our *predicted* delivery club signups, we were correct 100% of the time
 * Recall = **0.762** meaning that of all *actual* delivery club signups, we predicted correctly 76.2% of the time
 * F1-Score = **0.865**
 
-These are interesting.  The KNN has obtained the highest overall Classification Accuracy & Precision, but the lower Recall score has penalised the F1-Score meaning that is actually lower than what was seen for both the Decision Tree & the Random Forest!
+The KNN has obtained the highest overall Classification Accuracy & Precision, but the lower Recall score has penalized the F1-Score meaning that is actually lower than what was seen for both the Decision Tree & the Random Forest!
 
 <br>
+
 ### Finding The Optimal Value For k <a name="knn-opt-k"></a>
 
 By default, the KNN algorithm within scikit-learn will use k = 5 meaning that classifications are based upon the five nearest neighbouring data-points in n-dimensional space.
@@ -1505,6 +1475,7 @@ Just because this is the default threshold *does not mean* it is the best one fo
 Here, we will test many potential values for k, and plot the Precision, Recall & F1-Score, and find an optimal solution!
 
 <br>
+
 ```python
 
 # set up range for search, and empty list to append accuracy scores to
@@ -1536,21 +1507,23 @@ plt.show()
 
 ```
 <br>
-That code gives us the below plot - which visualises the results!
 
 <br>
+
 ![alt text](/img/posts/knn-optimal-k-value-plot.png "KNN Optimal k Value Plot")
 
 <br>
-In the plot we can see that the *maximum* F1-Score on the test set is found when applying a k value of 5 - which is exactly what we started with, so nothing needs to change!
+
+It turns out that the *maximum* F1-Score on the test set is found when applying a k value of 5 - which is exactly what we started with, so nothing needs to change!
 
 ___
 <br>
-# Modelling Summary  <a name="modelling-summary"></a>
 
-The goal for the project was to build a model that would accurately predict the customers that would sign up for the *delivery club*.  This would allow for a much more targeted approach when running the next iteration of the campaign.  A secondary goal was to understand what the drivers for this are, so the client can get closer to the customers that need or want this service, and enhance their messaging.
+## Modelling Summary  <a name="modelling-summary"></a>
 
-Based upon these, the chosen the model is the Random Forest as it was a) the most consistently performant on the test set across classication accuracy, precision, recall, and f1-score, and b) the feature importance and permutation importance allows the client an understanding of the key drivers behind *delivery club* signups.
+The primary goal for the project was to build a model that would accurately predict the customers that would sign up for the *delivery club*. This would allow for a much more targeted approach when running the next iteration of the campaign. A secondary goal was to understand what the drivers for this are, so the client can get closer to the customers that need or want this service, and enhance their messaging.
+
+Based upon these, the chosen the model is the Random Forest as it was a) the most consistent performer on the test set across classication accuracy, precision, recall, and f1-score, and b) the feature importance and permutation importance allows the client an understanding of the key drivers behind *delivery club* signups.
 
 <br>
 **Metric 1: Classification Accuracy**
@@ -1586,18 +1559,18 @@ Based upon these, the chosen the model is the Random Forest as it was a) the mos
 
 ___
 <br>
-# Application <a name="modelling-application"></a>
 
-We now have a model object, and a the required pre-processing steps to use this model for the next *delivery club* campaign.  When this is ready to launch we can aggregate the neccessary customer information and pass it through, obtaining predicted probabilities for each customer signing up.
+## Application <a name="modelling-application"></a>
 
-Based upon this, we can work with the client to discuss where their budget can stretch to, and contact only the customers with a high propensity to join.  This will drastically reduce marketing costs, and result in a much improved ROI.
+We now have a model object, and a the required pre-processing steps to use this model for the next *delivery club* campaign. When this is ready to launch we can aggregate the neccessary customer information and pass it through, obtaining predicted probabilities for each customer signing up.
+
+Based upon this, we can work with the client to discuss where their budget can stretch to, and contact only the customers with a high propensity to join, thereby reducing marketing costs, and improving ROI.
 
 ___
 <br>
-# Growth & Next Steps <a name="growth-next-steps"></a>
 
-While predictive accuracy was relatively high - other modelling approaches could be tested, especially those somewhat similar to Random Forest, for example XGBoost, LightGBM to see if even more accuracy could be gained.
+## Growth & Next Steps <a name="growth-next-steps"></a>
 
-We could even look to tune the hyperparameters of the Random Forest, notably regularisation parameters such as tree depth, as well as potentially training on a higher number of Decision Trees in the Random Forest.
+While predictive accuracy was relatively high, other modelling approaches could be tested to see if even more accuracy could be gained.
 
-From a data point of view, further variables could be collected, and further feature engineering could be undertaken to ensure that we have as much useful information available for predicting customer loyalty
+From a data point of view, further data could be collected, and further feature engineering could be undertaken to ensure that we have as much useful information available for predicting delivery club sign up. For example, because distance from store appears to be the key driver of delivery club sign up (as well as customer loyalty... c.f., _Predicting Customer Loyalty_), it may make sense to collect more data on the geographic details of the business, specifically, where do customers live in relation to ABC vs. other stores?
