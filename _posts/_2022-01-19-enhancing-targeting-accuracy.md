@@ -5,8 +5,7 @@ image: "/posts/classification-title-img.png"
 tags: [Customer Targeting, Machine Learning, Classification, Python]
 ---
 
-In this project, I use machine learning models for a classification task to solve another business for ABC Grocery. 
-ABC wants to reduce mailing costs, and improve ROI, so they would like to know whether a promotional campaign to sign customers up for a delivery subscription works. 
+In this project, I use machine learning models for a classification task to solve another business problem for ABC Grocery: Logistic Regression, Decision Tree, Random Forest, and K-Nearest-Neighbors.
 
 # Table of contents
 
@@ -39,7 +38,7 @@ ABC Grocery sent out mailers in a marketing campaign for their new *delivery clu
 
 The overall goal here is to *predict* delivery club membership, which is a binary (yes/no) outcome, and therefore a classification problem that machine learning can help solve. 
 
-Like the regression problem from a previous post (where we used machine learning to predict customer loyalty) this task involves familiar modeling techniques - Logistic (not linear) Regression, Decision Tree, and Random Forest - and here we include the K-Nearest Neighbors (KNN) method, and compare results for their predictive power. Because the methods are mostly familiar, I'll reserve my notes for strictly classification concerns. 
+Like the regression problem from a previous post (c.f., *Predicting Customer Loyalty*) this task involves familiar modeling techniques - Logistic (not linear) Regression, Decision Tree, and Random Forest - and here we include the K-Nearest Neighbors (KNN) method, and comparing the results for their predictive power. Because the methods are mostly familiar, I'll reserve my notes for classification concerns. 
 
 The data from the last marketing campaign found that 69% of customers did not sign up and 31% did. The data is not perfectly balanced at 50:50, but it isn't *too* imbalanced either. Thus, the data is appropriate for classification modeling, but we make sure to not rely on classification accuracy alone when assessing results - also analysing Precision, Recall, and F1-Score.
 
@@ -347,7 +346,7 @@ The below code then produces a plot that visualises the cross-validated classifi
 
 ```python
 
-plt.style.use('seaborn-poster')
+plt.style.use("seaborn-v0_8-poster")
 plt.plot(range(1, len(fit.cv_results_['mean_test_score']) + 1), fit.cv_results_['mean_test_score'], marker = "o")
 plt.ylabel("Classification Accuracy")
 plt.xlabel("Number of Features")
@@ -412,7 +411,7 @@ The below code creates the Confusion Matrix using the *confusion_matrix* functio
 conf_matrix = confusion_matrix(y_test, y_pred_class)
 
 # plot the confusion matrix
-plt.style.use("seaborn-poster")
+plt.style.use("seaborn-v0_8-poster")
 plt.matshow(conf_matrix, cmap = "coolwarm")
 plt.gca().xaxis.tick_bottom()
 plt.title("Confusion Matrix")
@@ -708,7 +707,7 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 conf_matrix = confusion_matrix(y_test, y_pred_class)
 
 # plot the confusion matrix
-plt.style.use("seaborn-poster")
+plt.style.use("seaborn-v0_8-poster")
 plt.matshow(conf_matrix, cmap = "coolwarm")
 plt.gca().xaxis.tick_bottom()
 plt.title("Confusion Matrix")
@@ -988,7 +987,7 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 conf_matrix = confusion_matrix(y_test, y_pred_class)
 
 # plot the confusion matrix
-plt.style.use("seaborn-poster")
+plt.style.use("seaborn-v0_8-poster")
 plt.matshow(conf_matrix, cmap = "coolwarm")
 plt.gca().xaxis.tick_bottom()
 plt.title("Confusion Matrix")
@@ -1108,11 +1107,9 @@ There are slight differences in the order or "importance" for the remaining vari
 ___
 <br>
 
-## K Nearest Neighbours <a name="knn-title"></a>
+## K Nearest Neighbors <a name="knn-title"></a>
 
-K nearest neighbors 
-
-
+K nearest neighbors is a method of prediction where each datapoint is assessed for similar it is (or how close it is) to other data points. 
 
 <br>
 
@@ -1149,13 +1146,7 @@ data_for_model["signup_flag"].value_counts(normalize = True)
 
 ### Data Preprocessing <a name="knn-preprocessing"></a>
 
-For KNN, as it is a distance based algorithm, we have certain data preprocessing steps that need to be addressed, including:
-
-* Missing values in the data
-* The effect of outliers
-* Encoding categorical variables to numeric form
-* Feature Scaling
-* Feature Selection
+As a distance-based algorithm, KNN models are influenced by outliers, and they require scaled data. Other than this, the preprocessing steps are the same as the models above. 
 
 <br>
 
@@ -1175,11 +1166,7 @@ data_for_model.dropna(how = "any", inplace = True)
 
 #### Outliers
 
-As KNN is a distance based algorithm, you could argue that if a data point is a long way away, then it will simply never be selected as one of the neighbours - and this is true - but outliers can still cause us problems here.  The main issue we face is when we come to scale our input variables, a very important step for a distance based algorithm.
-
-We don't want any variables to be "bunched up" due to a single outlier value, as this will make it hard to compare their values to the other input variables.  We should always investigate outliers rigorously - in this case we will simply remove them.
-
-In this code section, just like we saw when applying Logistic Regression, we use **.describe()** from Pandas to investigate the spread of values for each of our predictors.  The results of this can be seen in the table below.
+As KNN models are affected by outliers, because when we scale the data, outliers cause remaining values to be bunched together - far from the outlier values, which may cause problems comparing them to the other input variables. Like in previous models, we can use the boxplot method to identify and remove outliers. 
 
 <br>
 
@@ -1192,17 +1179,6 @@ In this code section, just like we saw when applying Logistic Regression, we use
 | 50% | 1.64 | 0.59 | 691.64 | 123.00 | 23.00 | 4.00 | 31.07  |
 | 75% | 2.92 | 0.67 | 1121.53 | 170.50 | 28.00 | 5.00 | 46.43  |
 | max | 400.97 | 0.88 | 7372.06 | 910.00 | 75.00 | 5.00 | 141.05  |
-
-<br>
-Again, based on this investigation, we see some *max* column values for several variables to be much higher than the *median* value.
-
-This is for columns *distance_from_store*, *total_sales*, and *total_items*
-
-For example, the median *distance_to_store* is 1.64 miles, but the maximum is over 400 miles!
-
-Because of this, we apply some outlier removal in order to facilitate generalisation across the full dataset.
-
-We do this using the "boxplot approach" where we remove any rows where the values within those columns are outside of the interquartile range multiplied by 2.
 
 <br>
 
@@ -1232,9 +1208,7 @@ for column in outlier_columns:
 
 #### Split Out Data For Modelling
 
-In exactly the same way we've done for the other three models, in the next code block we do two things, we firstly split our data into an X object which contains only the predictor variables, and a y object that contains only our dependent variable.
-
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training. In this case, we have allocated 80% of the data for training, and the remaining 20% for validation. Again, we make sure to add in the stratify parameter to ensure that both our training and test sets have the same proportion of customers who did, and did not, sign up for the delivery club - meaning we can be more confident in our assessment of predictive performance.
+Same as in the previous models...
 
 <br>
 
@@ -1252,6 +1226,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 <br>
 
 #### Categorical Predictor Variables
+
+See the discussion in the Logistic Regression code, above. 
 
 <br>
 
@@ -1285,19 +1261,12 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 
 #### Feature Scaling
 
-As KNN is a *distance based* algorithm, in other words it is reliant on an understanding of how similar or different data points are across different dimensions in n-dimensional space, the application of *Feature Scaling* is extremely important.
+In distance baseds algorithms in which the models compares values to similar or different data points across different dimensions in n-dimensional space, it is important to ensure that the variances for all variables are similar.
 
-Feature Scaling is where we force the values from different columns to exist on the same scale, in order to enchance the learning capabilities of the model. There are two common approaches for this, Standardization, and Normalization.
-
-Standardization rescales data to have a mean of 0, and a standard deviation of 1 - meaning most datapoints will most often fall between values of around -4 and +4.
-
-Normalization rescales datapoints so that they exist in a range between 0 and 1.
-
-The below code uses the in-built *MinMaxScaler* functionality from scikit-learn to apply Normalisation to all of our input variables.  The reason we choose Normalization over Standardization is that our scaled data will all exist between 0 and 1, and these will then be compatible with any categorical variables that we have encoded as 1's and 0's. 
-
-In the code, we also make sure to apply *fit_transform* to the training set, but only *transform* to the test set. This means the scaling logic will learn and apply the scaling "rules" from the training data, but only apply them to the test data (or any other data we predict on in the future). This is important in order to avoid data leakage where the test set learns information about the training data, and means we can’t fully trust model performance metrics!
+There are two common approaches for this, Standardization, and Normalization. Standardization rescales data to have a mean of 0, and a standard deviation of 1 - meaning most datapoints will most often fall between values of around -4 and +4. Normalization rescales datapoints so that they exist in a range between 0 and 1. Normalized data are less intuitive to interpret, but it is prefered here so that the scaled data will be compatible with any categorical variables that we have encoded as 1's and 0's. 
 
 <br>
+
 ```python
 
 # create our scaler object
@@ -1315,13 +1284,8 @@ X_test = pd.DataFrame(scale_norm.transform(X_test), columns = X_test.columns)
 
 #### Feature Selection
 
-As we discussed when applying Logistic Regression above - Feature Selection is the process used to select the input variables that are most important to your Machine Learning task.  For more information around this, please see that section above.
+As we discussed when applying Logistic Regression above - *Recursive Feature Elimination With Cross Validation (RFECV)* allows us to find the optimal number of input variables to model by finding the optimal accuracy scores over a number of model scenarios. 
 
-When applying KNN, Feature Selection is an interesting topic.  The algorithm is measuring the distance between data-points across all dimensions, where each dimension is one of our input variables.  The algorithm treats each input variable as equally important, there isn't really a concept of "feature importance" so the spread of data within an unimportant variable could have an effect on judging other data points as either "close" or "far".  If we had a lot of "unimportant" variables in our data, this *could* create a lot of noise for the algorithm to deal with, and we'd just see poor classification accuracy without really knowing why.
-
-Having a high number of input variables also means the algorithm has to process a lot more information when processing distances between all of the data-points, so any way to reduce dimensionality is important from a computational perspective as well.
-
-For our task here we are again going to apply *Recursive Feature Elimination With Cross Validation (RFECV)* which is an approach that starts with all input variables, and then iteratively removes those with the weakest relationships with the output variable.  RFECV does this using Cross Validation, so splits the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately.  This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was.  From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
 
 <br>
 
@@ -1347,11 +1311,11 @@ X_test = X_test.loc[:, feature_selector.get_support()]
 
 <br>
 
-The below code then produces a plot that visualises the cross-validated classification accuracy with each potential number of features
+We can then visualize these the cross-validated classification accuracy scores for each potential number of input variables. 
 
 ```python
 
-plt.style.use('seaborn-poster')
+plt.style.use("seaborn-v0_8-poster")
 plt.plot(range(1, len(fit.cv_results_['mean_test_score']) + 1), fit.cv_results_['mean_test_score'], marker = "o")
 plt.ylabel("Classification Accuracy")
 plt.xlabel("Number of Features")
@@ -1363,7 +1327,7 @@ plt.show()
 
 <br>
 
-This creates the below plot, which shows us that the highest cross-validated classification accuracy (0.9472) is when we include six of our original input variables - although there isn't much difference in predictive performance between using three variables through to eight variables - and this syncs with what we saw in the Random Forest section above where only three of the input variables scored highly when assessing Feature Importance & Permutation Importance.
+The highest cross-validated classification accuracy (0.9472) is when we include six of our original input variables - although there isn't much difference in predictive performance between using three variables through to eight variables - and this syncs with what we saw in the Random Forest section above where only three of the input variables scored highly when assessing Feature Importance & Permutation Importance.
 
 The variables that have been dropped are *total_items* and *credit score* - we will continue on with the remaining six!
 
@@ -1377,8 +1341,8 @@ The variables that have been dropped are *total_items* and *credit score* - we w
 
 Instantiating and training our KNN model is done using the below code.  At this stage we will just use the default parameters, meaning that the algorithm:
 
-* Will use a value for k of 5, or in other words it will base classifications based upon the 5 nearest neighbours
-* Will use *uniform* weighting, or in other words an equal weighting to all 5 neighbours regardless of distance
+* Will use a value for k of 5, or in other words it will base classifications based upon the 5 nearest neighbors
+* Will use *uniform* (default) weighting, or in other words an equal weighting to all 5 neighbors regardless of distance
 
 ```python
 
@@ -1414,7 +1378,7 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 conf_matrix = confusion_matrix(y_test, y_pred_class)
 
 # plot the confusion matrix
-plt.style.use("seaborn-poster")
+plt.style.use("seaborn-v0_8-poster")
 plt.matshow(conf_matrix, cmap = "coolwarm")
 plt.gca().xaxis.tick_bottom()
 plt.title("Confusion Matrix")
@@ -1514,7 +1478,7 @@ plt.show()
 
 <br>
 
-It turns out that the *maximum* F1-Score on the test set is found when applying a k value of 5 - which is exactly what we started with, so nothing needs to change!
+It turns out that the *maximum* F1-Score on the test set is found when applying a k value of 5 - which is exactly what we started with, so nothing needs to change.
 
 ___
 <br>
