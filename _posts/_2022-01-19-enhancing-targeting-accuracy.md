@@ -278,7 +278,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 
 #### Categorical Predictor Variables
 
-Again using the One Hot Encoder function from scikitlearn to transform categorical data into numeric form (c.f, _predicting customer loyalty_). This ensures that the model can learn from patterns in the training data and apply them to unseen future data. For example, in the case of our data, although *gender* only includes two values, "M" & "F", future data may include additional categories, and the code here allows the model the flexibility to parse that data. 
+Recoding categorical data for classification works the same as it does for regression: data needs to be in numeric form, 1s and 0s. 
+
+Again, I use the One Hot Encoder function from scikitlearn to make the transformation. This ensures that the model can learn from patterns in the training data and apply them to unseen future data. For example, in the case of our data, although *gender* only includes two values, "M" & "F", future data may include additional categories, and the code here allows the model the flexibility to parse the data in that event. 
 
 <br>
 
@@ -312,13 +314,13 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 
 #### Feature Selection
 
-Selecting the most important variables for the model means that we can have:
+Features Selection also works the same for logistic regression as it does for linear regression. Selecting the most important variables for the model means that we can have:
 
 * **Improved Model Accuracy** - eliminating noise can help true relationships stand out
 * **Lower Computational Cost** - our model becomes faster to train, and faster to make predictions
 * **Explainability** - understanding & explaining outputs for stakeholder & customers becomes much easier
 
-Although I like to analyze variable relationships at the bivariate level - using Chi-Square analyses to assess relationships (with categorical outcomes), a convenient approach for Machine Learning tasks, executable with the suite of scikitlearn functions is called *Recursive Feature Elimination With Cross Validation*. RFECV splits the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately. This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was. From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
+Although I like to analyze variable relationships at the bivariate level - using Chi-Square analyses to assess relationships (with categorical outcomes), *Recursive Feature Elimination With Cross Validation* using the scikitlearn package is convenient for machine learning tasks. RFECV splits the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately. This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was. From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
 
 <br>
 ```python
@@ -341,7 +343,7 @@ X_test = X_test.loc[:, feature_selector.get_support()]
 ```
 
 <br>
-The below code then produces a plot that visualises the cross-validated classification accuracy with each potential number of features
+The below code then produces a plot that visualises the cross-validated classification accuracy with each potential number of features.
 
 ```python
 
@@ -356,15 +358,17 @@ plt.show()
 ```
 
 <br>
-This creates the below plot, which shows us that the highest cross-validated classification accuracy (0.904) is when we include seven of our original input variables.  The variable that has been dropped is *total_sales* but from the chart we can see that the difference is negligible.  However, we will continue on with the selected seven!
+The highest cross-validated classification accuracy (0.904) is when we include seven of our original input variables.
 
 <br>
+
 ![alt text](/img/posts/log-reg-feature-selection-plot.png "Logistic Regression Feature Selection Plot")
 
 <br>
+
 ### Model Training <a name="logreg-model-training"></a>
 
-Instantiating and training our Logistic Regression model is done using the below code.  We use the *random_state* parameter to ensure reproducible results, meaning any refinements can be compared to past results.  We also specify *max_iter = 1000* to allow the solver more attempts at finding an optimal regression line, as the default value of 100 was not enough.
+Now can train the model, using the *random_state* parameter to ensure reproducible results. The *max_iter = 1000* parameter to allow the solver more attempts at finding an optimal regression line, as the default value of 100 was not enough.
 
 ```python
 
@@ -377,11 +381,12 @@ clf.fit(X_train, y_train)
 ```
 
 <br>
+
 ### Model Performance Assessment <a name="logreg-model-assessment"></a>
 
 ##### Predict On The Test Set
 
-To assess how well our model is predicting on new data - we use the trained model object (here called *clf*) and ask it to predict the *signup_flag* variable for the test set.
+To assess how well our model is predicting on new data - we ask the trained model object (here called *clf*) to predict the *signup_flag* variable for the test set.
 
 In the code below we create one object to hold the binary 1/0 predictions, and another to hold the actual prediction probabilities for the positive class.
 
@@ -394,7 +399,8 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 ```
 
 <br>
-##### Confusion Matrix
+
+#### Confusion Matrix
 
 A Confusion Matrix provides us a visual way to understand how our predictions match up against the actual values for those test set observations.
 
@@ -419,6 +425,7 @@ plt.show()
 ```
 
 <br>
+
 ![alt text](/img/posts/log-reg-confusion-matrix.png "Logistic Regression Confusion Matrix")
 
 <br>
@@ -427,15 +434,14 @@ The aim is to have a high proportion of observations falling into the top left c
 Since the proportion of signups in our data was around 30:70 we will next analyse not only Classification Accuracy, but also Precision, Recall, and F1-Score which will help us assess how well our model has performed in reality.
 
 <br>
-##### Classification Performance Metrics
+
+#### Classification Performance Metrics
 <br>
 **Classification Accuracy**
 
-Classification Accuracy is a metric that tells us *of all predicted observations, what proportion did we correctly classify*.  This is very intuitive, but when dealing with imbalanced classes, can be misleading.  
+Classification Accuracy is a metric that tells us *of all predicted observations, what proportion were correctly classified*.  This is intuitive, but when dealing with imbalanced classes, classification accuracy alone can be misleading.  
 
-An example of this could be a rare disease. A model with a 98% Classification Accuracy on might appear like a fantastic result, but if our data contained 98% of patients *without* the disease, and 2% *with* the disease - then a 98% Classification Accuracy could be obtained simply by predicting that *no one* has the disease - which wouldn't be a great model in the real world.  Luckily, there are other metrics which can help us!
-
-In this example of the rare disease, we could define Classification Accuracy as *of all predicted patients, what proportion did we correctly classify as either having the disease, or not having the disease*
+An example of this could be a rare disease. A model with a 98% Classification Accuracy on might appear like a fantastic result, but if our data contained 98% of patients *without* the disease, and 2% *with* the disease - then a 98% Classification Accuracy could be obtained simply by predicting that *no one* has the disease - even though the model did nothing. 
 
 <br>
 **Precision & Recall**
@@ -448,21 +454,15 @@ Recall is a metric that tells us *of all positive observations, how many did we 
 
 Again, referring to the rare disease example, Recall would tell us *of all patients who actually had the disease, how many did we correctly predict*
 
-The tricky thing about Precision & Recall is that it is impossible to optimise both - it's a zero-sum game.  If you try to increase Precision, Recall decreases, and vice versa.  Sometimes however it will make more sense to try and elevate one of them, in spite of the other.  In the case of our rare-disease prediction like we've used in our example, perhaps it would be more important to optimise for Recall as we want to classify as many positive cases as possible.  In saying this however, we don't want to just classify every patient as having the disease, as that isn't a great outcome either!
-
-So - there is one more metric we will discuss & calculate, which is actually a *combination* of both...
+The tricky thing about Precision & Recall is that it is impossible to optimize both.  If you try to increase Precision, Recall decreases, and vice versa. Sometimes however it will make more sense to try and elevate one of them, in spite of the other. In the case of rare-disease prediction, perhaps it would be more important to optimize for Recall as we want to classify as many positive cases as possible. In saying this however, we don't want to just classify every patient as having the disease, as that isn't a great outcome either!
 
 <br>
 **F1 Score**
 
-F1-Score is a metric that essentially "combines" both Precision & Recall.  Technically speaking, it is the harmonic mean of these two metrics.  A good, or high, F1-Score comes when there is a balance between Precision & Recall, rather than a disparity between them.
-
-Overall, optimising your model for F1-Score means that you'll get a model that is working well for both positive & negative classifications rather than skewed towards one or the other.  To return to the rare disease predictions, a high F1-Score would mean we've got a good balance between successfully predicting the disease when it's present, and not predicting cases where it's not present.
-
-Using all of these metrics in combination gives a really good overview of the performance of a classification model, and gives us an understanding of the different scenarios & considerations!
+So... the F1-Score is a metric that takes the harmonic mean of Precisoin and Recall. A good, or high, F1-Score comes when there is a balance between Precision & Recall, rather than a disparity between them. It means that the model is working well for both positive & negative classifications rather than skewed towards one or the other. To return to the rare disease predictions, a high F1-Score would mean there is a good balance between successfully predicting the disease when it's present, and not predicting cases where it's not present.
 
 <br>
-In the code below, we utilise in-built functionality from scikit-learn to calculate these four metrics.
+And again, the scikitlearn package makes calculating all of this very convenient.
 
 ```python
 
@@ -487,18 +487,20 @@ Running this code gives us:
 * Recall = **0.69** meaning that of all *actual* delivery club signups, we predicted correctly 69% of the time
 * F1-Score = **0.734** 
 
-Since our data is *somewhat* imbalanced, looking at these metrics rather than just Classification Accuracy on it's own - is a good idea, and gives us a much better understanding of what our predictions mean!  We will use these same metrics when applying other models for this task, and can compare how they stack up.
+Since our data is somewhat imbalanced, looking at these metrics is a good idea, and gives us a much better understanding of what our predictions mean. The same metrics can be applied to the other classification models for this task, so we can compare them to find out what type of algorithm works the best.
 
 <br>
+
 ### Finding The Optimal Classification Threshold <a name="logreg-opt-threshold"></a>
 
 By default, most pre-built classification models & algorithms will just use a 50% probability to discern between a positive class prediction (delivery club signup) and a negative class prediction (delivery club non-signup).
 
-Just because 50% is the default threshold *does not mean* it is the best one for our task.
+Just because 50% is the default threshold *does not mean* it is the best one for our task. A lower or higher probability threshold (although counterintuitive) may actually predict the data better. 
 
-Here, we will test many potential classification thresholds, and plot the Precision, Recall & F1-Score, and find an optimal solution!
+Different thresholds can be used, and the accuracy metrics can be plotted, to find the optimal solution threshold. 
 
 <br>
+
 ```python
 
 # set up the list of thresholds to loop through
@@ -533,10 +535,11 @@ max_f1_idx = f1_scores.index(max_f1)
 Now we have run this, we can use the below code to plot the results!
 
 <br>
+
 ```python
 
 # plot the results
-plt.style.use("seaborn-poster")
+plt.style.use("seaborn-v0_8-poster")
 plt.plot(thresholds, precision_scores, label = "Precision", linestyle = "--")
 plt.plot(thresholds, recall_scores, label = "Recall", linestyle = "--")
 plt.plot(thresholds, f1_scores, label = "F1", linewidth = 5)
@@ -548,33 +551,23 @@ plt.tight_layout()
 plt.show()
 
 ```
+
 <br>
+
 ![alt text](/img/posts/log-reg-optimal-threshold-plot.png "Logistic Regression Optimal Threshold Plot")
 
 <br>
-Along the x-axis of the above plot we have the different classification thresholds that were testing.  Along the y-axis we have the performance score for each of our three metrics.  As per the legend, we have Precision as a blue dotted line, Recall as an orange dotted line, and F1-Score as a thick green line.  You can see the interesting "zero-sum" relationship between Precision & Recall *and* you can see that the point where Precision & Recall meet is where F1-Score is maximised.
 
-As you can see at the top of the plot, the optimal F1-Score for this model 0.78 and this is obtained at a classification threshold of 0.44.  This is higher than the F1-Score of 0.734 that we achieved at the default classification threshold of 0.50!
+Thus we can visualize our performance metrics at each 0.01 probability treshhold between 0 and 1.  As per the legend, we have Precision as a blue dotted line, Recall as an orange dotted line, and F1-Score as a thick green line. As we can see, the point where Precision & Recall meet is where the F1-Score is maximized, which is obtained at a classification threshold of 0.44.
 
 ___
 <br>
-# Decision Tree <a name="clftree-title"></a>
 
-We will again utlise the scikit-learn library within Python to model our data using a Decision Tree. The code sections below are broken up into 6 key sections:
-
-* Data Import
-* Data Preprocessing
-* Model Training
-* Performance Assessment
-* Tree Visualisation
-* Decision Tree Regularisation
+## Decision Tree <a name="clftree-title"></a>
 
 <br>
+
 ### Data Import <a name="clftree-import"></a>
-
-Since we saved our modelling data as a pickle file, we import it.  We ensure we remove the id column, and we also ensure our data is shuffled.
-
-Just like we did for Logistic Regression - our code also investigates the class balance of our dependent variable.
 
 ```python
 
@@ -603,17 +596,14 @@ data_for_model["signup_flag"].value_counts(normalize = True)
 
 ```
 <br>
+
 ### Data Preprocessing <a name="clftree-preprocessing"></a>
 
-While Logistic Regression is susceptible to the effects of outliers, and highly correlated input variables - Decision Trees are not, so the required preprocessing here is lighter. We still however will put in place logic for:
-
-* Missing values in the data
-* Encoding categorical variables to numeric form
+While Logistic Regression is susceptible to the effects of outliers, and highly correlated input variables - Decision Trees are not, so we don't need to remove them. 
 
 <br>
-##### Missing Values
 
-The number of missing values in the data was extremely low, so instead of applying any imputation (i.e. mean, most common value) we will just remove those rows
+#### Missing Values
 
 ```python
 
@@ -624,14 +614,13 @@ data_for_model.dropna(how = "any", inplace = True)
 ```
 
 <br>
-##### Split Out Data For Modelling
 
-In exactly the same way we did for Logistic Regression, in the next code block we do two things, we firstly split our data into an **X** object which contains only the predictor variables, and a **y** object that contains only our dependent variable.
+#### Split Out Data For Modelling
 
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training.  In this case, we have allocated 80% of the data for training, and the remaining 20% for validation.  Again, we make sure to add in the *stratify* parameter to ensure that both our training and test sets have the same proportion of customers who did, and did not, sign up for the *delivery club* - meaning we can be more confident in our assessment of predictive performance.
-
+Again, we make sure to add in the *stratify* parameter to ensure that both our training and test sets have the same proportion of customers who did, and did not, sign up for the *delivery club* - so we can be more confident in our assessment of predictive performance.
 
 <br>
+
 ```python
 
 # split data into X and y objects for modelling
@@ -644,15 +633,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 ```
 
 <br>
-##### Categorical Predictor Variables
 
-In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
+#### Categorical Predictor Variables
 
-Just like the Logisitc Regression algorithm, the Decision Tree cannot deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
-
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - we would again apply One Hot Encoding to the categorical column.
+c.f., Logistic Regression, above. 
 
 <br>
+
 ```python
 
 # list of categorical variables that need encoding
@@ -680,9 +667,8 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 ```
 
 <br>
-### Model Training <a name="clftree-model-training"></a>
 
-Instantiating and training our Decision Tree model is done using the below code.  We use the *random_state* parameter to ensure we get reproducible results, and this helps us understand any improvements in performance with changes to model hyperparameters.
+### Model Training <a name="clftree-model-training"></a>
 
 ```python
 
@@ -695,9 +681,10 @@ clf.fit(X_train, y_train)
 ```
 
 <br>
+
 ### Model Performance Assessment <a name="clftree-model-assessment"></a>
 
-##### Predict On The Test Set
+#### Predict On The Test Set
 
 Just like we did with Logistic Regression, to assess how well our model is predicting on new data - we use the trained model object (here called *clf*) and ask it to predict the *signup_flag* variable for the test set.
 
@@ -712,11 +699,8 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 ```
 
 <br>
-##### Confusion Matrix
 
-As we discussed in the above section applying Logistic Regression - a Confusion Matrix provides us a visual way to understand how our predictions match up against the actual values for those test set observations.
-
-The below code creates the Confusion Matrix using the *confusion_matrix* functionality from within scikit-learn and then plots it using matplotlib.
+#### Confusion Matrix
 
 ```python
 
@@ -737,21 +721,17 @@ plt.show()
 ```
 
 <br>
+
 ![alt text](/img/posts/clf-tree-confusion-matrix.png "Decision Tree Confusion Matrix")
 
 <br>
-The aim is to have a high proportion of observations falling into the top left cell (predicted non-signup and actual non-signup) and the bottom right cell (predicted signup and actual signup).
-
-Since the proportion of signups in our data was around 30:70 we will again analyse not only Classification Accuracy, but also Precision, Recall, and F1-Score as they will help us assess how well our model has performed from different points of view.
-
 <br>
-##### Classification Performance Metrics
+
+#### Classification Performance Metrics
 <br>
 **Accuracy, Precision, Recall, F1-Score**
 
-For details on these performance metrics, please see the above section on Logistic Regression.  Using all four of these metrics in combination gives a really good overview of the performance of a classification model, and gives us an understanding of the different scenarios & considerations!
-
-In the code below, we utilise in-built functionality from scikit-learn to calculate these four metrics.
+For details on these performance metrics, please see the above section on Logistic Regression. 
 
 ```python
 
@@ -769,22 +749,22 @@ f1_score(y_test, y_pred_class)
 
 ```
 <br>
-Running this code gives us:
 
 * Classification Accuracy = **0.929** meaning we correctly predicted the class of 92.9% of test set observations
 * Precision = **0.885** meaning that for our *predicted* delivery club signups, we were correct 88.5% of the time
 * Recall = **0.885** meaning that of all *actual* delivery club signups, we predicted correctly 88.5% of the time
 * F1-Score = **0.885**
 
-These are all higher than what we saw when applying Logistic Regression, even after we had optimised the classification threshold!
-
+These are all higher than what we saw when applying Logistic Regression, even after we had optimized the classification threshold!
 
 <br>
+
 ### Visualise Our Decision Tree <a name="clftree-visualise"></a>
 
-To see the decisions that have been made in the tree, we can use the plot_tree functionality that we imported from scikit-learn.  To do this, we use the below code:
+To see the decisions that have been made in the tree, we can use the plot_tree functionality that we imported from scikit-learn. 
 
 <br>
+
 ```python
 
 # plot the nodes of the decision tree
@@ -800,23 +780,23 @@ tree = plot_tree(clf,
 That code gives us the below plot:
 
 <br>
+
 ![alt text](/img/posts/clf-tree-nodes-plot.png "Decision Tree Max Depth Plot")
 
 <br>
-This is a very powerful visual, and one that can be shown to stakeholders in the business to ensure they understand exactly what is driving the predictions.
 
-One interesting thing to note is that the *very first split* appears to be using the variable *distance from store* so it would seem that this is a very important variable when it comes to predicting signups to the delivery club!
+We can note that the *very first split* appears to be using the variable *distance from store* so it would seem that this is a very important variable when it comes to predicting signups to the delivery club.
 
 <br>
+
 ### Decision Tree Regularisation <a name="clftree-model-regularisation"></a>
 
-Decision Tree's can be prone to over-fitting, in other words, without any limits on their splitting, they will end up learning the training data perfectly.  We would much prefer our model to have a more *generalised* set of rules, as this will be more robust & reliable when making predictions on *new* data.
+Decision Trees will over-fit if they're not limited in some way. Without any limits on their splitting, they will end up learning the training data perfectly. Instead we want a model that is flexible and can generalize, instead of predicting data that it already knows, as this will be more robust & reliable when making predictions on *new* data.
 
-One effective method of avoiding this over-fitting, is to apply a *max depth* to the Decision Tree, meaning we only allow it to split the data a certain number of times before it is required to stop.
-
-We initially trained our model with a placeholder depth of 5, but unfortunately, we don't necessarily know the *optimal* number for this.  Below we will loop over a variety of values and assess which gives us the best predictive performance!
+Like with the regression analysis (c.f., predicting customer loyalty), we can apply a max_depth parameter. We initially trained our model with a placeholder depth of 5, but we don't *know* the number for this until we loop over a variety of values and assess which gives us the best predictive performance.
 
 <br>
+
 ```python
 
 # finding the best max_depth
@@ -839,6 +819,11 @@ max_accuracy = max(accuracy_scores)
 max_accuracy_idx = accuracy_scores.index(max_accuracy)
 optimal_depth = max_depth_list[max_accuracy_idx]
 
+```
+... which we can vizualize with the following. 
+
+```python
+
 # plot accuracy by max depth
 plt.plot(max_depth_list,accuracy_scores)
 plt.scatter(optimal_depth, max_accuracy, marker = "x", color = "red")
@@ -849,10 +834,9 @@ plt.tight_layout()
 plt.show()
 
 ```
-<br>
-That code gives us the below plot - which visualises the results!
 
 <br>
+
 ![alt text](/img/posts/clf-tree-max-depth-plot.png "Decision Tree Max Depth Plot")
 
 <br>
@@ -860,21 +844,12 @@ In the plot we can see that the *maximum* F1-Score on the test set is found when
 
 ___
 <br>
-# Random Forest <a name="rf-title"></a>
 
-We will again utlise the scikit-learn library within Python to model our data using a Random Forest. The code sections below are broken up into 4 key sections:
-
-* Data Import
-* Data Preprocessing
-* Model Training
-* Performance Assessment
+## Random Forest <a name="rf-title"></a>
 
 <br>
+
 ### Data Import <a name="rf-import"></a>
-
-Again, since we saved our modelling data as a pickle file, we import it.  We ensure we remove the id column, and we also ensure our data is shuffled.
-
-As this is the exact same process we ran for both Logistic Regression & the Decision Tree - our code also investigates the class balance of our dependent variable
 
 ```python
 
@@ -901,17 +876,14 @@ data_for_model = shuffle(data_for_model, random_state = 42)
 
 ```
 <br>
+
 ### Data Preprocessing <a name="rf-preprocessing"></a>
 
-While Linear Regression is susceptible to the effects of outliers, and highly correlated input variables - Random Forests, just like Decision Trees, are not, so the required preprocessing here is lighter. We still however will put in place logic for:
-
-* Missing values in the data
-* Encoding categorical variables to numeric form
+While Linear Regression is susceptible to the effects of outliers, and highly correlated input variables - Random Forests, just like Decision Trees, are not.
 
 <br>
-##### Missing Values
 
-The number of missing values in the data was extremely low, so instead of applying any imputation (i.e. mean, most common value) we will just remove those rows.  Again, this is exactly the same process we ran for Logistic Regression & the Decision Tree.
+#### Missing Values
 
 ```python
 
@@ -922,13 +894,11 @@ data_for_model.dropna(how = "any", inplace = True)
 ```
 
 <br>
-##### Split Out Data For Modelling
 
-In exactly the same way we did for both Logistic Regression & our Decision Tree, in the next code block we do two things, we firstly split our data into an X object which contains only the predictor variables, and a y object that contains only our dependent variable.
-
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training. In this case, we have allocated 80% of the data for training, and the remaining 20% for validation. Again, we make sure to add in the stratify parameter to ensure that both our training and test sets have the same proportion of customers who did, and did not, sign up for the delivery club - meaning we can be more confident in our assessment of predictive performance.
+#### Split Out Data For Modelling
 
 <br>
+
 ```python
 
 # split data into X and y objects for modelling
@@ -941,15 +911,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 ```
 
 <br>
-##### Categorical Predictor Variables
 
-In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
+#### Categorical Predictor Variables
 
-Just like the Logistic Regression algorithm, Random Forests cannot deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
-
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - we would again apply One Hot Encoding to the categorical column.
+See discussion in Logistic Regression, above... 
 
 <br>
+
 ```python
 
 # list of categorical variables that need encoding
@@ -977,13 +945,12 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 ```
 
 <br>
+
 ### Model Training <a name="rf-model-training"></a>
 
-Instantiating and training our Random Forest model is done using the below code.  We use the *random_state* parameter to ensure we get reproducible results, and this helps us understand any improvements in performance with changes to model hyperparameters.
+We can build more Decision Trees in the Random Forest (500) than would be done using the default value of 100. It may be worth testing the results of varying forest sizes. 
 
-We also look to build more Decision Trees in the Random Forest (500) than would be done using the default value of 100.
-
-Lastly, since the default scikit-learn implementation of Random Forests does not limit the number of randomly selected variables offered up for splitting at each split point in each Decision Tree - we put this in place using the *max_features* parameter.  This can always be refined later through testing, or through an approach such as gridsearch.
+Since the default scikit-learn implementation of Random Forests does not limit the number of randomly selected variables offered up for splitting at each split point in each Decision Tree - we put this in place using the *max_features* parameter. This can always be refined later through testing, or through an approach such as gridsearch.
 
 ```python
 
@@ -996,11 +963,10 @@ clf.fit(X_train, y_train)
 ```
 
 <br>
+
 ### Model Performance Assessment <a name="rf-model-assessment"></a>
 
-##### Predict On The Test Set
-
-Just like we did with Logistic Regression & our Decision Tree, to assess how well our model is predicting on new data - we use the trained model object (here called *clf*) and ask it to predict the *signup_flag* variable for the test set.
+#### Predict On The Test Set
 
 In the code below we create one object to hold the binary 1/0 predictions, and another to hold the actual prediction probabilities for the positive class.
 
@@ -1013,11 +979,8 @@ y_pred_prob = clf.predict_proba(X_test)[:,1]
 ```
 
 <br>
-##### Confusion Matrix
 
-As we discussed in the above sections - a Confusion Matrix provides us a visual way to understand how our predictions match up against the actual values for those test set observations.
-
-The below code creates the Confusion Matrix using the *confusion_matrix* functionality from within scikit-learn and then plots it using matplotlib.
+#### Confusion Matrix
 
 ```python
 
@@ -1038,21 +1001,17 @@ plt.show()
 ```
 
 <br>
+
 ![alt text](/img/posts/rf-confusion-matrix.png "Random Forest Confusion Matrix")
 
-<br>
-The aim is to have a high proportion of observations falling into the top left cell (predicted non-signup and actual non-signup) and the bottom right cell (predicted signup and actual signup).
-
-Since the proportion of signups in our data was around 30:70 we will again analyse not only Classification Accuracy, but also Precision, Recall, and F1-Score as they will help us assess how well our model has performed from different points of view.
 
 <br>
-##### Classification Performance Metrics
+
+#### Classification Performance Metrics
 <br>
 **Accuracy, Precision, Recall, F1-Score**
 
-For details on these performance metrics, please see the above section on Logistic Regression.  Using all four of these metrics in combination gives a really good overview of the performance of a classification model, and gives us an understanding of the different scenarios & considerations!
-
-In the code below, we utilise in-built functionality from scikit-learn to calculate these four metrics.
+See discussion in Logistic Regression, above...   
 
 ```python
 
@@ -1070,16 +1029,16 @@ f1_score(y_test, y_pred_class)
 
 ```
 <br>
-Running this code gives us:
 
 * Classification Accuracy = **0.935** meaning we correctly predicted the class of 93.5% of test set observations
 * Precision = **0.887** meaning that for our *predicted* delivery club signups, we were correct 88.7% of the time
 * Recall = **0.904** meaning that of all *actual* delivery club signups, we predicted correctly 90.4% of the time
 * F1-Score = **0.895**
 
-These are all higher than what we saw when applying Logistic Regression, and marginally higher than what we got from our Decision Tree.  If we are after out and out accuracy then this would be the best model to choose.  If we were happier with a simpler, easier explain model, but that had almost the same performance - then we may choose the Decision Tree instead!
+These are all higher than the results from the Logistic Regression model, and marginally higher than those from the Decision Tree model. Because our primary concern here is predictive accuracy, this is the best model to predict our data on. If we were happier with a simpler, easier to explain model, but that had almost the same performance - then we would choose the Decision Tree instead.
 
 <br>
+
 ### Feature Importance <a name="rf-model-feature-importance"></a>
 
 Random Forests are an ensemble model, made up of many, many Decision Trees, each of which is different due to the randomness of the data being provided, and the random selection of input variables available at each potential split point.
