@@ -5,7 +5,8 @@ image: "/posts/classification-title-img.png"
 tags: [Customer Targeting, Machine Learning, Classification, Python]
 ---
 
-Our client, a grocery retailer, wants to utilise Machine Learning to reduce mailing costs, and improve ROI!
+In this project, I use machine learning models for a classification task to solve another business for ABC Grocery. 
+ABC wants to reduce mailing costs, and improve ROI, so they would like to know whether a promotional campaign to sign customers up for a delivery subscription works. 
 
 # Table of contents
 
@@ -26,41 +27,36 @@ Our client, a grocery retailer, wants to utilise Machine Learning to reduce mail
 
 ___
 
-# Project Overview  <a name="overview-main"></a>
+## Project Overview  <a name="overview-main"></a>
 
 ### Context <a name="overview-context"></a>
 
-Our client, a grocery retailer, sent out mailers in a marketing campaign for their new *delivery club*.  This cost customers $100 per year for membership, and offered free grocery deliveries, rather than the normal cost of $10 per delivery.
+ABC Grocery sent out mailers in a marketing campaign for their new *delivery club*. The dlub costs customers $100 per year for membership, and offered free grocery deliveries, rather than the normal cost of $10 per delivery. ABC hopes that this will encourage customers to buy more groceries, but the marketing campaign is expensive, so first they would like to know which customers are likely to sign up. This will allow ABC to be more targeted in their mailing, thus lowering costs and improving their return on investment. 
 
-For this, they sent mailers to their entire customer base (apart from a control group) but this proved expensive.  For the next batch of communications they would like to save costs by *only* mailing customers that were likely to sign up.
-
-Based upon the results of the last campaign and the customer data available, we will look to understand the *probability* of customers signing up for the *delivery club*.  This would allow the client to mail a more targeted selection of customers, lowering costs, and improving ROI.
-
-Let's use Machine Learning to take on this task!
 <br>
-<br>
+
 ### Actions <a name="overview-actions"></a>
 
-We firstly needed to compile the necessary data from tables in the database, gathering key customer metrics that may help predict *delivery club* membership.
+The overall goal here is to *predict* delivery club membership, which is a binary (yes/no) outcome, and therefore a classification problem that machine learning can help solve. 
 
-Within our historical dataset from the last campaign, we found that 69% of customers did not sign up and 31% did.  This tells us that while the data isn't perfectly balanced at 50:50, it isn't *too* imbalanced either.  Even so, we make sure to not rely on classification accuracy alone when assessing results - also analysing Precision, Recall, and F1-Score.
+Like the regression problem from a previous post (where we used machine learning to predict customer loyalty) this task involves familiar modeling techniques - Logistic (not linear) Regression, Decision Tree, and Random Forest - and here we include the K-Nearest Neighbors (KNN) method, and compare results for their predictive power. Because the methods are mostly familiar, I'll reserve my notes for strictly classification concerns. 
 
-As we are predicting a binary output, we tested four classification modelling approaches, namely:
+The data from the last marketing campaign found that 69% of customers did not sign up and 31% did. The data is not perfectly balanced at 50:50, but it isn't *too* imbalanced either. Thus, the data is appropriate for classification modeling, but we make sure to not rely on classification accuracy alone when assessing results - also analysing Precision, Recall, and F1-Score.
+
+For each model below: 
 
 * Logistic Regression
 * Decision Tree
 * Random Forest
-* K Nearest Neighbours (KNN)
+* K Nearest Neighbors
 
-For each model, we will import the data in the same way but will need to pre-process the data based up the requirements of each particular algorithm.  We will train & test each model, look to refine each to provide optimal performance, and then measure this predictive performance based on several metrics to give a well-rounded overview of which is best.
-<br>
+Data will be imported in the same way but will be pre-processed based on the requirements of each particular algorithm. I train & test each model, then look to refine each to provide optimal performance, and then measure this predictive performance based on several metrics to give a well-rounded overview of which is best.
+
 <br>
 
 ### Results <a name="overview-results"></a>
 
-The goal for the project was to build a model that would accurately predict the customers that would sign up for the *delivery club*.  This would allow for a much more targeted approach when running the next iteration of the campaign.  A secondary goal was to understand what the drivers for this are, so the client can get closer to the customers that need or want this service, and enhance their messaging.
-
-Based upon these, the chosen the model is the Random Forest as it was a) the most consistently performant on the test set across classication accuracy, precision, recall, and f1-score, and b) the feature importance and permutation importance allows the client an understanding of the key drivers behind *delivery club* signups.
+Again, like in the regression task, the Random Forest model here proves the best method for this particular data. It returns the highest classication accuracy, precision, recall, and f1-scores, and its the feature importance and permutation importance metrics allows the client an understanding of the key drivers behind *delivery club* signups.
 
 <br>
 **Metric 1: Classification Accuracy**
@@ -94,25 +90,21 @@ Based upon these, the chosen the model is the Random Forest as it was a) the mos
 * KNN = 0.865
 * Logistic Regression = 0.734
 <br>
-<br>
+
 ### Growth/Next Steps <a name="overview-growth"></a>
 
-While predictive accuracy was relatively high - other modelling approaches could be tested, especially those somewhat similar to Random Forest, for example XGBoost, LightGBM to see if even more accuracy could be gained.
+The model here performs well, and while we could look to other classification methods to try to improve predictive power, more value may be attained by learning from the key drivers of prediction. Not surprisingly, the strongest predictor of delivery club signup was how close the customer lives to the store. As this was the same variable that showed the strongest relationship to customer loyalty, it may make sense to collect more data on the geographic details of the business, specifically, where do customers live in relation to ABC vs. other stores?
 
-From a data point of view, further variables could be collected, and further feature engineering could be undertaken to ensure that we have as much useful information available for predicting customer loyalty
-<br>
 <br>
 ___
 
-# Data Overview  <a name="data-overview"></a>
+## Data Overview  <a name="data-overview"></a>
 
-We will be predicting the binary *signup_flag* metric from the *campaign_data* table in the client database.
+The dependent variable here is the *signup_flag* metric from the *campaign_data* table in the client database.
 
-The key variables hypothesised to predict this will come from the client database, namely the *transactions* table, the *customer_details* table, and the *product_areas* table.
+The key variables hypothesized to predict this will come from the client database, namely the *transactions* table, the *customer_details* table, and the *product_areas* table.
 
-We aggregated up customer data from the 3 months prior to the last campaign.
-
-After this data pre-processing in Python, we have a dataset for modelling that contains the following fields...
+After pre-processing and aggregating data from these tables in Python, the dataset for modelling contains the following fields...
 <br>
 <br>
 
@@ -129,7 +121,8 @@ After this data pre-processing in Python, we have a dataset for modelling that c
 | average_basket_value | Independent | The average spend per transaction for the customer in ABC Grocery - 3 months pre campaign |
 
 <br>
-# Modelling Overview  <a name="modelling-overview"></a>
+
+## Modelling Overview  <a name="modelling-overview"></a>
 
 We will build a model that looks to accurately predict *signup_flag*, based upon the customer metrics listed above.
 
@@ -140,11 +133,13 @@ As we are predicting a binary output, we tested three classification modelling a
 * Logistic Regression
 * Decision Tree
 * Random Forest
+* KNN
 
 <br>
-# Logistic Regression <a name="logreg-title"></a>
 
-We utlise the scikit-learn library within Python to model our data using Logistic Regression. The code sections below are broken up into 5 key sections:
+## Logistic Regression <a name="logreg-title"></a>
+
+The code sections below are broken up into 5 key sections:
 
 * Data Import
 * Data Preprocessing
@@ -153,11 +148,8 @@ We utlise the scikit-learn library within Python to model our data using Logisti
 * Optimal Threshold Analysis
 
 <br>
+
 ### Data Import <a name="logreg-import"></a>
-
-Since we saved our modelling data as a pickle file, we import it.  We ensure we remove the id column, and we also ensure our data is shuffled.
-
-We also investigate the class balance of our dependent variable - which is important when assessing classification accuracy.
 
 ```python
 
@@ -187,12 +179,13 @@ data_for_model["signup_flag"].value_counts(normalize = True)
 
 ```
 <br>
-From the last step in the above code, we see that **69% of customers did not sign up and 31% did**.  This tells us that while the data isn't perfectly balanced at 50:50, it isn't *too* imbalanced either.  Because of this, and as you will see, we make sure to not rely on classification accuracy alone when assessing results - also analysing Precision, Recall, and F1-Score.
+Although the data isn't perfectly balanced at 50:50, it isn't imbalanced either. Instead of reling on classification accuracy alone when assessing results - we'll also analyze Precision, Recall, and F1-Score - metrics that help us make sense of unbalanced data. 
 
 <br>
+
 ### Data Preprocessing <a name="logreg-preprocessing"></a>
 
-For Logistic Regression we have certain data preprocessing steps that need to be addressed, including:
+Concerns for preprocessing Logistic Regression data include:
 
 * Missing values in the data
 * The effect of outliers
@@ -200,7 +193,8 @@ For Logistic Regression we have certain data preprocessing steps that need to be
 * Multicollinearity & Feature Selection
 
 <br>
-##### Missing Values
+
+#### Missing Values
 
 The number of missing values in the data was extremely low, so instead of applying any imputation (i.e. mean, most common value) we will just remove those rows
 
@@ -213,11 +207,10 @@ data_for_model.dropna(how = "any", inplace = True)
 ```
 
 <br>
-##### Outliers
 
-The ability for a Logistic Regression model to generalise well across *all* data can be hampered if there are outliers present.  There is no right or wrong way to deal with outliers, but it is always something worth very careful consideration - just because a value is high or low, does not necessarily mean it should not be there!
+#### Outliers
 
-In this code section, we use **.describe()** from Pandas to investigate the spread of values for each of our predictors.  The results of this can be seen in the table below.
+The **.describe()** function from Pandas shows the spread of values for each of our predictors. 
 
 <br>
 
@@ -232,17 +225,14 @@ In this code section, we use **.describe()** from Pandas to investigate the spre
 | max | 400.97 | 0.88 | 7372.06 | 910.00 | 75.00 | 5.00 | 141.05  |
 
 <br>
-Based on this investigation, we see some *max* column values for several variables to be much higher than the *median* value.
+As the *max* column values for several variables are much higher than the *median* value (e.g., in *distance_from_store*, *total_sales*, and *total_items*), we can consider removing outliers to help model generalize across the full dataset. 
 
-This is for columns *distance_from_store*, *total_sales*, and *total_items*
+In real world terms, we can imagine that a customer that lives 400 miles from the store is not a regular customer, and someone that we wouldn't imagine signing up for a delivery club. In data terms, we don't want this person's data influencing how the model is thinking about regular customers.  
 
-For example, the median *distance_to_store* is 1.64 miles, but the maximum is over 400 miles!
-
-Because of this, we apply some outlier removal in order to facilitate generalisation across the full dataset.
-
-We do this using the "boxplot approach" where we remove any rows where the values within those columns are outside of the interquartile range multiplied by 2.
+I use the "boxplot approach" where we remove any rows where the values within those columns are outside of the interquartile range multiplied by 2. In terms of distance_from_store, the 75th percentile + 2x is only 9 miles away. Because the vast majority of customers live within 9 miles (75% live within 3 miles), we'll eliminate those that live further from the model. We continue this process for each of the variables where there are clear outliers. 
 
 <br>
+
 ```python
 
 outlier_investigation = data_for_model.describe()
@@ -266,13 +256,13 @@ for column in outlier_columns:
 ```
 
 <br>
-##### Split Out Data For Modelling
 
-In the next code block we do two things, we firstly split our data into an **X** object which contains only the predictor variables, and a **y** object that contains only our dependent variable.
+#### Split Out Data For Modelling
 
-Once we have done this, we split our data into training and test sets to ensure we can fairly validate the accuracy of the predictions on data that was not used in training.  In this case, we have allocated 80% of the data for training, and the remaining 20% for validation.  We make sure to add in the *stratify* parameter to ensure that both our training and test sets have the same proportion of customers who did, and did not, sign up for the *delivery club* - meaning we can be more confident in our assessment of predictive performance.
+For classification modeling tasks, the data are split into training and test sets (as in regression analysis), and they are also stratified to ensure that both training and test sets have the same proportion of customers who did, and did not, sign up for the *delivery club*.
 
 <br>
+
 ```python
 
 # split data into X and y objects for modelling
@@ -285,23 +275,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, rando
 ```
 
 <br>
-##### Categorical Predictor Variables
 
-In our dataset, we have one categorical variable *gender* which has values of "M" for Male, "F" for Female, and "U" for Unknown.
+#### Categorical Predictor Variables
 
-The Logistic Regression algorithm can't deal with data in this format as it can't assign any numerical meaning to it when looking to assess the relationship between the variable and the dependent variable.
-
-As *gender* doesn't have any explicit *order* to it, in other words, Male isn't higher or lower than Female and vice versa - one appropriate approach is to apply One Hot Encoding to the categorical column.
-
-One Hot Encoding can be thought of as a way to represent categorical variables as binary vectors, in other words, a set of *new* columns for each categorical value with either a 1 or a 0 saying whether that value is true or not for that observation.  These new columns would go into our model as input variables, and the original column is discarded.
-
-We also drop one of the new columns using the parameter *drop = "first"*.  We do this to avoid the *dummy variable trap* where our newly created encoded columns perfectly predict each other - and we run the risk of breaking the assumption that there is no multicollinearity, a requirement or at least an important consideration for some models, Linear Regression being one of them! Multicollinearity occurs when two or more input variables are *highly* correlated with each other, it is a scenario we attempt to avoid as in short, while it won't neccessarily affect the predictive accuracy of our model, it can make it difficult to trust the statistics around how well the model is performing, and how much each input variable is truly having.
-
-In the code, we also make sure to apply *fit_transform* to the training set, but only *transform* to the test set.  This means the One Hot Encoding logic will *learn and apply* the "rules" from the training data, but only *apply* them to the test data.  This is important in order to avoid *data leakage* where the test set *learns* information about the training data, and means we can't fully trust model performance metrics!
-
-For ease, after we have applied One Hot Encoding, we turn our training and test objects back into Pandas Dataframes, with the column names applied.
+Again using the One Hot Encoder function from scikitlearn to transform categorical data into numeric form (c.f, _predicting customer loyalty_). This ensures that the model can learn from patterns in the training data and apply them to unseen future data. For example, in the case of our data, although *gender* only includes two values, "M" & "F", future data may include additional categories, and the code here allows the model the flexibility to parse that data. 
 
 <br>
+
 ```python
 
 # list of categorical variables that need encoding
@@ -329,17 +309,16 @@ X_test.drop(categorical_vars, axis = 1, inplace = True)
 ```
 
 <br>
-##### Feature Selection
 
-Feature Selection is the process used to select the input variables that are most important to your Machine Learning task.  It can be a very important addition or at least, consideration, in certain scenarios.  The potential benefits of Feature Selection are:
+#### Feature Selection
+
+Selecting the most important variables for the model means that we can have:
 
 * **Improved Model Accuracy** - eliminating noise can help true relationships stand out
 * **Lower Computational Cost** - our model becomes faster to train, and faster to make predictions
 * **Explainability** - understanding & explaining outputs for stakeholder & customers becomes much easier
 
-There are many, many ways to apply Feature Selection.  These range from simple methods such as a *Correlation Matrix* showing variable relationships, to *Univariate Testing* which helps us understand statistical relationships between variables, and then to even more powerful approaches like *Recursive Feature Elimination (RFE)* which is an approach that starts with all input variables, and then iteratively removes those with the weakest relationships with the output variable.
-
-For our task we applied a variation of Reursive Feature Elimination called *Recursive Feature Elimination With Cross Validation (RFECV)* where we split the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately.  This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was.  From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
+Although I like to analyze variable relationships at the bivariate level - using Chi-Square analyses to assess relationships (with categorical outcomes), a convenient approach for Machine Learning tasks, executable with the suite of scikitlearn functions is called *Recursive Feature Elimination With Cross Validation*. RFECV splits the data into many "chunks" and iteratively trains & validates models on each "chunk" seperately. This means that each time we assess different models with different variables included, or eliminated, the algorithm also knows how accurate each of those models was. From the suite of model scenarios that are created, the algorithm can determine which provided the best accuracy, and thus can infer the best set of input variables to use!
 
 <br>
 ```python
