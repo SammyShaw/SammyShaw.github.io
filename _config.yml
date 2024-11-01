@@ -10,9 +10,9 @@ plugins:
 # General Site Settings
 title: Sammy Shaw
 description: "Hi, I’m Sammy – Data Scientist and Researcher.
-My porfolio is a collection of recent projects and demos, emphasis on data analysis, visualization, basic programming, and data problem-solving. I have a PhD in Sociology, so I love to derive insights about human behavior from large public data sets like the General Social Survey and the American Community Survey.
+My porfolio is a collection of recent data science projects - emphasis on data processing and analysis, machine learning, business problem solving, and programming. My statistics and research expertise comes from my PhD in Sociology, which also equips me with a unique perspective on social trends and patterns, crucial for interpretting social dynamics with data that are invaluable for predicting consumer behavior, identifying market trends, and addressing issues of equity and inclusion.  
 
-Feel free to explore my GitHub for project details, check out my LinkedIn, or download my resume below!
+Check out my Linked In profile, Github, and download my resume below!
 
 "
 baseurl: "" # the subpath of your site, e.g. /blog
