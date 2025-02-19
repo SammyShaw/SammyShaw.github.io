@@ -46,6 +46,29 @@ Coding scripts are available in my GSS repository. Examples are shown below.
 
 ### Measure and Dimension details
 
+| **Variable Name** | **Variable Type** | **Description** | **GSS Variables** | 
+|---|---|---|---|---|
+| Education | Single Measure | Years of school, standardized. | EDUC |  | 
+| Health | Single Measure | Self reported Health, scale 1(poor health) - 4(excellent health), standardized. | HEALTH |
+| Happiness | Index Measure | Average happiness, life excitement, and happy relationships, standardized. | HAPPY, LIFE, HAPMAR, HAPCOHAB |
+| Religiosity | Index Measure | Average relgious service attendance, prayer, importance of religion, and strength of beliefs, standardized. | ATTEND, PRAY, RELITEN, GOD, BIBLE |
+| Social Relationships | Index Measure | Average time spent with family, friends, neighbors, and out a bars, standardized. | SOCREL, SOCFREND, SOCOMMUN, SOCBAR |
+| Social Attitudes | Index Measure | Average trust, and feelings about others being helpful and fair | TRUST, HELPFUL, FAIR |
+| Work-Life Balance | Index Measure | Product of job satisfaction and reversed hours/week worked for respondents with at least 10 hr/week, standardized. | SATJOB, HRS1 |
+| Quality of Life | Index Measure | Average standardized Education, Health, Social Relationships, and Work-Life Balance | EDUC, HEALTH, SOCREL, SOCFREND, SOCOMMUN, SOCBAR, SATJOB, HRS1 |
+| Confidence in Institutions | Index Measure | Average confidence in 13 institutions | CONEDUC, CONFED, CONMEDIC, CONARMY, CONBUS, CONCLERG, CONFINAN, CONJUDGE, CONLABOR, CONLEGIS, CONPRESS, CONSCI, CONTV |
+| Confidence in Government | Index Measure | Average confidence in congress and executive branch | CONFED, CONLEGIS |
+| Confidence in Media | Index Measure | Average confidence in television and the press | CONPRESS, CONTV |
+| Age Group | Dimension | Respondent' age categorized for comparability | AGE |
+| Degree | Dimension | Respondent's education level (note correlation with Education, above) | DEGREE |
+| Race | Dimension | Respondent's race | RACE |
+| Socioeconomic Status | Index Dimension | Standardized education (years of school), occupational prestige, and total family income, split 30(low)/40(mid)/30(high)% | EDUC, PRESTG10, REALINC |
+| Gender | Dimension | Repondent's gender | SEX |
+| Race * Gender | Dimension | Repondent's Race/Gender | RACE, SEX |
+| Race * SES | Dimension | Respondent's Race/Socioeconomic status | RACE, EDUC, REALINC, PRESTG10 |
+| Place | Dimension | Type of Social Environment, recodes using SIZE and XNORCSIZ | SIZE, XNORCSIZ |
+| Region | Dimension | Region of interview. All nine categories are used in the map. Collapsed to four categories for dimension comparison | REGION |
+___
 
 
 ### Sample 
