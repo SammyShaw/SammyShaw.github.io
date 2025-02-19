@@ -11,8 +11,13 @@ This project demonstrates 1. Visualization using Tableau, and 2. Getting and pre
 
 ### Visualization Using Tableau
 
-<iframe seamless frameborder="0" src="https://public.tableau.com/views/GSS_2_17387981106750/GSSDashboard" width = '1400' height = '800'></iframe>
-
+<iframe 
+    src="https://public.tableau.com/views/GSS_2_17387981106750/GSSDashboard" 
+    width="1400" 
+    height="800" 
+    frameborder="0" 
+    allowfullscreen>
+</iframe>
 
 
 
