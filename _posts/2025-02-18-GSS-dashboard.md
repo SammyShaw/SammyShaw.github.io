@@ -14,9 +14,7 @@ This project demonstrates 1. Visualization using Tableau, and 2. Getting and pre
 <iframe 
     src="https://public.tableau.com/views/GSS_2_17387981106750/GSSDashboard?:embed=yes&:display_count=yes&:showVizHome=no" 
     width="1400" 
-    height="800" 
-    frameborder="0" 
-    allowfullscreen>
+    height="800">
 </iframe>
 
 
