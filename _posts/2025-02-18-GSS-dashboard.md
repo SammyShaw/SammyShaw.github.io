@@ -1,0 +1,22 @@
+---
+layout: post
+title: "GSS Dashboard"
+image: "/posts/[filename].png"
+tags: [GSS, Data Cleaning, Visualization, Tableau]
+---
+
+## Summary
+This project demonstrates 1. Visualization using Tableau, and 2. Getting and preprocessing a large public dataset.
+
+
+### Visualization Using Tableau
+
+<iframe seamless frameborder="0" src="https://public.tableau.com/views/GSS_2_17387981106750/GSSDashboard" width = '1400' height = '800'></iframe>
+
+
+
+
+
+### The General Social Survey
+
+[placeholder]
