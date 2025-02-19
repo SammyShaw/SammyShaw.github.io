@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GSS Dashboard"
-image: "/posts/[filename].png"
+image: "/posts/GSS_dashboard.png"
 tags: [GSS, Data Cleaning, Visualization, Tableau]
 ---
 
