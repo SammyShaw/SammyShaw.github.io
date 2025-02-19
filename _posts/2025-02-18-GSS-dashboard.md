@@ -47,7 +47,7 @@ Coding scripts are available in my GSS repository. Examples are shown below.
 ### Measure and Dimension details
 
 | **Variable Name** | **Variable Type** | **Description** | **GSS Variables** | 
-|---|---|---|---|---|
+|---|---|---|---|
 | Education | Single Measure | Years of school, standardized. | EDUC |  | 
 | Health | Single Measure | Self reported Health, scale 1(poor health) - 4(excellent health), standardized. | HEALTH |
 | Happiness | Index Measure | Average happiness, life excitement, and happy relationships, standardized. | HAPPY, LIFE, HAPMAR, HAPCOHAB |
