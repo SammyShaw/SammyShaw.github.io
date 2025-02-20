@@ -75,6 +75,7 @@ In the code below, I will
 * Demonstrate key variable recodes. 
 * Construct indices, demonstrating reliability analysis, factor analysis, and a minimum variable threshold.
 * Impute measures for continuous trend lines.
+
 <br>
 
 ### Select Variables
@@ -368,10 +369,11 @@ for measure in dashboard_measures:
 ```
 <br>
 
-### Tableau 
+### Data Storytelling vs. Comprehensiveness vs. Interactivity in Tableau
 
+Tableau is a powerful tool because it allows almost limitless ways to visualize information, which gives the author incredible creative power to tell stories with data. Its interactive features allow users to assume some of that power as well. However, I find that the more information that is crammed onto a dashboard, the more difficult it becomes to make a data story cohere. A simple bivariate relationship can be given a well-designed graph, exciting visuals, KPI-style output text, and accompanying description or analytic detail. And it is often these simple dashboards that make Tableau's viz-of-the-day list. But my purpose was more a celebration of GSS's awesome breadth. It was hard to choose what NOT to include. I make no appologies that I crammed a lot in; in the future I would like to add more. Unfortunately, this means that there is not a singular storyline in the dashboard, but multiple, and the user is given the ability to uncover what narrative they will. 
 
+In any case the key to creating an appealing dashboard has as much to do with design decisions as what data are available. I chose to center the trend lines and include "50 years" in the title to emphasize the theme of changes over time. I created index buttons in different colors with thumbnail trend lines attached to draw the user's attention to the several different measures, while emphasizing that change is still the theme. Regretably, however, on the theme of change, I was not able to reconcile Tableau's filter and pages shelves for allowing the user to toggle between years. I love that the pages feature allows users to fast forward through the years, which dynamically updates the barchart, map, and political distribution graphs. But the pages shelf does not allow an "all years" page, which is frustrating. I could include both a year filter and a pages button, but then there are two "Year" switches and when the Year filter is set to "all years" and a user toggles the pages, the filter parameter does not change, thus indicating "all years" even as the pages are changing. A user could stop the pages, but then they would have to unselect all years from the filters shelf and reselect it to get back to an "all years" view, which is not intuitive, and thus I decided was a bad design feature. I spent a whole day trying to figure this out. I have not seen another dashboard that accomplishes this. I found no results in a google search, and chatGTP-o3 could not figure it out either. I ended up with just a filter switch for the years, with the default set to "all years". Still, it is not immediately apparent that selecting a specific year will automatically update the bar charts, political distributions, and map details. 
 
-
-
+What did work well was the several parameter controls and calculated fields that control which data are being visualized. Because I included all of my measures and all of the dimensions in each chart, I used the same parameters and calculated fields (pointing the parameter to the data) for each. 
 
