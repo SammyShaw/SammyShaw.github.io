@@ -48,7 +48,7 @@ Coding scripts are available in my GSS repository. Examples are shown below.
 
 | **Variable Name** | **Variable Type** | **Description** | **GSS Variables** | 
 |---|---|---|---|
-| Education | Single Measure | Years of school, standardized. | EDUC |  | 
+| Education | Single Measure | Years of school, standardized. | EDUC |
 | Health | Single Measure | Self reported Health, scale 1(poor health) - 4(excellent health), standardized. | HEALTH |
 | Happiness | Index Measure | Average happiness, life excitement, and happy relationships, standardized. | HAPPY, LIFE, HAPMAR, HAPCOHAB |
 | Religiosity | Index Measure | Average relgious service attendance, prayer, importance of religion, and strength of beliefs, standardized. | ATTEND, PRAY, RELITEN, GOD, BIBLE |
