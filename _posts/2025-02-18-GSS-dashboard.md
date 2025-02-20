@@ -40,6 +40,8 @@ Details for each measure are shared below. Briefly, most measures are individual
 
 Python coding scripts are available in my Github repository (GSS project). Examples are shown below. 
 
+<br> 
+
 ### Measure and Dimension details
 
 | **Variable Name**               | **Variable Type**   | **Description**                                                                                  | **GSS Variables** |
@@ -107,10 +109,12 @@ trends = df[["YEAR", "SIZE", "XNORCSIZ", "AGE", "SEX", "EDUC", "PRESTG10", "REAL
            "CONBUS", "CONCLERG", "CONFINAN", "CONJUDGE", "CONLABOR", 
            "CONLEGIS", "CONPRESS", "CONSCI", "CONTV"]].copy()
 ```
+<br>
 
 ### Key Variable Recodes
 
 I demonstrate recodes and index construction for two key measures: Confidence in Institutions & Work-Life Balance
+<br>
 
 #### Confidence in Institutions
 
@@ -150,7 +154,7 @@ min          1.000000
 max          3.000000
 Name: conf_index, dtype: float64
 
-Now we have an index, but how well to the component items cohere, and how do respondents' answers cohere?
+# Now we have an index, but how well to the component items cohere, and how do respondents' answers cohere?
 
 ## A. Alpha Analysis for inter-item reliability
 
