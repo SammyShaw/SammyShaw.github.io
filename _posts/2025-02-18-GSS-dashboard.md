@@ -377,3 +377,4 @@ In any case the key to creating an appealing dashboard has as much to do with de
 
 What did work well was the several parameter controls and calculated fields that control which data are being visualized. Because I included all of my measures and all of the dimensions in each chart, I used the same parameters and calculated fields (pointing the parameter to the data) for each. 
 
+I'm excited to continue to use this awesome tool in future projects, with an eye to keeping measures and outcomes simple while allowing for more impactful design. 
