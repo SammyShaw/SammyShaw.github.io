@@ -8,13 +8,13 @@ tags: [GSS, Data Cleaning, Visualization, Tableau]
 ## Summary & Context
 This project demonstrates 1. Visualization using Tableau, and 2. Preprocessing and analyzing a large public dataset. 
 
-I chose this project to practice Tableau and to represent my background in the social sciences. It is also an effort to celebrate publically available data, and an attempt to make that data even more accessible. The General Social Survey, which recieves its primary funding from the National Science Foundation, has been collecting data on American political opinions and social behaviors since 1972. While the analyses here tell a story of American's declining trust in instutions alongside rising political polarization, current administration efforts to slash public spending puts funding for projects like the GSS in the crosshairs. 
+I chose this project to practice Tableau and to represent my background in the social sciences. It is also an effort to celebrate publicaly available data and an attempt to make that data even more accessible. The General Social Survey, which receives its primary funding from the National Science Foundation, has been collecting data on American political opinions and social behaviors since 1972. While the analyses here tell a story of Americans' declining trust in instutions alongside rising political polarization, current administration efforts to slash public spending puts funding for projects like the GSS in the crosshairs. 
 
 ## The General Social Survey Dashboard
 
-The General Social Survey is made of 34 waves of representative sample survey. The entire dataset contains over 72,000 rows and over 6,600 columns. See the [GSS](https://gss.norc.org/) website for further details. 
+The General Social Survey consists of 34 waves of representative surveys. The entire dataset contains over 72,000 rows and over 6,600 columns. See the [GSS](https://gss.norc.org/) website for further details. 
 
-My purpose here is not to provide extensive analysis of any one measure, but merely to offer a dashboard that allows uers to interactively explore basic relationships through visualization. I constructed a series of measures at my discretion, including: 
+My purpose here is not to provide extensive analysis of any one measure, but users can interactively explore basic relationships through visualization. I constructed a series of measures at my discretion, including: 
 
 * Education
 * Health
@@ -32,13 +32,13 @@ My purpose here is not to provide extensive analysis of any one measure, but mer
 Click on a measure button to see its description, distribution, and trends. Toggle a demographic dimension. Select a specific year or all years. 
 
 <iframe seamless frameborder="0" src="https://public.tableau.com/views/GSS_2_17387981106750/GSSDashboard?:embed=yes&:display_count=yes&:showVizHome=no" width = '1100' height = '900'></iframe>
-Unfortunately, I have difficulty right-sizing Tableau's dashboards for github pages. Automatic scaling in Tableau shifts objects in the view, and github's default width does not correspond with my desktop. 
+Unfortunately, I have difficulty right-sizing Tableau's dashboards for github pages. Automatic scaling in Tableau alters objects in the view, and github's default width does not correspond with my desktop. 
 Visit my [Tableau Public Profile](https://public.tableau.com/app/profile/samuel.shaw2748/vizzes) for a more responsive Dashboard:
 [50 Years of the General Social Survey](https://public.tableau.com/views/GSS_2_17387981106750/GSSDashboard?:language=en-US&publish=yes&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
 
-Details for each measure are shared below. Briefly, most measures are individual-level indices (expcept Education and Health, which are raw measures, and Polarization, which is an aggregation). All measures except Polarization are standardized for comparability. Global trend line data include imputed data for the sake of drawing a continuous trend line - but those imputed data do not carry over to other charts. 
+Details for each measure are shared below. Briefly, most measures are individual-level indices (except Education and Health, which are raw measures, and Polarization, which is an aggregation). All measures except Polarization have been standardized for better comparability. Global trend line data include imputed data for the sake of drawing a continuous trend line - but those imputed data do not carry over to other charts. 
 
-Python coding scripts are available in my Github repository (GSS project). Examples are shown below. 
+Python coding scripts are available in my [Github repository](https://github.com/SammyShaw/GSS-Dashboard). Examples are shown below. 
 
 <br> 
 
@@ -99,7 +99,7 @@ df.shape
 Out[5]: (72390, 6691)
 ```
 
-6,691 is a lot of columns. The best way to figure out which columns are of interest is to go to the GSS website. They have a variable explorer dashboard, which allows you search variables by topic area, or by module, including their "core" module - measures that are collected at every wave, and many others. The following are selected after extensive digging, researching and iteratively realizing what I am interested in. 
+6,691 is a lot of columns. To identify relevant columns, I used the GSS website's variable explorer dashboard, which allows you search variables by topic area, or by module, including their "core" module - measures that are collected at every wave, and many others. The following are selected after extensive digging, researching and iteratively realizing what I am interested in. 
 
 ```python
 trends = df[["YEAR", "SIZE", "XNORCSIZ", "AGE", "SEX", "EDUC", "PRESTG10", "REALINC",
@@ -204,13 +204,13 @@ factor2 = ["confed", "conlegis"] # confidence in the government
 factor3 = ["conpress", "contv"] # confidence in the media
 
 # subsequent reliability analysis does not show an improvement of factor1 (a subset of 5) over the total index measuring confidence in 13 institutions.
-# For the dashboard, I'll keep the Confidence in Institutions Index, and I'll add Confidence in Government and Confidence in Media Indices for comparison.
+# For the dashboard, I'll keep the Confidence in Institutions Index, and I'll add seperate indices for Confidence in Government and Confidence in Media.
 
 ```
 <br>
 
 ##### Number of Items Sensitivity Test
-Earlier I mentioned that taking the mean of the component measures is better than summing to the get the index because if there are missing values in some of the items, then a respondent's total index score is artificially lowered. It's true that taking the mean of any number of variables of range 1-3 stil yeilds a range of 1-3, which doesn't feel like a composite index, but we would standardize in the end anyway, which will (ideally) yeild us a zero-centered range of -3 to 3 either way. But when we do take the mean, we should be careful that the output represents the same thing for all respondents. If one respondent answered a 3 for one item and then refused to continue, that would be much different than a respondent who answered carefully for all 13. We can count the number of items a respondent answered, and compare means, distributions, and n for respondents that answered k, k-1, k-2, etc. 
+Earlier I mentioned that taking the mean of the component measures is better than summing to the get the index because if there are missing values in some of the items, then a respondent's total index score is artificially lowered. Averaging any number of variables of range 1-3 still yields a range of 1-3, which doesn't feel like a composite index, but we would standardize in the end anyway, which will (ideally) yeild us a zero-centered range of -3 to 3 either way. But when we do take the mean, we should be careful that the output represents the same thing for all respondents. If one respondent answered a 3 for one item and then refused to continue, that would be much different than a respondent who answered carefully for all 13. We can count the number of items a respondent answered, and compare means, distributions, and n for respondents that answered k, k-1, k-2, etc. 
 
 ```python
 trends["num_conf_vars"] = trends[conf_vars].notna().sum(axis=1) # count the number of missing items per row. 
@@ -322,14 +322,14 @@ GSS Codes:
 
 GSS Codes: Continuous numeric, Range 0-89. 
 
-To construct this index I'll first recode these variables so that they are numerically interpretable within our construct. I'll reverse code both job satisfaction so that high numbers = high satisfaction = 'good for work-life balance', and work hours, so that low work hours = good for work-life balance. Even though the GSS only asks work hours among those with a Full-time or part-time job, I'll exclude those working less than 10 hours to ensure that people actually are working. And because there are a number of respondents who have apparently worked 89+ hours, I analyze outliers and remove these (80+) from the distribution, for a practical range of 10-80 hrs/work/week. Multiplying by job satisfaction yeilds a possible continous index score of range 10-320. Because these component variables are on completely different scales, alpha analysis and factor analysis do not apply. And because there are only two variables that make up the construct, it will be necessary to include both in the measure. Like Confidence in institutions, Work-Life Balance will be standardized so it is comparable with other measures on the same scale. 
+To construct this index I'll first recode these variables so that they are numerically interpretable within our construct. I'll reverse code both job satisfaction so that high numbers = high satisfaction = 'good for work-life balance', and work hours, so that low work hours = good for work-life balance. Even though the GSS only asks work hours among those with a Full-time or part-time job, I'll exclude those working less than 10 hours to ensure that people actually are working. And because there are a number of respondents who have apparently worked 89+ hours, I identified outliers (>80 hrs) and removed these from the distribution, for a practical range of 10-80 hrs/work/week. Multiplying hours worked by job satisfaction yields a possible index score of range 10-320. Because these component variables are on completely different scales, alpha analysis and factor analysis do not apply. And because there are only two variables that make up the construct, it will be necessary to include both in the measure. Like Confidence in institutions, Work-Life Balance will be standardized so it is comparable with other measures on the same scale. 
 
 ```python
 
 # recode job satisfaction
 trends["satjob"] = 5 - trends["SATJOB"] # reverse order so "very satisfied" is highest.
 
-trends["hrs_trim"] = np.where(trends["HRS1"] < 10, np.nan, trends["HRS1"] # subset minimum hours to ensure people are actually part of the work force
+trends["hrs_trim"] = np.where(trends["HRS1"] < 10, np.nan, trends["HRS1"]) # subset minimum hours to ensure people are actually part of the work force
 
 # trim outliers at 3 std * mean
 outlier_threshold = trends["HRS1"].mean() + (3 * trends["HRS1"].std()) # Find the treshold. 3 standard deviations above the mean is one way. 
@@ -373,7 +373,7 @@ for measure in dashboard_measures:
 
 Tableau is a powerful tool because it allows almost limitless ways to visualize information, which gives the author incredible creative power to tell stories with data. Its interactive features allow users to assume some of that power as well. However, I find that the more information that is crammed onto a dashboard, the more difficult it becomes to make a data story cohere. A simple bivariate relationship can be given a well-designed graph, exciting visuals, KPI-style output text, and accompanying description or analytic detail. And it is often these simple dashboards that make Tableau's viz-of-the-day list. But my purpose was more a celebration of GSS's awesome breadth. It was hard to choose what NOT to include. I make no appologies that I crammed a lot in; in the future I would like to add more. Unfortunately, this means that there is not a singular storyline in the dashboard, but multiple, and the user is given the ability to uncover what narrative they will. 
 
-In any case the key to creating an appealing dashboard has as much to do with design decisions as what data are available. I chose to center the trend lines and include "50 years" in the title to emphasize the theme of changes over time. I created index buttons in different colors with thumbnail trend lines attached to draw the user's attention to the several different measures, while emphasizing that change is still the theme. Regretably, however, on the theme of change, I was not able to reconcile Tableau's filter and pages shelves for allowing the user to toggle between years. I love that the pages feature allows users to fast forward through the years, which dynamically updates the barchart, map, and political distribution graphs. But the pages shelf does not allow an "all years" page, which is frustrating. I could include both a year filter and a pages button, but then there are two "Year" switches and when the Year filter is set to "all years" and a user toggles the pages, the filter parameter does not change, thus indicating "all years" even as the pages are changing. A user could stop the pages, but then they would have to unselect all years from the filters shelf and reselect it to get back to an "all years" view, which is not intuitive, and thus I decided was a bad design feature. I spent a whole day trying to figure this out. I have not seen another dashboard that accomplishes this. I found no results in a google search, and chatGTP-o3 could not figure it out either. I ended up with just a filter switch for the years, with the default set to "all years". Still, it is not immediately apparent that selecting a specific year will automatically update the bar charts, political distributions, and map details. 
+In any case the key to creating an appealing dashboard has as much to do with design decisions as what data are available. I chose to center the trend lines and include "50 years" in the title to emphasize the theme of changes over time. I created index buttons in different colors with thumbnail trend lines attached to draw the user's attention to the several different measures, while emphasizing that change is still the theme. Unfortunately, I was not able to reconcile Tableau's filter and pages shelves to allow users to toggle between years seamlessly. I love that the pages feature allows users to fast forward through the years, which dynamically updates the barchart, map, and political distribution graphs. But the pages shelf does not allow an "all years" page, which is frustrating. I could include both a year filter and a pages button, but then there are two "Year" switches and when the Year filter is set to "all years" and a user toggles the pages, the filter parameter does not change, thus indicating "all years" even as the pages are changing. A user could stop the pages, but then they would have to unselect all years from the filters shelf and reselect it to get back to an "all years" view, which is not intuitive, and thus I decided was a bad design feature. Despite extensive research, I have not yet been able figure this out. I have not seen another dashboard that accomplishes this. I found no results in a google search, and chatGTP-o3 could not figure it out either. I ended up with just a filter switch for the years, with the default set to "all years". Still, it is not immediately apparent that selecting a specific year will automatically update the bar charts, political distributions, and map details. 
 
 What did work well was the several parameter controls and calculated fields that control which data are being visualized. Because I included all of my measures and all of the dimensions in each chart, I used the same parameters and calculated fields (pointing the parameter to the data) for each. 
 
