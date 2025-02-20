@@ -8,7 +8,7 @@ tags: [GSS, Data Cleaning, Visualization, Tableau]
 ## Summary & Context
 This project demonstrates 1. Visualization using Tableau, and 2. Preprocessing and analyzing a large public dataset. 
 
-I chose this project to practice Tableau and to represent my background in the social sciences. It is also an effort to celebrate publically available data, and an attempt to make that data even more acessible. The General Social Survey, which recieves its primary funding from the National Science Foundation, has been collecting data on American political opinions and social behaviors since 1972. While the analyses here tell a story of American's declining trust in instutions alongside rising political polarization, current administration efforts to slash public spending puts funding for projects like the GSS in the crosshairs. 
+I chose this project to practice Tableau and to represent my background in the social sciences. It is also an effort to celebrate publically available data, and an attempt to make that data even more accessible. The General Social Survey, which recieves its primary funding from the National Science Foundation, has been collecting data on American political opinions and social behaviors since 1972. While the analyses here tell a story of American's declining trust in instutions alongside rising political polarization, current administration efforts to slash public spending puts funding for projects like the GSS in the crosshairs. 
 
 ## The General Social Survey Dashboard
 
@@ -112,7 +112,8 @@ trends = df[["YEAR", "SIZE", "XNORCSIZ", "AGE", "SEX", "EDUC", "PRESTG10", "REAL
 
 I demonstrate recodes and index construction for two key measures: Confidence in Institutions & Work-Life Balance
 
-**Confidence institutions** 
+#### Confidence in Institutions
+
 The GSS provides 13 items about confidence in institutions. The questionaire script reads: "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them?"
 
 And the GSS codes these responses:
@@ -121,8 +122,6 @@ And the GSS codes these responses:
 3: "hardly any"
 
 To create an index out of these I'll first need to recode these questions in a positive direction so that outcomes are easily interpretatble: high numbers = high confidence. I'll then analyze how internally reliable the set of 13 questions is using an alpha analysis. I'll use factor analysis to see whether and how respondents cohere around these questions. Because 13 is a lot of items, we'll then want to know if there is a minimum item cut-off if some rows contain missing values. That is, we want to minimize the number of index values that contain few item answers, but maximize our total responses (n). Finally, this index, along with all the others, will be standardized for easy comparison.  
-
-#### Confidence in Institutions
 ```python
 # use a list to recode all items at once
 conf_vars = ["CONEDUC", "CONFED", "CONMEDIC", "CONARMY", "CONBUS", 
@@ -302,6 +301,7 @@ trends.loc[trends["num_conf_vars"] < 8, "conf_index"] = np.nan # calling all row
 <br>
 
 #### Work-Life Balance
+
 A less obvious measure is Work-Life Balance. Rather than providing a subjective measure, the GSS offers several items relevant to this construct. Past researchers have constructed this index in myriad ways, often including domestic responsibilities (especially for working women that double as primary caretakers) among the factors that make it up. However, work-life balance is not the primary focus here, so I'll elect to keep it simple and define it as a function of job satisfaction and number of hours worked. As far as trends go, I'm simply interested to see if the average American is working longer and harder hours.
 
 * Job Satistfaction (SATJOB): The GSS asks: "On the whole, how satisfied are you with the work you do--would you say you are very satisfied, moderately satisfied, 
