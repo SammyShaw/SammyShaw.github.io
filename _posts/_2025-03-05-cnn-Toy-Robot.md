@@ -115,11 +115,13 @@ Although my kid has dozens of types of toys, I began with a modest set of five c
 * Magnatiles
 
 Problems: 
+
 At first glance, these toys appear distinct enough, but when considering how an algorithm might think about it, there are plenty of challenges. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels like the car toy set. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
 
 [IMAGES PLACEHOLDER] 
 
 Solutions: 
+
 To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of toys in some classes, I separated the actual toys for the training, validation, and test set images.
 
 I ended up with 145 images of each toy, separated as follows: 
@@ -131,24 +133,26 @@ I ended up with 145 images of each toy, separated as follows:
 ![alt text](/img/posts/toy_collage.png "Toy Robot Image Samples")
 
 <br>
-For ease of use in Keras, our data folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
+For ease of use in Keras, my data folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
 
 Images in the folders are varying sizes, but will be fed into the data pipeline as 128 x 128 pixel images. 
 
 ___
 <br>
+
 # Data Pipeline  <a name="data-pipeline"></a>
 
-Before we get to building the network architecture, & subsequently training & testing it - we need to set up a pipeline for our images to flow through, from our local hard-drive where they are located, to, and through our network.
+Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for our images to flow from my local hard-drive through the network.
 
-In the code below, we:
+In the code below, I will:
 
-* Import the required packages
-* Set up the parameters for our pipeline
-* Set up our image generators to process the images as they come in
-* Set up our generator flow - specifying what we want to pass in for each iteration of training
+* Import the required packages for the baseline model
+* Set up the parameters for the data pipeline
+* Set up the image generators to process the images as they come in
+* Set up the generator flow - specifying what we want to pass in for each iteration of training
 
 <br>
+
 ```python
 
 # import the required python libraries
@@ -164,7 +168,7 @@ batch_size = 32
 img_width = 128
 img_height = 128
 num_channels = 3
-num_classes = 6
+num_classes = 5
 
 # image generators
 training_generator = ImageDataGenerator(rescale = 1./255)
@@ -181,16 +185,18 @@ validation_set = validation_generator.flow_from_directory(directory = validation
                                                                       batch_size = batch_size,
                                                                       class_mode = 'categorical')
 
+# because I moved the folders around once or twice during this project, I now keep this code in place to ensure that everything aligns. 
+print(training_set.class_indices)
+print(validation_set.class_indices)
+{'bananagrams': 0, 'brios': 1, 'cars': 2, 'duplos': 3, 'magnatiles': 4}
+{'bananagrams': 0, 'brios': 1, 'cars': 2, 'duplos': 3, 'magnatiles': 4}
+
 ```
 <br>
-We specify that we will resize the images down to 128 x 128 pixels, and that we will pass in 32 images at a time (known as the batch size) for training.
 
-To start with, we simply use the generators to rescale the raw pixel values (ranging between 0 and 255) to float values that exist between 0 and 1.  The reason we do this is mainly to help Gradient Descent find an optimal, or near optional solution each time much more efficiently - in other words, it means that the features that are learned in the depths of the network are of a similar magnitude, and the learning rate that is applied to descend down the loss or cost function across many dimensions, is somewhat proportionally similar across all dimensions - and long story short, means training time is faster as Gradient Descent can converge faster each time!
+Images are resized down to 128 x 128 pixels (of three RGB channels), and they will be input 32 at a time (batch size) for training. I have five toy classes (the labels will conveniently come from the folder names inside the training and validation sets). 
 
-We will add more logic to the training set generator to apply Image Augmentation.
-
-With this pipeline in place, our images will be extracted, in batches of 32, from our hard-drive, where they're being stored and sent into our model for training!
-
+Raw pixel values (ranging between 0 and 255) are normalized to help gradient descent find an optimal solution more efficiently.
 ___
 <br>
 
@@ -210,9 +216,9 @@ As a Convolutional Neural Network trains, it iteratively calculates how well it 
 
 There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. I liken it to a machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy.
 
-
 ___
 <br>
+
 # Baseline Network <a name="cnn-baseline"></a>
 
 <br>
