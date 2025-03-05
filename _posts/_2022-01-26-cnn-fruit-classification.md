@@ -5,7 +5,7 @@ image: "/posts/ToyRobot_CoverImage.png"
 tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Python]
 ---
 
-This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys, using a bespoke, self-collected data set. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. I find that while CNN is all about optimizing model architecture and training parameters, building a successful model has much to do with the nature and quality of the data itself. 
+This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys on a bespoke, self-collected data set. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. CNN is all about optimizing model architecture and training parameters, but building a successful model has much to do with the nature and quality of the data too. 
 
 # Table of contents
 
@@ -31,7 +31,7 @@ ___
 
 ### Context <a name="overview-context"></a>
 
-I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! Because my four-year old is better at playing with toys than picking them up, and because I'm better at throwing them all in one basket than sorting them. I'll use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (and other toys).
+I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! Because my four-year old is better at playing with toys than picking them up, and because I'm better at throwing them all in one basket than sorting them, I'll use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys).
 
 I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, because I'll want to simulate the real-world scenarios of his toys scattered throughout the house. 
 
@@ -41,29 +41,43 @@ If this is successful and put into place on a larger scale, no parent will ever 
 <br>
 ### Actions <a name="overview-actions"></a>
 
-Thanks to the *Keras* Deep Learning library, most of the tasks and procedures for building a computer vision model are made easy in Python. On the other hand, while Keras provides the tools, understanding and optimizing the model's architecture and training parameters is not so easy. In my case, since I will be taking my own pictures, I also have to think hard about what constitutes good, useful data. 
+Thanks to the *Keras* Deep Learning library, most of the tasks and procedures for building a computer vision model are made easy in Python. On the other hand, while Keras provides the tools, understanding and optimizing the model's architecture and training parameters is not so easy. In my case, since I will be taking my own pictures, I also have to think hard about what constitutes good, useful data. The process of building this model, broken into subsections below, is as follows:
 
-After taking images and structuring the data into training, validation, and Test set folders, I define the data flow parameters and set up image data generator objects.
+Generate Data: 
+1. Take images - This became a trial/error/experiment process throughout this project. 
+2. Structure the data into training, validation, and Test set folders.
+3. Define the data flow parameters and set up data generator objects.
 
-My method is to: 1. Start with a simple baseline model, and then add or refine aspects to try to improve its toy predictability. The first network consists of only two convolutional layers, each with 32 filters and subsequent Max Pooling Layers, a single dense (fully connected) layer following flattening with 32 neurons followed by an output layer for five toy classes.  I use the RELU activation function on all layers, and use the 'adam' optimizer. 
-Subsequent model refinements include: 
-2. Add a **Dropout** layer to reduce overfitting (which will be tweaked throughout). 
-3. Add **Image Augmentation** to the data pipeline to increase variation in the training data, as well as address overfitting.
-4. Add a Learning Rate Reducer to smooth convergence. 
-5. Experiment with Layers and Filters: 
+Iterative Model Building Method: 
+
+4. I Start with a simple baseline model. The first network consists of:
+    **Two convolutional layers**, each with 
+    **32 filters** and subsequent 
+    **Max Pooling** Layers, 
+    A single **Dense (fully connected) layer** following flattening with 32 neurons 
+    followed by an output layer for five toy classes. 
+    I use the **RELU** activation function on all layers, 
+    and I use the **'ADAM'** learning optimizer. 
+
+Then I will add or refine aspects to try to improve its predictability:
+
+5. Add a **Dropout** layer to reduce overfitting (which will be tweaked throughout). 
+6. Add **Image Augmentation** to the data pipeline to increase variation in the training data, as well as address overfitting.
+7. Add a Learning Rate Reducer to smooth convergence. 
+8. Experiment with Layers and Filters: 
     a. First adding more convolutional layer
     b. Increasing the filters in convolutional layers
     c. Deceasing the filters in the convolutional layers
     d. Increasing the kernel size
 
-Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
+9. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
 
 <br>
 <br>
 
 ### Results <a name="overview-results"></a>
 
-The baseline network suffered badly from overfitting, but the addition of Dropout & Image Augmentation elimited this entirely.
+The baseline network suffered badly from overfitting, but the addition of Dropout & Image Augmentation elimited this entirely (and also let to underfitting).
 
 In terms of Classification Accuracy on the Test Set, we saw:
 
@@ -75,7 +89,7 @@ In terms of Classification Accuracy on the Test Set, we saw:
 * Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
 * MobilenetV2 base model: **100%**
 
-The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that predicts my kids toys 100% of the time. 
+The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. 
 
 <br>
 <br>
@@ -83,9 +97,9 @@ The use of Transfer Learning with the MobilenetV2 base architecture was a bitter
 
 The concept here is demonstrated, if not proven. We have shown that we can get very accurate predictions - that should this robot come to market, it will at least be able to accurately predict in what bins your childs' toys belong. 
 
-I hold out that there is considerable room for improvement in my own self-built model. The experimental architectures that I tested here do not exhaust the possibilities. I can use Keras Tuner to get an optimal network architecture. 
+I hold out that there is considerable room for improvement in my own self-built model. The experimental architectures that I tested here do not exhaust the possibilities. I can use the Keras Tuner to get an optimal network architecture. And/or, I can revisit my dataset, which is currently 'small' and is likely riddled with bias. 
 
-However, my current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that most image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
+My current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that the other image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
 
 <br>
 <br>
@@ -93,19 +107,33 @@ ___
 
 # Data Overview  <a name="data-overview"></a>
 
-To build out this proof of concept, the client have provided us some sample data. This is made up of images of six different types of fruit, sitting on the landing platform in the warehouse.
+Although my kid has dozens of types of toys, I began with a modest set of five classes of toys: 
+* Bananagrams (a game for adults, which has become material for Teddy's garbage truck)
+* Brios 
+* Cars 
+* Duplos (big legos for younger builders)
+* Magnatiles
 
-We randomly split the images for each fruit into training (60%), validation (30%) and test (10%) sets.
+Problems: 
+At first glance, these toys appear distinct enough, but when considering how an algorithm might think about it, there are plenty of challenges. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels like the car toy set. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
 
-Examples of four images of each fruit class can be seen in the image below:
+[IMAGES PLACEHOLDER] 
+
+Solutions: 
+To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of toys in some classes, I separated the actual toys for the training, validation, and test set images.
+
+I ended up with 145 images of each toy, separated as follows: 
+* 100 training set images (500 total)
+* 30 validation set images (150 total)
+* 15 test set images (75 total)
 
 <br>
-![alt text](/img/posts/cnn-image-examples.png "CNN Fruit Classification Samples")
+![alt text](/img/posts/toy_collage.png "Toy Robot Image Samples")
 
 <br>
-For ease of use in Keras, our folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the six fruit classes.
+For ease of use in Keras, our data folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
 
-All images are of size 300 x 200 pixels.
+Images in the folders are varying sizes, but will be fed into the data pipeline as 128 x 128 pixel images. 
 
 ___
 <br>
