@@ -193,25 +193,23 @@ With this pipeline in place, our images will be extracted, in batches of 32, fro
 
 ___
 <br>
+
 # Convolutional Neural Network Overview <a name="cnn-overview"></a>
 
-Convolutional Neural Networks (CNN) are an adaptation of Artificial Neural Networks and are primarily used for image based tasks.
+Convolutional Neural Networks (CNNs) are an adaptation of Artificial Neural Networks and are primarily used for image data tasks.
 
-To a computer, an image is simply made up of numbers, those being the colour intensity values for each pixel.  Colour images have values ranging between 0 and 255 for each pixel, but have three of these values, for each - one for Red, one for Green, and one for Blue, or in other words the RGB values that mix together to make up the specific colour of each pixel.
+To a computer, an image is a three-dimensional tensor made of rows and columns of pixels (in our case 128x128), each with 3 'channels' for intensity values for colors (Red, Green, and Blue, hence RGB), that range from 0 to 255 (before normalizing). Thus, each pixel (all 16,384 of them in a 128x128 image) is a function of a 3x255 color value.
 
-These pixel values are the *input* for a Convolutional Neural Network.  It needs to make sense of these values to make predictions about the image, for example, in our task here, to predict what the image is of, one of the six possible fruit classes.
+A Convolutional Neural Network then tries to make sense of these values to make predictions about the image, or to predict what the image is of—here, one of the five possible toy classes. Of course, the pixel values themselves are meaningless; they only make sense in relation to each other in spatial dimensions. The network tries to learn these relationships—turning the patterns that it finds into features, much like we do as humans.
 
-The pixel values themselves don't hold much useful information on their own - so the network needs to turn them into *features* much like we do as humans.
+Convolution is the process in which images are scanned over using filters, detecting patterns such as edges or textures, and then pooling compresses these into more generalizable representations. This helps reduce the problem space and the network's sensitivity to minor changes—allowing it to recognize the same object even when images differ slightly.
 
-A big part of this process is called **Convolution** where each input image is scanned over, and compared to many different, and smaller filters, to compress the image down into something more generalised.  This process not only helps reduce the problem space, it also helps reduce the network's sensitivy to minor changes, in other words to know that two images are of the same object, even though the images are not *exactly* the same.
+CNNs consist of multiple convolutional layers (each with filters to detect different features), pooling layers to generalize features, and dense layers with neurons to interpret these features for final classification.
 
-A somewhat similar process called **Pooling** is also applied to faciliate this *generalisation* even further.  A CNN can contain many of these Convolution & Pooling layers - with deeper layers finding more abstract features.
+As a Convolutional Neural Network trains, it iteratively calculates how well it is predicting class labels as loss. It then goes backward through the network in a process known as Backpropagation to update the parameters within the network, minimizing error and improving predictive accuracy over time.
 
-Similar to Artificial Neural Networks, Activation Functions are applied to the data as it moves forward through the network, helping the network decide which neurons will fire, or in other words, helping the network understand which neurons are more or less important for different features, and ultimately which neurons are more or less important for the different output classes.
+There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. I liken it to a machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy.
 
-Over time - as a Convolutional Neural Network trains, it iteratively calculates how well it is predicting on the known classes we pass it (known as the **loss** or **cost**, then heads back through in a process known as **Back Propagation** to update the paramaters within the network, in a way that reduces the error, or in other words, improves the match between predicted outputs and actual outputs.  Over time, it learns to find a good mapping between the input data, and the output classes.
-
-There are many parameters that can be changed within the architecture of a Convolutional Neural Network, as well as clever logic that can be included, all which can affect the predictive accuracy.  We will discuss and put in place many of these below!
 
 ___
 <br>
