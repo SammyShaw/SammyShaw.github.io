@@ -5,8 +5,7 @@ image: "/posts/ToyRobot_CoverImage.png"
 tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Python]
 ---
 
-This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. 
-
+This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys, using a bespoke, self-collected data set. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. I find that while CNN is all about optimizing model architecture and training parameters, building a successful model has much to do with the nature and quality of the data itself. 
 
 # Table of contents
 
@@ -32,60 +31,64 @@ ___
 
 ### Context <a name="overview-context"></a>
 
-I'm building a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'll use a Convolutional Neural Network to train a computer to recognize a Brio from a Bananagram (and other classes of toys). And I'll never step on a lego again!
+I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! Because my four-year old is better at playing with toys than picking them up, and because I'm better at throwing them all in one basket than sorting them. I'll use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (and other toys).
 
-If this was successful and put into place on a larger scale, the client would be able to enhance their sorting & delivery processes.
+I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, because I'll want to simulate the real-world scenarios of his toys scattered throughout the house. 
+
+If this is successful and put into place on a larger scale, no parent will ever step on a Lego again! 
 
 <br>
 <br>
 ### Actions <a name="overview-actions"></a>
 
-We utilise the *Keras* Deep Learning library for this task.
+Thanks to the *Keras* Deep Learning library, most of the tasks and procedures for building a computer vision model are made easy in Python. On the other hand, while Keras provides the tools, understanding and optimizing the model's architecture and training parameters is not so easy. In my case, since I will be taking my own pictures, I also have to think hard about what constitutes good, useful data. 
 
-We start by creating our pipeline for feeding training & validation images in batches, from our local directory, into the network.  We investigate & quantify predictive performance epoch by epoch on the validation set, and then also on a held-back test set.
+After taking images and structuring the data into training, validation, and Test set folders, I define the data flow parameters and set up image data generator objects.
 
-Our baseline network is simple, but gives us a starting point to refine from.  This network contains **2 Convolutional Layers**, each with **32 filters** and subsequent **Max Pooling** Layers.  We have a **single Dense (Fully Connected) layer** following flattening with **32 neurons** followed by our output layer.  We apply the **relu** activation function on all layers, and use the **adam** optimizer.
+My method is to: 1. Start with a simple baseline model, and then add or refine aspects to try to improve its toy predictability. The first network consists of only two convolutional layers, each with 32 filters and subsequent Max Pooling Layers, a single dense (fully connected) layer following flattening with 32 neurons followed by an output layer for five toy classes.  I use the RELU activation function on all layers, and use the 'adam' optimizer. 
+Subsequent model refinements include: 
+2. Add a **Dropout** layer to reduce overfitting (which will be tweaked throughout). 
+3. Add **Image Augmentation** to the data pipeline to increase variation in the training data, as well as address overfitting.
+4. Add a Learning Rate Reducer to smooth convergence. 
+5. Experiment with Layers and Filters: 
+    a. First adding more convolutional layer
+    b. Increasing the filters in convolutional layers
+    c. Deceasing the filters in the convolutional layers
+    d. Increasing the kernel size
 
-Our first refinement is to add **Dropout** to tackle the issue of overfitting which is prevalent in the baseline network performance.  We use a **dropout rate of 0.5**.
-
-We then add in **Image Augmentation** to our data pipeline to increase the variation of input images for the network to learn from, resulting in a more robust results as well as also address overfitting.
-
-With these additions in place, we utlise *keras-tuner* to optimise our network architecture & tune the hyperparameters.  The best network from this testing contains **3 Convolutional Layers**, each followed by **Max Pooling** Layers.  The first Convolutional Layer has **96 filters**, the second & third have **64 filters**.  The output of this third layer is flattened and passed to a **single Dense (Fully Connected) layer** with **160 neurons**.  The Dense Layer has **Dropout** applied with a **dropout rate of 0.5**.  The output from this is passed to the output layer.  Again, we apply the **relu** activation function on all layers, and use the **adam** optimizer.
-
-Finally, we utilise **Transfer Learning** to compare our network's results against that of the pre-trained **VGG16** network.
+Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
 
 <br>
 <br>
 
 ### Results <a name="overview-results"></a>
 
-We have made some huge strides in terms of making our network's predictions more accurate, and more reliable on new data.
-
-Our baseline network suffered badly from overfitting - the addition of both Dropout & Image Augmentation elimited this almost entirely.
+The baseline network suffered badly from overfitting, but the addition of Dropout & Image Augmentation elimited this entirely.
 
 In terms of Classification Accuracy on the Test Set, we saw:
 
-* Baseline Network: **75%**
-* Baseline + Dropout: **85%**
-* Baseline + Image Augmentation: **93%**
-* Optimised Architecture + Dropout + Image Augmentation: **95%**
-* Transfer Learning Using VGG16: **98%**
+* Baseline Network: **74%**
+* Baseline + Dropout: **81%**
+* Baseline + Dropout + Image Augmentation: **64%**
+* Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **74%**
+* Experiment 2 (32, 32, 64, 32): **78.7%**
+* Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
+* MobilenetV2 base model: **100%**
 
-Tuning the networks architecture with Keras-Tuner gave us a great boost, but was also very time intensive - however if this time investment results in improved accuracy then it is time well spent.
-
-The use of Transfer Learning with the VGG16 architecture was also a great success, in only 10 epochs we were able to beat the performance of our smaller, custom networks which were training over 50 epochs.  From a business point of view we also need to consider the overheads of (a) storing the much larger VGG16 network file, and (b) any increased latency on inference.
+The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that predicts my kids toys 100% of the time. 
 
 <br>
 <br>
 ### Growth/Next Steps <a name="overview-growth"></a>
 
-The proof of concept was successful, we have shown that we can get very accurate predictions albeit on a small number of classes.  We need to showcase this to the client, discuss what it is that makes the network more robust, and then look to test our best networks on a larger array of classes.
+The concept here is demonstrated, if not proven. We have shown that we can get very accurate predictions - that should this robot come to market, it will at least be able to accurately predict in what bins your childs' toys belong. 
 
-Transfer Learning has been a big success, and was the best performing network in terms of classification accuracy on the Test Set - however we still only trained for a small number of epochs so we can push this even further.  It would be worthwhile testing other available pre-trained networks such as ResNet, Inception, and the DenseNet networks.
+I hold out that there is considerable room for improvement in my own self-built model. The experimental architectures that I tested here do not exhaust the possibilities. I can use Keras Tuner to get an optimal network architecture. 
+
+However, my current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that most image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
 
 <br>
 <br>
-
 ___
 
 # Data Overview  <a name="data-overview"></a>
