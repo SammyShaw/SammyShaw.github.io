@@ -1,11 +1,12 @@
 ---
 layout: post
-title: Fruit Classification Using A Convolutional Neural Network
-image: "/posts/cnn-fruit-classification-title-img.png"
-tags: [Deep Learning, CNN, Data Science, Computer Vision, Python]
+title: Toy Robot: Toy Classification Using CNN
+image: "/posts/ToyRobot_CoverImage.png"
+tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Python]
 ---
 
-In this project we build & optimise a Convolutional Neural Network to classify images of fruits, with the goal of helping a grocery retailer enhance & scale their sorting & delivery processes. 
+This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. 
+
 
 # Table of contents
 
@@ -31,15 +32,7 @@ ___
 
 ### Context <a name="overview-context"></a>
 
-Our client had an interesting proposal put forward to them, and requested our help to assess whether it was viable.
-
-At a recent tech conference, they spoke to a contact from a robotics company that creates robotic solutions that help other businesses scale and optimise their operations.
-
-Their representative mentioned that they had built a prototype for a robotic sorting arm that could be used to pick up and move products off a platform.  It would use a camera to "see" the product, and could be programmed to move that particular product into a designated bin, for further processing.
-
-The only thing they hadn't figured out was how to actually identify each product using the camera, so that the robotic arm could move it to the right place.
-
-We were asked to put forward a proof of concept on this - and were given some sample images of fruits from their processing platform.
+I'm building a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'll use a Convolutional Neural Network to train a computer to recognize a Brio from a Bananagram (and other classes of toys). And I'll never step on a lego again!
 
 If this was successful and put into place on a larger scale, the client would be able to enhance their sorting & delivery processes.
 
