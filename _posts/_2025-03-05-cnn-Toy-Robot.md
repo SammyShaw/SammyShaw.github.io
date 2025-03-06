@@ -82,7 +82,7 @@ The baseline network suffered badly from overfitting, but the addition of Dropou
 
 In terms of Classification Accuracy on the Test Set, we saw:
 
-* Baseline Network: **73.3%**
+* Baseline Network: **74.7%**
 * Baseline + Dropout: **81%**
 * Baseline + Dropout + Image Augmentation: **64%**
 * Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **74%**
@@ -476,12 +476,11 @@ Thus we have a convenient, and very useful dataframe storing our prediction data
 
 | **actual_label** | **predicted_label** | **predicted_probability** | **filename** | **correct** |
 |---|---|---|---|---|
-| apple | lemon | 0.700764 | apple_0034.jpg | 0 |
-| avocado | avocado | 0.99292046 | avocado_0074.jpg | 1 |
-| orange | orange | 0.94840413 | orange_0004.jpg | 1 |
-| banana | lemon | 0.87131584 | banana_0024.jpg | 0 |
-| kiwi | kiwi | 0.66800004 | kiwi_0094.jpg | 1 |
-| lemon | lemon | 0.8490372 | lemon_0084.jpg | 1 |
+| bananagrams | bananagrams | 0.65868604 | IMG_7817.jpg | 1 |
+| brios | brios | 0.99941015 | b1.jpg | 1 |
+| cars | magnatiles | 0.99988043 | c119.jpg | 0 |
+| duplos | bananagrams | 0.6900331 | IMG_8532.jpg | 0 |
+| magnatiles | magnatiles | 0.994294 | IMG_8635.jpg | 1 |
 
 <br>
 
@@ -505,77 +504,255 @@ print(test_set_accuracy)
 ```
 <br>
 
-The baseline network gets **73.3% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
+The baseline network gets **74.7% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
 
 <br>
+
 #### Test Set Confusion Matrix
 
-Overall Classification Accuracy is very useful, but it can hide what is really going on with the network's predictions!
+Overall Classification Accuracy is useful, but it can obscure where and why the model struggled.
 
-As we saw above, our Classification Accuracy for the whole test set was 75%, but it might be that our network is predicting extremely well on apples, but struggling with Lemons as for some reason it is regularly confusing them with Oranges.  A Confusion Matrix can help us uncover insights like this!
+Maybe the network is predicting extremely well on Bananagrams, but it thinks that Magnatiles are Brios? 
 
-We can create a Confusion Matrix with the below code:
+A Confusion Matrix can show us these patterns, which I create using the predictions dataframe below.
 
 ```python
 
-# confusion matrix (percentages)
-confusion_matrix = pd.crosstab(predictions_df['predicted_label'], predictions_df['actual_label'], normalize = 'columns')
+# confusion matrix 
+confusion_matrix = pd.crosstab(predictions_df['predicted_label'], predictions_df['actual_label'])
 print(confusion_matrix)
+# or, with percentages larger dataframes
+# confusion_matrix = pd.crosstab(predictions_df['predicted_label'], predictions_df['actual_label'], normalize = 'columns')
+# print(confusion_matrix)
+
+actual_label     bananagrams  brios  cars  duplos  magnatiles
+predicted_label                                              
+bananagrams               10      1     0       0           0
+brios                      4     12     0       1           1
+cars                       0      1    13       0           0
+duplos                     0      0     0      13           6
+magnatiles                 1      1     2       1           8
 
 ```
+
 <br>
-This results in the following output:
 
-```
+So, while overall our test set accuracy was ~ 75% - for each individual class we see:
 
-actual_label     apple  avocado  banana  kiwi  lemon  orange
-predicted_label                                             
-apple              0.8      0.0     0.0   0.1    0.0     0.1
-avocado            0.0      1.0     0.0   0.0    0.0     0.0
-banana             0.0      0.0     0.2   0.1    0.0     0.0
-kiwi               0.0      0.0     0.1   0.7    0.0     0.0
-lemon              0.2      0.0     0.7   0.0    1.0     0.1
-orange             0.0      0.0     0.0   0.1    0.0     0.8
+* Bananagrams: 66.7%
+* Brios: 80%
+* Cars: 86.7%
+* Duplos: 86.7%
+* Magnatiles: 53.3%
 
-```
-<br>
-Along the top are our *actual* classes and down the side are our *predicted* classes - so counting *down* the columns we can get the Classification Accuracy (%) for each class, and we can see where it is getting confused.
+Insightful! I honestly thought the Magnatiles would be the most recognizable, but here the model thinks a big portion of them are Duplos. Perhaps its not surprising since Magnatiles and Duplos share common features. They are both square/blocky and made of solid colors, which combine to form multi-color, multi-block shapes. 
 
-So, while overall our test set accuracy was 75% - for each individual class we see:
-
-* Apple: 80%
-* Avocado: 100%
-* Banana: 20%
-* Kiwi: 70%
-* Lemon: 100%
-* Orange: 80%
-
-This is very powerful - we now can see what exactly is driving our *overall* Classification Accuracy.
-
-The standout insight here is for Bananas - with a 20% Classification Accuracy, and even more interestingly we can see where it is getting confused. The network predicted 70% of Banana images to be of the class Lemon!
+But that is just me guessing! To really see what features the model is picking up on, use a grad-CAM analysis. 
 
 ___
 <br>
-# Tackling Overfitting With Dropout <a name="cnn-dropout"></a>
+
+#### Grad-CAM Analysis
+
+Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image!
+
+A heatmap is used to color-code the regions of the image that the model found most useful for classifying it as one thing or another. 
+
+In the code below, I: 
+
+* Find the name of the last convolutional layer (layers are named as saved in Keras as part of the model object) (Any convolutional layer can be used, but the last one should be the most meaningful).
+* Set the image properties and directory paths (as we did when calling test images) (Any image can be analyzed).
+* Define the Grad-CAM function to turn activated features into mappable objects (I use a script I found, not fully sure what "tape" and "GradientTape" refer to).
+* Define a function to preprocess image(s) to analyze.
+* Define a function to overlay the heat-map on the images
+* Define a function to plot the image and the heatmap.
+
+```python
+
+import os
+import cv2
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+
+os.chdir("C:/Dat_Sci/Data Projects/Toy Robot")
+
+# Load the model
+model_path = 'models/Toy_Robot_basic_v01.h5'
+model = load_model(model_path)
+
+# Print all layers in the model to inspect names and shapes
+for i, layer in enumerate(model.layers):
+    print(i, layer.name, layer.output.shape)
+
+# Find the last Conv2D layer in the model
+def find_last_conv_layer(model):
+    for layer in reversed(model.layers):
+        if isinstance(layer, tf.keras.layers.Conv2D):
+            return layer.name
+    raise ValueError("No Conv2D layer found in the model.")
+
+# Get the last conv layer name (this is what we will use for Grad-CAM)
+last_conv_layer_name = find_last_conv_layer(model)
+print("Last conv layer name:", last_conv_layer_name)
+
+# Define which conv layers to use for Grad-CAM (here we just use the last conv layer)
+conv_layers = [last_conv_layer_name]
+
+
+
+# Define image properties and directories
+img_size = (128, 128)  # Model input size
+test_dir = "data/test"  # Directory with test images
+output_dir = "grad_cam"  # Directory to save Grad-CAM images
+os.makedirs(output_dir, exist_ok=True)
+
+# --- Grad-CAM Function ---
+def grad_cam(model, img_array, target_layer_name):
+    """Compute Grad-CAM heatmap for a specified convolutional layer."""
+    # Get the target conv layer from the model
+    conv_layer = model.get_layer(target_layer_name)
+    
+    # Create a model that maps the input image to the conv layer output and predictions
+    grad_model = tf.keras.models.Model(
+        inputs=[model.input],
+        outputs=[conv_layer.output, model.output]
+    )
+    
+    with tf.GradientTape() as tape:
+        conv_output, predictions = grad_model(img_array)
+        # Get the predicted class index
+        class_idx = tf.argmax(predictions[0])
+        # Use the score of the predicted class as the loss
+        loss = predictions[:, class_idx]
+    
+    # Compute gradients of the loss with respect to the conv layer output
+    grads = tape.gradient(loss, conv_output)
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+    
+    conv_output = conv_output[0]
+    heatmap = np.mean(conv_output * pooled_grads, axis=-1)
+    
+    # Normalize the heatmap between 0 and 1
+    heatmap = np.maximum(heatmap, 0)
+    if np.max(heatmap) != 0:
+        heatmap /= np.max(heatmap)
+    
+    return heatmap
+
+# --- Image Preprocessing ---
+def preprocess_image(img_path):
+    """Load and preprocess an image for the model."""
+    img = load_img(img_path, target_size=img_size)
+    img_array = img_to_array(img) / 255.0  # Normalize
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+    return img, img_array
+
+def overlay_heatmap(heatmap, img_path, alpha=0.4):
+    """Overlay the Grad-CAM heatmap on the original image."""
+    img = cv2.imread(img_path)
+    img = cv2.resize(img, img_size)
+
+    heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
+    heatmap = np.uint8(255 * heatmap)
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+    # Blend heatmap with the original image
+    superimposed_img = cv2.addWeighted(img, 1 - alpha, heatmap, alpha, 0)
+    return superimposed_img
+
+# --- Apply Grad-CAM on Test Images ---
+def run_grad_cam_on_test_set():
+    """Run Grad-CAM on test images for specified convolutional layers."""
+    for category in os.listdir(test_dir):
+        category_path = os.path.join(test_dir, category)
+        if not os.path.isdir(category_path):
+            continue  # Skip non-directory files
+
+        for img_name in os.listdir(category_path):
+            img_path = os.path.join(category_path, img_name)
+            try:
+                # Preprocess the image
+                original_img, img_array = preprocess_image(img_path)
+
+                # Iterate over the chosen conv layers (here, just the last conv layer)
+                for layer in conv_layers:
+                    heatmap = grad_cam(model, img_array, target_layer_name=layer)
+                    superimposed_img = overlay_heatmap(heatmap, img_path)
+
+                    # Save the Grad-CAM output image
+                    heatmap_path = os.path.join(output_dir, f"heatmap_{layer}_{category}_{img_name}")
+                    cv2.imwrite(heatmap_path, superimposed_img)
+
+                    # Display the original and Grad-CAM images side by side
+                    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+                    ax[0].imshow(original_img)
+                    ax[0].set_title(f"Original Image ({category})")
+                    ax[0].axis("off")
+
+                    ax[1].imshow(cv2.cvtColor(superimposed_img, cv2.COLOR_BGR2RGB))
+                    ax[1].set_title(f"Grad-CAM at {layer}")
+                    ax[1].axis("off")
+
+                    plt.show()
+
+            except Exception as e:
+                print(f"Error processing {img_path}: {e}")
+
+# --- Run Grad-CAM on the Test Set ---
+run_grad_cam_on_test_set()
+
+```
+These heat-maps offer two important insights, which I'll call *Bias insight* and *Depth insight*, 
+
+Below I show a raw test set image alongside its corresponding grad-CAM image.
+
+First, we can clearly see whether or not the model is picking up on the features that would distinguish one class of object from another. We see in the first one, an ideal scenario, in which the model seems to have honed in on the Brio track itself, distinguishing the shape and the parallel grooves as its distinguishing features. Below that, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
+
+![alt text](/img/posts/heatmap_conv2d_36_brios_IMG_8744.png "Grad-CAM_Good Feature Detection")
+
+![alt text](/img/posts/heatmap_conv2d_36_bananagrams_IMG_7823.png "Grad-CAM_Bad Feature Detection")
+
+##### Bias Insight
+Bias is a pervasive issue in CNN tasks. At a basic level, bias happens when a model learns to predict on something other than the features that distinguish separate classes. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on train tracks it will have a better chance of predicting train tracks that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what class it belongs too, even if it does guess correctly. But if a model is biased, it is probably because it has learned to *correctly* predict on other features... features that are associated with the class in training, but not in real life. 
+
+In fact, the model may well have predicted this particular Banagram correctly (I won't tell you). It may actually associate the floor (or perhaps the shape of its cut out), with the class Bananagram. If so, it is perhaps because the other backgrounds in the Bananagram training set include the same background, so when it sees wooden floor background it thinks that it is a Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. But the issue is more complex than that. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class, lets say Bananagrams has a 70/30% split, the model might still be biased towards that 70% background, because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distiguishing features in the other classes, then it might still guess Bananagram every time it sees a woodfloor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
+
+I'll address bias as a cocern with my self-collected data set again in the conclusion.
 
 <br>
+
+##### Depth Insight
+Secondly, we can use the grad-CAM images to compare what the model predicted correctly and what it missed! In the images below it looks like the network learned the features of the Magnatiles quite well. The heat-map looks like it is focused on the whole shape, as well as the screws, and the magnets inside the object. 
+
+![alt text](/img/posts/magnatile_baseline_gradcam_correct.png "Grad-CAM Correct Classification")
+
+![alt text](/img/posts/magnatiles_baseline_gradCAM1_.png "Grad-CAM Incorrect Classification")
+
+However, while the top image was correctly identified as a Magnatile, the bottom image was Identified as a Duplo. This *may* be a bias issue, but it also seems likely, this time, that the model is simply failing to understand the difference between Magnatiles and Duplos and deep enough level. 
+
+In subsequent iterations, I'll tackle the many issues identified above with various methods that should improve the model's overall performance. 
+
+# Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
+
+<br>
+
 #### Dropout Overview
 
-Dropout is a technique used in Deep Learning primarily to reduce the effects of over-fitting. Over-fitting is where the network learns the patterns of the training data so specifically, that it runs the risk of not generalising well, and being very unreliable when used to predict on new, unseen data.
+Dropout is a technique used in Deep Learning primarily to reduce the effects of over-fitting. 
 
-Dropout works in a way where, for each batch of observations that is sent forwards through the network, a pre-specified proportion of the neurons in a hidden layer are essentially ignored or deactivated.  This can be applied to any number of the hidden layers.
+As we have seen, *over-fitting* happens when the network learns the patterns of the training data so specifically that it essentially memorizes those images as the class of object itself. Then when it sees the same class of object in a different image (in the validation or test set), it cannot recognize it. 
 
-When we apply Dropout, the deactivated neurons are completely taken out of the picture - they take no part in the passing of information through the network.
+*Dropout* is a technique in which, for each batch of observations that is sent forwards through the network, a pre-specified portion of the neurons in a hidden layer are randomly deactivated. This can be applied to any number of the hidden layers. 
 
-All the math is the same, the network will process everything as it always would (so taking the sum of the inputs multiplied by the weights, and adding a bias term, applying activation functions, and updating the network’s parameters using Back Propagation) - it’s just that in this scenario where we are disregarding some of the neurons, we’re essentially pretending that they’re not there.
+When neurons are deactivated - they take no part in the passing of information through the network.
 
-In a full network (i.e. where Dropout is not being applied) each of the combinations of neurons becomes quite specific at what it represents, at least in terms of predicting the output.  At a high level, if we were classifying pictures of cats and dogs, there might be some linked combination of neurons that fires when it sees pointy ears and a long tongue.  This combination of neurons becomes very tuned into its role in prediction, and it becomes very good at what it does - but as is the definition of overfitting, it becomes too good - it becomes too rigidly aligned with the training data.
+The math is the same, the network will process everything as it always would (taking the sum of the inputs multiplied by the weights, and adding a bias term, applying activation functions, and updating the network’s parameters using Back Propagation) - but now some of the neurons are simply turned off. If some neurons are turned off, then the other neurons have to jump in and pick up the slack (so to speak). If those other neurons were previously dedicated to certain very specific features of training images, they will now be forced to generalize a bit more. If over-trained neurons that were turned off in one epoch jump back in in the next, they now contend with a model that has found more generalizable patterns and will have to tune accordingly. 
 
-If we *drop out* neurons during training, *other* neurons need to jump in fill in for this particular role of detecting those features.  They essentially have to come in at late notice and cover the ignored neurons job, dealing with that particular representation that is so useful for prediction.
+Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent - the network learns more robust features, and are less susceptible to noise.
 
-Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data.  Since no particular neuron can rely on the presence of other neurons, and the features with which they represent - the network learns more robust features, and are less susceptible to noise.
-
-In a Convolutional Neural Network, such as in our task here - it is generally best practice to only apply Dropout to the Dense (Fully Connected) layer or layers, rather than to the Convolutional Layers.  
 
 
 <br>
