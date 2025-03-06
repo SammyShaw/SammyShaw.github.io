@@ -20,7 +20,7 @@ This project uses a Convolutional Neural Network to train a computer model to re
 - [04. Baseline Network](#cnn-baseline)
 - [05. Tackling Overfitting With Dropout](#cnn-dropout)
 - [06. Image Augmentation](#cnn-augmentation)
-- [07. Hyper-Parameter Tuning](#cnn-tuning)
+- [07. Learning Rate Reduction](#cnn-learning rate)
 - [08. Transfer Learning](#cnn-transfer-learning)
 - [09. Overall Results Discussion](#cnn-results)
 - [10. Next Steps & Growth](#growth-next-steps)
@@ -883,29 +883,80 @@ I dropped Dropout from the model, so the Augmented Image model can be compared t
 
 <br>
 
-The best classification accuracy on the *validation set* was **x%**, not significantly higher than the **75.3%** we saw for the baseline network. 
-Validation set accuracy plateaus early again, at about the 10th epoch. 
+The best classification accuracy on the *validation set* was **77.3%**, slightly higher than the **75.3%** we saw for the baseline network. 
+Validation set accuracy plateaus again, but not as early, and its highest validation accuracy was found in the 39th epoch.
 
-Accuracy on the *test set* was **x%**, which is a nice bump from the **74.7%** test set accuracy from the baseline model. 
+Accuracy on the *test set* was **74.7%**, same as the **74.7%** test set accuracy from the baseline model,  and not as good as the **81%** accuracy from the Dropout model. 
 
-[ 
-The model is no longer over-fitting. The gap between the classification accuracy on the training set and the validation set has been eliminated. In fact, the model is consistently predicting better on the validation set, which might indicate that the validation set data is more consistent within each class. 
-]
-[
-On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it is become less confident in its predictions. That is the probabilities output associated with its predictions are likely going down. It is becoming less confident in the validation preditions, and more confident in the training predictions. 
-]
+The model appears to be slightly overfitting. Compared to the baseline model, the gap between the classification accuracy on the training set and the validation set has not been eliminated, but it is greatly reduced, which unfortunately in this case did not lead to better performance overall.  
 
-Image Augmentation *and* applying Dropout might be powerful combination!
-]
+Using Image Augmentation *and* applying Dropout together might be a powerful combination. I'll do so in later iterations. 
 
-Before turning to the model architecture, I have one more trick to try to maximize performance: Learning Rate Reduction. 
+Before turning to the model architecture, however, I'll try to increase the model's performance by adjusting the learning rate when the performance metrics plateau.  
 
 ___
 <br>
-# Hyper-Parameter Tuning <a name="cnn-tuning"></a>
+
+# Learning Rate Reduction <a name="cnn-learning rate"></a>
 
 <br>
-#### Keras Tuner Overview
+
+#### Learning Rate Overview
+
+The learning rate in a Convolutional Neural Network refers to how big a step the model takes during **gradient descent** in its effort to minimize error. For each weight, the model applies gradient descent to find the best value that minimizes the overall loss across all layers. The **minima** is the point at which a weight's value acheives minimum loss for the model as a whole. Because image data present complex (not linear) patterns, each weight might positively contribute to the model at different values, but we want it to find the best overall weight value for the entire model, or the **global minima,** among contending minima. Along the way, the model might encounters **local minima**, which are suboptimal, or *misleading* low points that can trap the model's learning process. 
+
+If the gradient descent algorithm moves too quickly, the model risks overshooting the global minima. On the other hand, if it moves too slowly, it risks getting stuck in local minima and never getting out. 
+
+Keras' LearningRateReducer allows us to reduce learning (the rate of gradient descent) in the training process if and when the learning starts to plateau. That is, we can tell the model to slow down if, epoch-to-epoch, it is not making any improvements in terms of accuracy or loss. 
+
+<br>
+
+#### Implementing Learning Rate Reducer
+
+Keras' ReduceLROnPlateau function allows this as a model callback. 
+The code belongs with our other "training parameters", and is passed in our model.fit() "history" object. 
+In the code below, I: 
+* Set it to monitor the validation accuracy.
+* Decrease by speed by 0.5
+* If (patience) Validation Accuracy does not increase in 4 epochs. 
+
+```python
+
+# install packages
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+
+# save as
+model_filename = 'models/Toy_Robot_LRreducer_v01.h5'
+
+# reduce learning when validation loss stops improving
+reduce_lr = ReduceLROnPlateau(monitor='val_accuracy',  # Monitor validation accuracy
+                              factor=0.5,         # Reduce LR by half
+                              patience=4,         # Wait 4 epochs before reducing
+                              min_lr=1e-6,        # Minimum learning rate
+                              verbose=1)          # Print updates
+# train the network
+
+history = model.fit(x = training_set,
+                    validation_data = validation_set,
+                    batch_size = batch_size,
+                    epochs = num_epochs,
+                    callbacks = [save_best_model, reduce_lr])
+
+```
+
+#### Results with Learning Rate Reduction
+
+As before, I trained the same baseline network architecture, this time with both Image Augmentation and Dropout (0.5)
+
+<br>
+
+![alt text](/img/posts/LRreducer_Train_Val_Metrics.png "Toy Robot Learning Rate Reducer Plot")
+
+<br>
+
+
+
+#### Model architecture overview
 
 So far, with our Fruit Classification task, we have:
 
