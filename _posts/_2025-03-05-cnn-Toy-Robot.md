@@ -383,22 +383,19 @@ In the following sections, I'll add features to the model that address the overf
 
 #### Performance On The Test Set
 
-Above, we assessed our models performance on both the training set and the validation set - both of which were being passed in during training.
+The model trains only on the training data, but the validation data does inform this training, because the model saves its progress (its weights and bias values) every time the validation set accuracy improves. To get a truly 'real world' taste of how the model peforms, we can use it to predict on images that it has not seen at all during training - the test set.
 
-Here, we will get a view of how well our network performs when predict on data that was *no part* of the training process whatsoever - our test set.
+The model's predictive accuracy on the test set thus provides a good metric of how well the many iterations of our model performs relative to each other. 
 
-A test set can be extremely useful when looking to assess many different iterations of a network we build.  Where the validation set might be sent through the model in slightly different orders during training in order to assess the epoch by epoch performance, our test set is a *static set* of images.  Because of this, it makes for a really good baseline for testing the first iteration of our network versus any subsequent versions that we create, perhaps after we refine the architecture, or add any other clever bits of
-logic that we think might help the network perform better in the real world.
+In the code below, I will:
 
-In the below code we run this in isolation from training.  We:
-
-* Import the required packages for importing & manipulating our test set images
-* Set up the parameters for the predictions
-* Load in the saved network file from training
-* Create a function for preprocessing our test set images in the same way that training & validation images were
-* Create a function for making predictions, returning both predicted class label, and predicted class probability
-* Iterate through our test set images, preprocessing each and passing to the network for prediction
-* Create a Pandas DataFrame to hold all prediction data
+* Import the required packages for importing the test set images.
+* Set up the parameters for the predictions.
+* Load in the saved model file from training.
+* Create a function for preprocessing the test set images in the same way that training and validation images were.
+* Create a function for making predictions, returning both predicted class label, and predicted class probability.
+* Iterate through our test set images, preprocessing each and passing to the network for prediction.
+* Create a Pandas DataFrame to hold all prediction data.
 
 ```python
 
@@ -410,10 +407,10 @@ import pandas as pd
 from os import listdir
 
 # parameters for prediction
-model_filename = 'models/fruits_cnn_v01.h5'
+model_filename = 'models/toy_robot_basic_v01.h5'
 img_width = 128
 img_height = 128
-labels_list = ['apple', 'avocado', 'banana', 'kiwi', 'lemon', 'orange']
+labels_list = ['bananagrams', 'brios', 'cars', 'duplos', 'magnatiles']
 
 # load model
 model = load_model(model_filename)
@@ -440,7 +437,7 @@ def make_prediction(image):
 
 # loop through test data
 source_dir = 'data/test/'
-folder_names = ['apple', 'avocado', 'banana', 'kiwi', 'lemon', 'orange']
+folder_names = ['bananagrams', 'brios', 'cars', 'duplos', 'magnatiles']
 actual_labels = []
 predicted_labels = []
 predicted_probabilities = []
@@ -470,7 +467,8 @@ predictions_df['correct'] = np.where(predictions_df['actual_label'] == predictio
 
 ```
 <br>
-After running the code above, we end up with a Pandas DataFrame containing prediction data for each test set image. A random sample of this can be seen in the table below:
+
+Thus we have a convenient dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
 
 <br>
 
