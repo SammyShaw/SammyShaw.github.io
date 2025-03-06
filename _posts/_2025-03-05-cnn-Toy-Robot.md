@@ -202,19 +202,19 @@ ___
 
 # Convolutional Neural Network Overview <a name="cnn-overview"></a>
 
-Convolutional Neural Networks (CNNs) are an adaptation of Artificial Neural Networks and are primarily used for image data tasks.
+Convolutional Neural Networks (CNN) are an adaptation of Artificial Neural Networks and are primarily used for image data tasks.
 
-To a computer, an image is a three-dimensional tensor made of rows and columns of pixels (in our case 128x128), each with 3 'channels' for intensity values for colors (Red, Green, and Blue, hence RGB), that range from 0 to 255 (before normalizing). Thus, each pixel (all 16,384 of them in a 128x128 image) is a function of a 3x255 color value.
+To a computer, an image is a three dimensional dataframe (or *tensor*), made of rows and columns of pixels (in our case 128x128), each with 3 'channels' for intensity values for colors (Red, Green, and Blue, hence RBG), that range from 0 to 255 (before normalizing). Thus, each pixel (all 1,024 of them in a 128x128 image) is a function of a 3x255 color value. 
 
-A Convolutional Neural Network then tries to make sense of these values to make predictions about the image, or to predict what the image is of—here, one of the five possible toy classes. Of course, the pixel values themselves are meaningless; they only make sense in relation to each other in spatial dimensions. The network tries to learn these relationships—turning the patterns that it finds into features, much like we do as humans.
+A Convolutional Neural Network then tries to make sense of these values to make predictions about the image, or to predict what the image is of - here one of the five possible toy classes. Of course, the pixel values themselves are meaningless, they only make sense in relation to each other in spatial dimensions. The network tries to learn these relatinships - turning the patterns that it finds into *features* much like we do as humans. By learning to associate those feature-patterns with the class labels that it is provided, the network learns which features are meaningful for each class of object. 
 
-Convolution is the process in which images are scanned over using filters, detecting patterns such as edges or textures, and then pooling compresses these into more generalizable representations. This helps reduce the problem space and the network's sensitivity to minor changes—allowing it to recognize the same object even when images differ slightly.
+**Convolution** is the process in which images are scanned over with filters that detect patterns. **Pooling** compresses these into more generalizable representations. This process helps reduce the problem space (turning the image into a smaller and smaller generalizable representation of features), it also helps reduce the network's sensitivy to minor changes, in other words to know that two images are of the same object, even though the images are not *exactly* the same.
 
-CNNs consist of multiple convolutional layers (each with filters to detect different features), pooling layers to generalize features, and dense layers with neurons to interpret these features for final classification.
+CNN's consist of multiple convolutional layers (each made of any number of filters), and pooling layers, and dense layers that compress and generalize the data in the image so that it can ultimately be turned into a probability of belonging to one class of object or another. 
 
-As a Convolutional Neural Network trains, it iteratively calculates how well it is predicting class labels as loss. It then goes backward through the network in a process known as Backpropagation to update the parameters within the network, minimizing error and improving predictive accuracy over time.
+As a Convolutional Neural Network trains, it iteratively calculates how well it is predicting on class labels as **loss**. It then heads backward through the network in a process known as **Back Propagation** to update the paramaters within the network, trying to minimize error and improve predictive accuracy. Image can be sent through the network any number of times (or, *epochs*) during training. Over time, it learns to find a good mapping between the input data and the output classes.
 
-There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. I liken it to a machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy.
+There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (Activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. Many of these will be discussed below. I liken it to machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy. 
 
 ___
 <br>
