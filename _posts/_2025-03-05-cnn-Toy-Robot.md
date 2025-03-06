@@ -342,7 +342,7 @@ The ModelCheckpoint callback means that the *best* model is saved, in terms of v
 
 #### Analysis Of Training Results
 
-As we saved our training process to the *history* object, we can now analyse the performance (Classification Accuracy, and Loss) of the network epoch by epoch.
+In addition to saving the *best* model (to model_filename), we can use the *history* object that we created to analyze the performance of the network epoch by epoch. In the following code, I'll plot the training and validation loss, and its classification accuracy. 
 
 ```python
 
@@ -364,27 +364,23 @@ plt.show()
 max(history.history['val_accuracy'])
 
 ```
-<br>
-The below image contains two plots, the first showing the epoch by epoch **Loss** for both the training set (blue) and the validation set (orange) & the second show the epoch by epoch **Classification Accuracy** again, for both the training set (blue) and the validation set (orange).
 
 <br>
-![alt text](/img/posts/cnn-baseline-accuracy-plot.png "CNN Baseline Accuracy Plot")
+
+![alt text](/img/posts/Baseline_Train_Val_Metrics.png "Toy Robot Baseline Accuracy Plot")
 
 <br>
-There are two key learnings from above plots. The first is that, with this baseline architecture & the parameters we set for training, we are reaching our best performance in around 10-20 epochs - after that, not much improvement is seen.  This isn't to say that 50 epochs is wrong, especially if we change our network - but is interesting to note at this point.
 
-The second thing to notice is *very important* and that is the significant gap between orange and blue lines on the plot, in other words between our validation performance and our training performance.
+These results are not great. In terms of validation accuracy (bottom orange line), the plot shows that the model learns quickly, but then plateaus by the 5th epoch. It also quickly learns to predict the training data. Reaching 100% accuracy by the 12th epoch. But 100% on the training data is not a good thing, if the validation accuracy does not keep pace. 
 
-This gap is over-fitting.
+The more important pattern revealed by these graphs is the significant gap between performance on the training and validation sets. This gap means that the model is **over-fitting.**
 
-Focusing on the lower plot above (Classification Accuracy) - it appears that our network is learning the features of the training data *so well* that after about 20 or so epochs it is *perfectly* predicting those images - but on the validation set, it never passes approximately **83% Classification Accuracy**.
+That is, the network is learning the features of the training data *so well* that it cannot see very far beyond it. In other words, it is memorizing the training data, and failing to find the generalizable patterns that would allow it to recognize similar objects in the validation set. This is not good, because it means that in the real world, my Toy Robot will get confused if it sees a lego that doesn't perfectly match the images that it was trained on. I want the model to be able to *generalize* about what makes a lego a lego, so that it can recognize a previously unseen lego from a bananagram. 
 
-We do not want over-fitting! It means that we're risking our predictive performance on new data.  The network is not learning to generalise, meaning that if something slightly 
-different comes along then it's going to really, really struggle to predict well, or at least predict reliably!
-
-We will look to address this with some clever concepts, and you will see those in the next sections.
+In the following sections, I'll add features to the model that address the overfitting problem, attempting to close the gap between the training and validation accuracy scores. 
 
 <br>
+
 #### Performance On The Test Set
 
 Above, we assessed our models performance on both the training set and the validation set - both of which were being passed in during training.
