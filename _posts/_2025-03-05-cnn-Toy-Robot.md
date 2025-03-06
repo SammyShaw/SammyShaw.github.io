@@ -735,6 +735,25 @@ However, while the top image was correctly identified as a Magnatile, the bottom
 
 In subsequent iterations, I'll tackle the many issues identified above with various methods that should improve the model's overall performance. 
 
+<br>
+
+# Model Improvements
+
+Rather than reproduce all of the text and discussion above for each of the subsequent iterations, I'll describe basic changes and performance metrics in the table below. Then, in the sections that follow, I'll discuss what additions are made, the rationalle behind them, and the result that matters: test set accuracy. 
+
+| **Model** | **Changes Made** | **Validation Accuracy** | **Test Accuracy** |
+|---|---|---|---|---|
+| 1 | Baseline (see above) | 73.3% | 74.7% | 
+| 2 | Add Dropout (0.5) | 76% | 81% | 
+| 3 | Add Image Augmentation | 72% | 64% | 
+| 4 | Adjust Learning Rate | 78.7% | 74% | 
+| 5 | Add 3rd Convolutional Layer with 64 filters (CV1_32, CV2_32, CV3_64, Dense_32), Reduce Dropout (0.25) | 78.7% | 78.7% | 
+| 6 | Reduce Filters in 1st Layer (CV1_16, CV2_32, CV3_64, Dense_32) | 73% | 72% |
+| 7 | Increase Filters and kernel size in 3rd layer (CV1_32, CV2_64, CV3_64 (kernel size = 5x5), Dense_32) | 76.7%  | 80% |
+| 8 | Add 4th Convolutional Layer | (CV1_32, CV2_32, CV3_32, CV4_64 (kernel size = 3x3), Dense_32) | 75.3% |  |
+| 9 | Use MobilenetV2 base model | 98% | 100% | 
+
+
 # Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
 
 <br>
@@ -753,15 +772,13 @@ The math is the same, the network will process everything as it always would (ta
 
 Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent - the network learns more robust features, and are less susceptible to noise.
 
-
-
 <br>
+
 #### Updated Network Architecture
 
-In our task here, we only have one Dense Layer, so we apply Dropout to that layer only.  A common proportion to apply (i.e. the proportion of neurons in the layer to be deactivated randomly each pass) is 0.5 or 50%.  We will apply this here.
+As is considered best practice, we apply dropout here to the dense layer only. In our task here, we only have one dense Layer, so we apply dropout to that layer. A common proportion to apply (i.e. the proportion of neurons in the layer to be deactivated randomly each pass) is 0.5 or 50%. 
 
 ```python
-
 model = Sequential()
 
 model.add(Conv2D(filters = 32, kernel_size = (3, 3), padding = 'same', input_shape = (img_width, img_height, num_channels)))
