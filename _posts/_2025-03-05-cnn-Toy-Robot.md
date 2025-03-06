@@ -754,7 +754,7 @@ Rather than reproduce all of the text and discussion above for each of the subse
 | 9 | Use MobilenetV2 base model | 98% | 100% | 
 
 
-# Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
+## Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
 
 <br>
 
@@ -774,108 +774,56 @@ Over time, with different combinations of neurons being ignored for each mini-ba
 
 <br>
 
-#### Updated Network Architecture
+#### Implementing Dropout
 
-As is considered best practice, we apply dropout here to the dense layer only. In our task here, we only have one dense Layer, so we apply dropout to that layer. A common proportion to apply (i.e. the proportion of neurons in the layer to be deactivated randomly each pass) is 0.5 or 50%. 
+Adding dropout using Keras is as simple as installing the function and adding a line of code. I saved a new code sheet with the three following changes:
 
 ```python
-model = Sequential()
 
-model.add(Conv2D(filters = 32, kernel_size = (3, 3), padding = 'same', input_shape = (img_width, img_height, num_channels)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D())
+# import
+from tensorflow.keras.layers import Dropout
 
-model.add(Conv2D(filters = 32, kernel_size = (3, 3), padding = 'same'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D())
-
-model.add(Flatten())
-
-model.add(Dense(32))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-
+# add dropout to the output layer
+# ... 
 model.add(Dense(num_classes))
-model.add(Activation('softmax'))
+model.add(Dropout(0.5))
+model.add(Activation('softmax')) 
+# ...
 
-```
-
-<br>
-#### Training The Updated Network
-
-We run the exact same code to train this updated network as we did for the baseline network (50 epochs) - the only change is that we modify the filename for the saved network to ensure we have all network files for comparison.
-
-<br>
-#### Analysis Of Training Results
-
-As we again saved our training process to the *history* object, we can now analyse & plot the performance (Classification Accuracy, and Loss) of the updated network epoch by epoch.
-
-With the baseline network we saw very strong overfitting in action - it will be interesting to see if the addition of Dropout has helped!
-
-The below image shows the same two plots we analysed for the updated network, the first showing the epoch by epoch **Loss** for both the training set (blue) and the validation set (orange) & the second show the epoch by epoch **Classification Accuracy** again, for both the training set (blue) and the validation set (orange).
-
-<br>
-![alt text](/img/posts/cnn-dropout-accuracy-plot.png "CNN Dropout Accuracy Plot")
-
-<br>
-Firstly, we can see a peak Classification Accuracy on the validation set of around **89%** which is higher than the **83%** we saw for the baseline network.
-
-Secondly, and what we were really looking to see, is that gap between the Classification Accuracy on the training set, and the validation set has been mostly eliminated. The two lines are trending up at more or less the same rate across all epochs of training - and the accuracy on the training set also never reach 100% as it did before meaning that we are indeed seeing this *generalisation* that we want!
-
-The addition of Dropout does appear to have remedied the overfitting that we saw in the baseline network.  This is because, while some neurons are turned off during each mini-batch iteration of training - all will have their turn, many times, to be updated - just in a way where no neuron, or combination of neurons will become so hard-wired to certain features found in the training data!
-
-<br>
-#### Performance On The Test Set
-
-During training, we assessed our updated networks performance on both the training set and the validation set.  Here, like we did for the baseline network, we will get a view of how well our network performs when predict on data that was *no part* of the training process whatsoever - our test set.
-
-We run the exact same code as we did for the baseline network, with the only change being to ensure we are loading in network file for the updated network
-
-<br>
-#### Test Set Classification Accuracy
-
-Our baseline network achieved a **75% Classification Accuracy** on the test set.  With the addition of Dropout we saw both a reduction in overfitting, and an increased *validation set* accuracy.  On the test set, we again see an increase vs. the baseline, with an **85% Classification Accuracy**. 
-
-<br>
-#### Test Set Confusion Matrix
-
-As mentioned above, while overall Classification Accuracy is very useful, but it can hide what is really going on with the network's predictions!
-
-The standout insight for the baseline network was that Bananas has only a 20% Classification Accuracy, very frequently being confused with Lemons.  It will be interesting to see if the extra *generalisation* forced upon the network with the application of Dropout helps this.
-
-Running the same code from the baseline section on results for our updated network, we get the following output:
-
-```
-
-actual_label     apple  avocado  banana  kiwi  lemon  orange
-predicted_label                                             
-apple              0.8      0.0     0.0   0.0    0.0     0.0
-avocado            0.0      1.0     0.1   0.2    0.0     0.0
-banana             0.0      0.0     0.7   0.0    0.0     0.0
-kiwi               0.2      0.0     0.0   0.7    0.0     0.1
-lemon              0.0      0.0     0.2   0.0    1.0     0.0
-orange             0.0      0.0     0.0   0.1    0.0     0.9
+# save model 
+model_filename = 'models/toy_robot_dropout_v01.h5'
 
 ```
 <br>
-Along the top are our *actual* classes and down the side are our *predicted* classes - so counting *down* the columns we can get the Classification Accuracy (%) for each class, and we can see where it is getting confused.
 
-So, while overall our test set accuracy was 85% - for each individual class we see:
+#### Results with Dropout
 
-* Apple: 80%
-* Avocado: 100%
-* Banana: 70%
-* Kiwi: 70%
-* Lemon: 100%
-* Orange: 90%
+Other than the above, the following output results from the same exact code as our baseline model. Adding dropout was the only change. 
 
-All classes here are being predicted *at least* as good as with the baseline network - and Bananas which had only a 20% Classification Accuracy last time, are now being classified correctly 70% of the time.  Still the lowest of all classes, but a significant improvement over the baseline network!
+<br>
+
+![alt text](/img/posts/DropoutModel_Train_Val_Metrics.png "Toy Robot Dropout Accuracy Plot")
+
+<br>
+
+The best classification accuracy on the *validation set* was **76%**, not significantly higher than the **75.3%** we saw for the baseline network. 
+Validation set accuracy plateaus early again, at about the 10th epoch. 
+
+Accuracy on the *test set* was **81%**, which is a nice bump from the **74.7%** test set accuracy from the baseline model. 
+
+The model is no longer over-fitting. The gap between the classification accuracy on the training set and the validation set has been eliminated. In fact, the model is consistently predicting better on the validation set, which might indicate that the validation set data is more consistent within each class. 
+
+On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it is become less confident in its predictions. That is the probabilities output associated with its predictions are likely going down. It is becoming less confident in the validation preditions, and more confident in the training predictions. 
+
+Next, I turn to another method for reducing overfitting, Image Augmentation. 
 
 ___
 <br>
+
 # Image Augmentation <a name="cnn-augmentation"></a>
 
 <br>
+
 #### Image Augmentation Overview
 
 Image Augmentation is a concept in Deep Learning that aims to not only increase predictive performance, but also to increase the robustness of the network through regularisation.
