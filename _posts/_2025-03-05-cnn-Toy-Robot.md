@@ -745,8 +745,8 @@ Rather than reproduce all of the text and discussion above for each of the subse
 |---|---|---|---|---|
 | 1 | Baseline (see above) | 73.3% | 74.7% | 
 | 2 | Add Dropout (0.5) | 76% | 81% | 
-| 3 | Add Image Augmentation | 72% | 64% | 
-| 4 | Adjust Learning Rate | 78.7% | 74% | 
+| 3 | Add Image Augmentation, *no Dropout* | 72% | 64% | 
+| 4 | Adjusted Learning Rate, w/Dropout & Image Augmentation | 78.7% | 74% | 
 | 5 | Add 3rd Convolutional Layer with 64 filters (CV1_32, CV2_32, CV3_64, Dense_32), Reduce Dropout (0.25) | 78.7% | 78.7% | 
 | 6 | Reduce Filters in 1st Layer (CV1_16, CV2_32, CV3_64, Dense_32) | 73% | 72% |
 | 7 | Increase Filters and kernel size in 3rd layer (CV1_32, CV2_64, CV3_64 (kernel size = 5x5), Dense_32) | 76.7%  | 80% |
@@ -871,72 +871,34 @@ Finally, **fill_mode** set to "nearest" means that when images are shifted and/o
 
 <br>
 
-
-
-
 #### Results with Augmentation
 
-As before, I trained the same network architecture, including with Dropout (0.5), and the only changes were made to the images flowing in.
+As before, I trained the same baseline network architecture, this time only changing the images flowing in. 
+
+I dropped Dropout from the model, so the Augmented Image model can be compared to both the baseline model and the dropout model. 
 
 <br>
 
-![alt text](/img/posts/cnn-augmentation-accuracy-plot.png "CNN Dropout Accuracy Plot")
+![alt text](/img/posts/Augmented_Train_Val_Metrics.png "Toy Robot Augmentation Accuracy Plot")
 
 <br>
-Firstly, we can see a peak Classification Accuracy on the validation set of around **97%** which is higher than the **83%** we saw for the baseline network, and higher than the **89%** we saw for the network with Dropout added.
 
-Secondly, and what we were again really looking to see, is that gap between the Classification Accuracy on the training set, and the validation set has been mostly eliminated. The two lines are trending up at more or less the same rate across all epochs of training - and the accuracy on the training set also never reach 100% as it did before meaning that Image Augmentation is also giving the network this *generalisation* that we want!
+The best classification accuracy on the *validation set* was **x%**, not significantly higher than the **75.3%** we saw for the baseline network. 
+Validation set accuracy plateaus early again, at about the 10th epoch. 
 
-The reason for this is that the network is getting a slightly different version of each image each epoch during training, meaning that while it's learning features, it can't cling to a *single version* of those features!
+Accuracy on the *test set* was **x%**, which is a nice bump from the **74.7%** test set accuracy from the baseline model. 
 
-<br>
-#### Performance On The Test Set
+[ 
+The model is no longer over-fitting. The gap between the classification accuracy on the training set and the validation set has been eliminated. In fact, the model is consistently predicting better on the validation set, which might indicate that the validation set data is more consistent within each class. 
+]
+[
+On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it is become less confident in its predictions. That is the probabilities output associated with its predictions are likely going down. It is becoming less confident in the validation preditions, and more confident in the training predictions. 
+]
 
-During training, we assessed our updated networks performance on both the training set and the validation set.  Here, like we did for the baseline & Dropout networks, we will get a view of how well our network performs when predict on data that was *no part* of the training process whatsoever - our test set.
+Image Augmentation *and* applying Dropout might be powerful combination!
+]
 
-We run the exact same code as we did for the earlier networks, with the only change being to ensure we are loading in network file for the updated network
-
-<br>
-#### Test Set Classification Accuracy
-
-Our baseline network achieved a **75% Classification Accuracy** on the test set, and our network with Dropout applied achieved **85%**.  With the addition of Image Augmentation we saw both a reduction in overfitting, and an increased *validation set* accuracy.  On the test set, we again see an increase vs. the baseline & Dropout, with a **93% Classification Accuracy**. 
-
-<br>
-#### Test Set Confusion Matrix
-
-As mentioned above, while overall Classification Accuracy is very useful, but it can hide what is really going on with the network's predictions!
-
-The standout insight for the baseline network was that Bananas has only a 20% Classification Accuracy, very frequently being confused with Lemons.  Dropout, through the additional *generalisation* forced upon the network, helped a lot - let's see how our network with Image Augmentation fares!
-
-Running the same code from the baseline section on results for our updated network, we get the following output:
-
-```
-
-actual_label     apple  avocado  banana  kiwi  lemon  orange
-predicted_label                                             
-apple              0.9      0.0     0.0   0.0    0.0     0.0
-avocado            0.0      1.0     0.0   0.0    0.0     0.0
-banana             0.1      0.0     0.8   0.0    0.0     0.0
-kiwi               0.0      0.0     0.0   0.9    0.0     0.0
-lemon              0.0      0.0     0.2   0.0    1.0     0.0
-orange             0.0      0.0     0.0   0.1    0.0     1.0
-
-```
-<br>
-Along the top are our *actual* classes and down the side are our *predicted* classes - so counting *down* the columns we can get the Classification Accuracy (%) for each class, and we can see where it is getting confused.
-
-So, while overall our test set accuracy was 93% - for each individual class we see:
-
-* Apple: 90%
-* Avocado: 100%
-* Banana: 80%
-* Kiwi: 90%
-* Lemon: 100%
-* Orange: 100%
-
-All classes here are being predicted *more accurately* when compared to the baseline network, and *at least as accurate or better* when compared to the network with Dropout added.
-
-Utilising Image Augmentation *and* applying Dropout will be a powerful combination!
+Before turning to the model architecture, I have one more trick to try to maximize performance: Learning Rate Reduction. 
 
 ___
 <br>
