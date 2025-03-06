@@ -39,6 +39,7 @@ If this is successful and put into place on a larger scale, no parent will ever 
 
 <br>
 <br>
+
 ### Actions <a name="overview-actions"></a>
 
 Thanks to the *Keras* Deep Learning library, most of the tasks and procedures for building a computer vision model are made easy in Python. On the other hand, while Keras provides the tools, understanding and optimizing the model's architecture and training parameters is not so easy. In my case, since I will be taking my own pictures, I also have to think hard about what constitutes good, useful data. The process of building this model, broken into subsections below, is as follows:
@@ -81,7 +82,7 @@ The baseline network suffered badly from overfitting, but the addition of Dropou
 
 In terms of Classification Accuracy on the Test Set, we saw:
 
-* Baseline Network: **74%**
+* Baseline Network: **73.3%**
 * Baseline + Dropout: **81%**
 * Baseline + Dropout + Image Augmentation: **64%**
 * Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **74%**
@@ -93,6 +94,7 @@ The use of Transfer Learning with the MobilenetV2 base architecture was a bitter
 
 <br>
 <br>
+
 ### Growth/Next Steps <a name="overview-growth"></a>
 
 The concept here is demonstrated, if not proven. We have shown that we can get very accurate predictions - that should this robot come to market, it will at least be able to accurately predict in what bins your childs' toys belong. 
@@ -468,7 +470,7 @@ predictions_df['correct'] = np.where(predictions_df['actual_label'] == predictio
 ```
 <br>
 
-Thus we have a convenient dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
+Thus we have a convenient, and very useful dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
 
 <br>
 
@@ -482,20 +484,17 @@ Thus we have a convenient dataframe storing our prediction data (predictions_df)
 | lemon | lemon | 0.8490372 | lemon_0084.jpg | 1 |
 
 <br>
-In our data we have:
 
-* Actual Label: The true label for that image
-* Prediction Label: The predicted label for the image (from the network)
-* Predicted Probability: The network's perceived probability for the predicted label
-* Filename: The test set image on our local drive (for reference)
-* Correct: A flag showing whether the predicted label is the same as the actual label
-
-This dataset is extremely useful as we can not only calculate our classification accuracy, but we can also deep-dive into images where the network was struggling to predict and try to assess why - leading to us improving our network, and potentially our input data!
+This data can be used to calculate the test set classification accuracy (below). 
+We can also use the data to figure out where and why the model struggled or failed, by: 
+* creating a confusion matrix (below).
+* using a Grad-CAM analysis (below). 
 
 <br>
+
 #### Test Set Classification Accuracy
 
-Using our DataFrame, we can calculate our overall Test Set classification accuracy using the below code:
+To calculate test set classification accuracy:
 
 ```python
 
@@ -505,7 +504,8 @@ print(test_set_accuracy)
 
 ```
 <br>
-Our baseline network achieves a **75% Classification Accuracy** on the Test Set.  It will be interesting to see how much improvement we can this with additions & refinements to our network.
+
+The baseline network gets **73.3% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
 
 <br>
 #### Test Set Confusion Matrix
