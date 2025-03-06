@@ -222,9 +222,16 @@ ___
 # Baseline Network <a name="cnn-baseline"></a>
 
 <br>
+
 #### Network Architecture
 
-Our baseline network is simple, but gives us a starting point to refine from.  This network contains **2 Convolutional Layers**, each with **32 filters** and subsequent **Max Pooling** Layers.  We have a **single Dense (Fully Connected) layer** following flattening with **32 neurons** followed by our output layer.  We apply the **relu** activation function on all layers, and use the **adam** optimizer.
+The baseline network architecture is simple, and gives us a starting point to refine from. This network contains:
+* **2 Convolutional Layers**, each with **32 filters** 
+* each with subsequent **Max Pooling** Layers
+* Flatten layer
+* One **single Dense (Fully Connected) layer** with **32 neurons**
+* Output layer for five class predictions.
+* I use the **relu** activation function on all layers, and use the **adam** optimizer.
 
 ```python
 
@@ -257,7 +264,7 @@ model.summary()
 
 ```
 <br>
-The below shows us more clearly our baseline architecture:
+The output printed below shows us more clearly our baseline architecture:
 
 ```
 
@@ -295,11 +302,12 @@ _________________________________________________________________
 ```
 
 <br>
+
 #### Training The Network
 
-With the pipeline, and architecture in place - we are now ready to train the baseline network!
+With the data pipeline and network architecture in place, we're ready to train the model. 
 
-In the below code we:
+In the below code I:
 
 * Specify the number of epochs for training
 * Set a location for the trained network to be saved (architecture & parameters)
@@ -310,7 +318,7 @@ In the below code we:
 
 # training parameters
 num_epochs = 50
-model_filename = 'models/fruits_cnn_v01.h5'
+model_filename = 'models/toy_robot_basic_v01.h5'
 
 # callbacks
 save_best_model = ModelCheckpoint(filepath = model_filename,
@@ -328,9 +336,10 @@ history = model.fit(x = training_set,
 
 ```
 <br>
-The ModelCheckpoint callback that has been put in place means that we do not just save the *final* network at epoch 50, but instead we save the *best* network, in terms of validation set performance - from *any point* during training.  In other words, at the end of each of the 50 epochs, Keras will assess the performance on the validation set and if is has not seen any improvement in performance it will do nothing.  If it does see an improvement however, it will update the network file that is saved on our hard-drive.
+The ModelCheckpoint callback means that the *best* model is saved, in terms of validation set performance - from *any point* during training. That is, although I'm telling the network to train for 50 epochs, or 50 rounds of data, there is no guarantee that it will continue to find better weights and biases throughout those 50 rounds. Usually, in fact, it will find the best fit before it reaches the 50th epoch, even though it will continue to adjust parameters until I tell it to stop. So the ModelCheckpoint function ensures that we don't lose progress. 
 
 <br>
+
 #### Analysis Of Training Results
 
 As we saved our training process to the *history* object, we can now analyse the performance (Classification Accuracy, and Loss) of the network epoch by epoch.
