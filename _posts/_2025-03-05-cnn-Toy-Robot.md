@@ -826,31 +826,15 @@ ___
 
 #### Image Augmentation Overview
 
-Image Augmentation is a concept in Deep Learning that aims to not only increase predictive performance, but also to increase the robustness of the network through regularisation.
+Image Augmentation means altering the training set images in random ways, so that the network will see each image, or feature within it, in a slightly different way each time it is passed through. Because the images are augmented slightly at each pass, the network can no longer memorize them. The aim is to increase the model's ability to generalize. 
 
-Instead of passing in each of the training set images as it stands, with Image Augmentation we pass in many transformed *versions* of each image.  This results in increased variation within our training data (without having to explicitly collect more images) meaning the network has a greater chance to understand and learn the objects we’re looking to classify, in a variety of scenarios.
-
-Common transformation techniques are:
-
-* Rotation
-* Horizontal/Vertical Shift
-* Shearing
-* Zoom
-* Horizontal/Vertical Flipping
-* Brightness Alteration
-
-When applying Image Augmentation using Keras' ImageDataGenerator class, we do this "on-the-fly" meaning the network does not actually train on the *original* training set image, but instead on the generated/transformed *versions* of the image - and this version changes each epoch.  In other words - for each epoch that the network is trained, each image will be called upon, and then randomly transformed based upon the specified parameters - and because of this variation, the network learns to generalise a lot better for many different scenarios.
+Image augmentation in CNN works like an image editor application: we can zoom, rotate, sheer, crop, alter the brightness, etc. But instead of doing this manually and adding nuanced versions of each image to our dataset, we simply set the parameters and let Keras randomly alter the images before they're passed through the training set. 
 
 <br>
+
 #### Implementing Image Augmentation
 
-We apply the Image Augmentation logic into the ImageDataGenerator class that exists within our Data Pipeline.
-
-It is important to note is that we only ever do this for our training data, we don't apply any transformation on our validation or test sets.  The reason for this is that we want our validation & test data be static, and serve us better for measuring our performance over time.  If the images in these set kept changing because of transformations it would be really hard to understand if our network was actually improving, or if it was just a lucky set of validation set transformations that made it appear that is was performing better!
-
-When setting up and training the baseline & Dropout networks - we used the ImageGenerator class for only one thing, to rescale the pixel values. Now we will add in the Image Augmentation parameters as well, meaning that as images flow into our network for training the transformations will be applied.
-
-In the code below, we add these transformations in and specify the magnitudes that we want each applied:
+When setting up and training the baseline and dropout models - we used the ImageGenerator function to rescale the pixel values. Now we will use it to add in the Image Augmentation parameters as well. In the code below, we add these transformations in and specify the magnitudes that we want each applied:
 
 ```python
 
@@ -865,43 +849,37 @@ training_generator = ImageDataGenerator(rescale = 1./255,
                                         fill_mode = 'nearest')
 
 validation_generator = ImageDataGenerator(rescale = 1./255)
+# It is important to note that these transformations are applied *only* to the training set, and not the validation set.
+
+# save model
+model_filename = 'models/toy_robot_augmented_v01.h5'
 
 ```
 <br>
-We apply a **rotation_range** of 20.  This is the *degrees* of rotation, and it dictates the *maximum* amount of rotation that we want.  In other words, a rotation value will be randomly selected for each image, each epoch, between negative and positive 20 degrees, and whatever is selected, is what will be applied.
 
-We apply a **width_shift_range** and a **height_shift_range** of 0.2.  These represent the fraction of the total width and height that we are happy to shift - in other words we're allowing Keras to shift our image *up to* 20% both vertically and horizonally.
+A **rotation_range** of 20 refers to the *maximum* degrees of rotation we want. Every time an image is passed, the ImageDataGenerator will randomly rotate it between 0-20 degrees.
 
-We apply a **zoom_range** of 0.1, meaning a maximum of 10% inward or outward zoom.
+**Width_shift_range** and **height_shift_range** of 0.2 refer to the maximum width and height that we are happy to shift. The ImageDataGenerator will randomly shift our image *up to* 20% both vertically and horizonally.
 
-We specify **horizontal_flip** to be True, meaning that each time an image flows in, there is a 50/50 chance of it being flipped.
+A **zoom_range** of 0.1 means a maximum of 10% inward or outward zoom.
 
-We specify a **brightness_range** between 0.5 and 1.5 meaning our images can become brighter or darker.
+**Horizontal_flip** = True means that each time an image flows in, there is a 50/50 chance of it being flipped.
 
-Finally, we have **fill_mode** set to "nearest" which will mean that when images are shifted and/or rotated, we'll just use the *nearest pixel* to fill in any new pixels that are required - and it means our images still resemble the scene, generally speaking!
+**Brightness_range** between 0.5 and 1.5 means our images can become brighter or darker.
 
-Again, it is important to note that these transformations are applied *only* to the training set, and not the validation set.
-
-<br>
-#### Updated Network Architecture
-
-Our network will be the same as the baseline network.  We will not apply Dropout here to ensure we can understand the true impact of Image Augmentation for our task.
+Finally, **fill_mode** set to "nearest" means that when images are shifted and/or rotated, we'll just use the *nearest pixel* to fill in any new pixels that are required - and it means our images still resemble the scene. 
 
 <br>
-#### Training The Updated Network
 
-We run the exact same code to train this updated network as we did for the baseline network (50 epochs) - the only change is that we modify the filename for the saved network to ensure we have all network files for comparison.
 
-<br>
-#### Analysis Of Training Results
 
-As we again saved our training process to the *history* object, we can now analyse & plot the performance (Classification Accuracy, and Loss) of the updated network epoch by epoch.
 
-With the baseline network we saw very strong overfitting in action - it will be interesting to see if the addition of Image Augmentation helps in the same way that Dropout did!
+#### Results with Augmentation
 
-The below image shows the same two plots we analysed for the updated network, the first showing the epoch by epoch **Loss** for both the training set (blue) and the validation set (orange) & the second show the epoch by epoch **Classification Accuracy** again, for both the training set (blue) and the validation set (orange).
+As before, I trained the same network architecture, including with Dropout (0.5), and the only changes were made to the images flowing in.
 
 <br>
+
 ![alt text](/img/posts/cnn-augmentation-accuracy-plot.png "CNN Dropout Accuracy Plot")
 
 <br>
