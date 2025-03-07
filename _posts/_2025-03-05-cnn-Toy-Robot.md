@@ -84,8 +84,8 @@ In terms of Classification Accuracy on the Test Set, we saw:
 
 * Baseline Network: **74.7%**
 * Baseline + Dropout: **81%**
-* Baseline + Dropout + Image Augmentation: **64%**
-* Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **74%**
+* Baseline + Image Augmentation: **77.3%**
+* Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **74.7%**
 * Experiment 2 (32, 32, 64, 32): **78.7%**
 * Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
 * MobilenetV2 base model: **100%**
@@ -954,21 +954,30 @@ As before, I trained the same baseline network architecture, this time with both
 
 <br>
 
+PLACEHOLDER
+The best classification accuracy on the *validation set* was **72.7**, not higher than **75.3%** we saw for the baseline network. 
+
+Accuracy on the *test set* was **74.7%**, same as the **74.7%** test set accuracy from the baseline model,  and not as good as the **81%** accuracy from the Dropout model. 
+
+The model appears to be slightly overfitting. Compared to the baseline model, the gap between the classification accuracy on the training set and the validation set has not been eliminated, but it is greatly reduced, which unfortunately in this case did not lead to better performance overall.  
+
+Using Image Augmentation *and* applying Dropout together might be a powerful combination. I'll do so in later iterations. 
+
+Before turning to the model architecture, however, I'll try to increase the model's performance by adjusting the learning rate when the performance metrics plateau.  
 
 
 #### Model architecture overview
 
-So far, with our Fruit Classification task, we have:
+So far, I've used the same network archiecture for each of the Baseline, Dropout, Image Augmentation, and Learning Rate models: 
+* 2 convolutional layers
+* Each with 32 filters
+* A single Dense layer with 32 neurons
 
-* Started with a baseline model
-* Added Dropout to help with overfitting
-* Utilised Image Augmentation
+One way for us to figure out if there are *better* architectures, would be to use Keras_tuner, a Keras function that automates what I will do below. I plan to use Keras_tuner in Toy Robot 2.0, but for now, I want to lay out what benefits, if any, subtle tweeks to the model architecture might gain. 
 
-The addition of Dropout, and Image Augmentation boosted both performance and robustness - but there is one thing we've not tinkered with yet, and something that *could* have a big impact on how well the network learns to find and utilise important features for classifying our fruits - and that is the network *architecture*!
+First I'll discuss the parameters, and then I'll post the results, wholesale. 
 
-So far, we've just used 2 convolutional layers, each with 32 filters, and we've used a single Dense layer, also, just by coincidence, with 32 neurons - and we admitted that this was just a place to start, our baseline.
-
-One way for us to figure out if there are *better* architectures, would be to just try different things. Maybe we just double our number of filters to 64, or maybe we keep the first convolutional layer at 32, but we increase the second to 64.Perhaps we put a whole lot of neurons in our hidden layer, and then, what about things like our use of Adam as an optimizer, is this the best one for our particular problem, or should we use something else?
+just try different things. Maybe we just double our number of filters to 64, or maybe we keep the first convolutional layer at 32, but we increase the second to 64.Perhaps we put a whole lot of neurons in our hidden layer, and then, what about things like our use of Adam as an optimizer, is this the best one for our particular problem, or should we use something else?
 
 As you can imagine, we could start testing all of these things, and noting down performances, but that would be quite messy.
 
