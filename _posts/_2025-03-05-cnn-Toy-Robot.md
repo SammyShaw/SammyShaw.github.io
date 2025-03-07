@@ -1056,7 +1056,10 @@ reduce_lr = ReduceLROnPlateau(monitor='val_accuracy',  # Monitor validation loss
 
 # Summary
 model.summary()
+
 ```
+<br>
+
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
@@ -1093,6 +1096,8 @@ activation_8 (Activation)    (None, 5)                 0
 Total params: 281,733
 Trainable params: 281,733
 Non-trainable params: 0
+
+<br>
 
 #### AE 1 Results
 
