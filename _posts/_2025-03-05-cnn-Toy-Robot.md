@@ -1060,6 +1060,7 @@ model.summary()
 ```
 <br>
 
+```
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
@@ -1096,6 +1097,7 @@ activation_8 (Activation)    (None, 5)                 0
 Total params: 281,733
 Trainable params: 281,733
 Non-trainable params: 0
+```
 
 <br>
 
@@ -1118,6 +1120,7 @@ Training and Validation Accuracy seem to be converging nicely here, which is goo
 
 Increasing number of filters in the 3rd Convolutional Layer from 32 to 64: 
 
+```
 Layer (type)                 Output Shape              Param #   
 =================================================================
 conv2d_8 (Conv2D)            (None, 128, 128, 32)      896       
@@ -1153,6 +1156,7 @@ activation_18 (Activation)   (None, 5)                 0
 Total params: 553,125
 Trainable params: 553,125
 Non-trainable params: 0
+```
 
 <br>
     
@@ -1177,6 +1181,7 @@ Next I'll try increasing the kernel size.
 
 Increasing kernel size in third layer:
 
+```
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
@@ -1214,6 +1219,7 @@ Total params: 585,893
 Trainable params: 585,893
 Non-trainable params: 0
 _________________________________________________________________
+```
 
 #### AE 3 Results
 
@@ -1234,6 +1240,7 @@ In the next iteration, I'll change the kernel size back to 3x3, and experiment w
 So far adding a layer and increasing filters has not done much to improve the model's performance. 
 I'll experiment one more time, decreasing filters in the first layer, and increasing filters in the second layer. 
 
+```
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
@@ -1276,6 +1283,7 @@ activation_5 (Activation)    (None, 5)                 0
 Total params: 191,781
 Trainable params: 191,781
 Non-trainable params: 0
+```
 
 <br>
 
@@ -1369,6 +1377,7 @@ model.summary()
 
 ```
 
+```
 <br>
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
@@ -1389,6 +1398,7 @@ Total params: 2,304,261
 Trainable params: 43,717
 Non-trainable params: 2,260,544
 _________________________________________________________________
+```
 
 <br>
 
@@ -1398,6 +1408,7 @@ Validation Set Accuracy: **100%**
 Test Set Accuracy: **100%**
 
 <br>
+
 ![alt text](/img/posts/MobileNetV2_Train_Val_Metrics.png "MobileNetV2 Accuracy Plot")
 
 <br>
