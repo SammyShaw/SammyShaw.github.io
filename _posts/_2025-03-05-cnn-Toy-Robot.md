@@ -537,7 +537,7 @@ magnatiles                 1      1     2       1           8
 
 <br>
 
-So, while overall our test set accuracy was ~ 75% - for each individual class we see:
+So, while overall our test set accuracy was ~75%, for each individual class we see:
 
 * Bananagrams: 66.7%
 * Brios: 80%
@@ -547,12 +547,12 @@ So, while overall our test set accuracy was ~ 75% - for each individual class we
 
 Insightful! I honestly thought the Magnatiles would be the most recognizable, but here the model thinks a big portion of them are Duplos. Perhaps its not surprising since Magnatiles and Duplos share common features. They are both square/blocky and made of solid colors, which combine to form multi-color, multi-block shapes. 
 
-But that is just me guessing! To really see what features the model is picking up on, use a grad-CAM analysis. 
+But that is just me guessing! To see what features the model actually is picking up on, I use a grad-CAM analysis. 
 
 ___
 <br>
 
-#### Grad-CAM Analysis
+### Grad-CAM Analysis
 
 Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image!
 
@@ -600,8 +600,6 @@ print("Last conv layer name:", last_conv_layer_name)
 
 # Define which conv layers to use for Grad-CAM (here we just use the last conv layer)
 conv_layers = [last_conv_layer_name]
-
-
 
 # Define image properties and directories
 img_size = (128, 128)  # Model input size
@@ -705,17 +703,21 @@ def run_grad_cam_on_test_set():
 run_grad_cam_on_test_set()
 
 ```
-These heat-maps offer two important insights, which I'll call *Bias insight* and *Depth insight*, 
+<br>
+
+Grad-CAM images offer two important insights, which I'll call *Bias insight* and *Depth insight*, 
 
 Below I show a raw test set image alongside its corresponding grad-CAM image.
 
+##### Bias Insight
 First, we can clearly see whether or not the model is picking up on the features that would distinguish one class of object from another. We see in the first one, an ideal scenario, in which the model seems to have honed in on the Brio track itself, distinguishing the shape and the parallel grooves as its distinguishing features. Below that, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
+<br>
 
 ![alt text](/img/posts/heatmap_conv2d_36_brios_IMG_8744.png "Grad-CAM_Good Feature Detection")
 
 ![alt text](/img/posts/heatmap_conv2d_36_bananagrams_IMG_7823.png "Grad-CAM_Bad Feature Detection")
 
-##### Bias Insight
+<br>
 Bias is a pervasive issue in CNN tasks. At a basic level, bias happens when a model learns to predict on something other than the features that distinguish separate classes. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on train tracks it will have a better chance of predicting train tracks that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what class it belongs too, even if it does guess correctly. But if a model is biased, it is probably because it has learned to *correctly* predict on other features... features that are associated with the class in training, but not in real life. 
 
 In fact, the model may well have predicted this particular Banagram correctly (I won't tell you). It may actually associate the floor (or perhaps the shape of its cut out), with the class Bananagram. If so, it is perhaps because the other backgrounds in the Bananagram training set include the same background, so when it sees wooden floor background it thinks that it is a Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. But the issue is more complex than that. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class, lets say Bananagrams has a 70/30% split, the model might still be biased towards that 70% background, because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distiguishing features in the other classes, then it might still guess Bananagram every time it sees a woodfloor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
@@ -731,7 +733,7 @@ Secondly, we can use the grad-CAM images to compare what the model predicted cor
 
 ![alt text](/img/posts/magnatiles_baseline_gradCAM1_.png "Grad-CAM Incorrect Classification")
 
-However, while the top image was correctly identified as a Magnatile, the bottom image was Identified as a Duplo. This *may* be a bias issue, but it also seems likely, this time, that the model is simply failing to understand the difference between Magnatiles and Duplos and deep enough level. 
+However, while the top image was correctly identified as a Magnatile, the bottom image was identified as a Duplo. This *may* be a bias issue, but it also seems likely, this time, that the model is simply failing to understand the difference between Magnatiles and Duplos and deep enough level. 
 
 In subsequent iterations, I'll tackle the many issues identified above with various methods that should improve the model's overall performance. 
 
@@ -1007,265 +1009,231 @@ Other architecture parameters can be changed or added, including:
 * Activation Function: Applied to each layer - tells each neuron whether or not to send information (weight) to the next layer. I use the Relu (or Rectified Linear Unit) activation function here, which I've seen to be most common. It works by passing information neuron to neuron only if the weights reach a threshold positive value. 
 * Batch Normalization: Scales weight values 0-1 (usually before being activated) for every batch, usually once per convolutional layer. Although it is a standard practice to include Batch Normalization to stabilize training, I've found that the time costs are not worth the results. 
 
-```python
-
-# import the required python libraries
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense, Dropout
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import ModelCheckpoint
-from keras_tuner.tuners import RandomSearch
-from keras_tuner.engine.hyperparameters import HyperParameters
-import os
-
-# data flow parameters
-training_data_dir = 'data/training'
-validation_data_dir = 'data/validation'
-batch_size = 32
-img_width = 128
-img_height = 128
-num_channels = 3
-num_classes = 6
-
-# image generators
-training_generator = ImageDataGenerator(rescale = 1./255)
-validation_generator = ImageDataGenerator(rescale = 1./255)
-
-# image flows
-training_set = training_generator.flow_from_directory(directory = training_data_dir,
-                                                      target_size = (img_width, img_height),
-                                                      batch_size = batch_size,
-                                                      class_mode = 'categorical')
-
-validation_set = validation_generator.flow_from_directory(directory = validation_data_dir,
-                                                                      target_size = (img_width, img_height),
-                                                                      batch_size = batch_size,
-                                                                      class_mode = 'categorical')
-
-```
-
 <br>
-#### Application Of Keras Tuner
 
-Here we specify what we want Keras Tuner to test, and how we want it to test it!
+#### Architecture Experiment 1
 
-We put our network architecture into a *function* with a single parameter called *hp* (hyperparameter)
-
-We then make use of several in-build bits of logic to specify what we want to test.  In the code below we test for:
-
-* Convolutional Layer Count - Between 1 & 4
-* Convolutional Layer Filter Count - Between 32 & 256 (Step Size 32)
-* Dense Layer Count - Between 1 & 4
-* Dense Layer Neuron Count - Between 32 & 256 (Step Size 32)
-* Application Of Dropout - Yes or No
-* Optimizer - Adam or RMSProp
+For the first experiment, I modify the previous learning parameters, and add one identical convolutional layer. 
+In the code below, I only include what is changed so as to avoid long blocks of redundant information: 
 
 ```python
 
-# network architecture
-def build_model(hp):
-    model = Sequential()
-    
-    model.add(Conv2D(filters = hp.Int("Input_Conv_Filters", min_value = 32, max_value = 256, step = 32), kernel_size = (3, 3), padding = 'same', input_shape = (img_width, img_height, num_channels)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D())
-    
-    for i in range(hp.Int("n_Conv_Layers", min_value = 1, max_value = 3, step = 1)):
-    
-        model.add(Conv2D(filters = hp.Int(f"Conv_{i}_Filters", min_value = 32, max_value = 256, step = 32), kernel_size = (3, 3), padding = 'same'))
-        model.add(Activation('relu'))
-        model.add(MaxPooling2D())
-    
-    model.add(Flatten())
-    
-    for j in range(hp.Int("n_Dense_Layers", min_value = 1, max_value = 4, step = 1)):
-    
-        model.add(Dense(hp.Int(f"Dense_{j}_Neurons", min_value = 32, max_value = 256, step = 32)))
-        model.add(Activation('relu'))
-        
-        if hp.Boolean("Dropout"):
-            model.add(Dropout(0.5))
-    
-    model.add(Dense(num_classes))
-    model.add(Activation('softmax'))
-    
-    # compile network
-    
-    model.compile(loss = 'categorical_crossentropy',
-                  optimizer = hp.Choice("Optimizer", values = ['adam', 'RMSProp']),
-                  metrics = ['accuracy'])
-    
-    return model
+# Decrease Image Augmentation
+training_generator = ImageDataGenerator(
+    rescale=1./255,
+    rotation_range=15, # Reduce rotation
+    width_shift_range=0.15,  # Reduce shift (was 0.2)
+    height_shift_range=0.15,
+    zoom_range=0.15,  # Keep small zoom (was 0.2)
+    horizontal_flip=True,  # Keep flipping
+    shear_range=10, # add shearing
+    brightness_range=(0.8, 1.3),  # Less extreme brightness (was 0.5–1.5)
+    fill_mode='nearest'
+)
 
-```
-<br>
-Once we have the testing logic in place - we use want to put in place the specifications for the search!
-
-In the code below, we set parameters to:
-
-* Point to the network *function* with the testing logic (hypermodel)
-* Set the metric to optimise for (objective)
-* Set the number of random network configurations to test (max_trials)
-* Set the number of times to try each tested configuration (executions_per_trial)
-* Set the details for the output of logging & results
-
-```python
-
-# search parameters
-tuner = RandomSearch(hypermodel = build_model,
-                     objective = 'val_accuracy',
-                     max_trials = 30,
-                     executions_per_trial = 2,
-                     directory = os.path.normpath('C:/'),
-                     project_name = 'fruit-cnn',
-                     overwrite = True)
-
-```
-<br>
-With the search parameters in place, we now want to put this into action.
-
-In the below code, we:
-
-* Specify the training & validation flows
-* Specify the number of epochs for each tested configuration
-* Specify the batch size for training
-
-```python
-
-# execute search
-tuner.search(x = training_set,
-             validation_data = validation_set,
-             epochs = 40,
-             batch_size = 32)
-
-```
-<br>
-Depending on how many configurations are to be tested, how many epochs are required for each, and the speed of processing - this can take a long time, but the results will most definitely guide us towards a more optimal architecture!
-
-<br>
-#### Updated Network Architecture
-
-Based upon the tested network architectures, the best in terms of validation accuracy was one that contains **3 Convolutional Layers**. The first has **96 filters** and the subsequent two each **64 filters**.  Each of these layers have an accompanying MaxPooling Layer (this wasn't tested). The network then has **1 Dense (Fully Connected) Layer** following flattening with **160 neurons** with **Dropout applied** - followed by our output layer. The chosen optimizer was **Adam**.
-
-```python
-
-# network architecture
-model = Sequential()
-
-model.add(Conv2D(filters = 96, kernel_size = (3, 3), padding = 'same', input_shape = (img_width, img_height, num_channels)))
+# Add 3rd Convoluational Layer
+model.add(Conv2D(filters = 32, kernel_size = (3,3), padding = 'same'))
 model.add(Activation('relu'))
 model.add(MaxPooling2D())
 
-model.add(Conv2D(filters = 64, kernel_size = (3, 3), padding = 'same'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D())
-
-model.add(Conv2D(filters = 64, kernel_size = (3, 3), padding = 'same'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D())
-
-model.add(Flatten())
-
-model.add(Dense(160))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-
+# Decrase Dropout
+# output layer
 model.add(Dense(num_classes))
-model.add(Activation('softmax'))
+model.add(Dropout(0.25))
+model.add(Activation('softmax')) 
 
-# compile network
-model.compile(loss = 'categorical_crossentropy',
-              optimizer = 'adam',
-              metrics = ['accuracy'])
+# Save model as...
+model_filename = 'models/Toy_Robot_tuned_v01.h5'
 
-```
-<br>
-The below shows us more clearly our optimised architecture:
+# Increase learning patience
+reduce_lr = ReduceLROnPlateau(monitor='val_accuracy',  # Monitor validation loss
+                              factor=0.5,         # Reduce LR by half
+                              patience=5,         # Wait 3 epochs before reducing
+                              min_lr=1e-6,        # Minimum learning rate
+                              verbose=1)          # Print updates
 
+# Summary
+model.summary()
 ```
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
-conv2d_10 (Conv2D)           (None, 128, 128, 96)      2688      
+conv2d_2 (Conv2D)            (None, 128, 128, 32)      896       
 _________________________________________________________________
-activation_20 (Activation)   (None, 128, 128, 96)      0         
+activation_4 (Activation)    (None, 128, 128, 32)      0         
 _________________________________________________________________
-max_pooling2d_10 (MaxPooling (None, 64, 64, 96)        0         
+max_pooling2d_2 (MaxPooling2 (None, 64, 64, 32)        0         
 _________________________________________________________________
-conv2d_11 (Conv2D)           (None, 64, 64, 64)        55360     
+conv2d_3 (Conv2D)            (None, 64, 64, 32)        9248      
 _________________________________________________________________
-activation_21 (Activation)   (None, 64, 64, 64)        0         
+activation_5 (Activation)    (None, 64, 64, 32)        0         
 _________________________________________________________________
-max_pooling2d_11 (MaxPooling (None, 32, 32, 64)        0         
+max_pooling2d_3 (MaxPooling2 (None, 32, 32, 32)        0         
 _________________________________________________________________
-conv2d_12 (Conv2D)           (None, 32, 32, 64)        36928     
+conv2d_4 (Conv2D)            (None, 32, 32, 32)        9248      
 _________________________________________________________________
-activation_22 (Activation)   (None, 32, 32, 64)        0         
+activation_6 (Activation)    (None, 32, 32, 32)        0         
 _________________________________________________________________
-max_pooling2d_12 (MaxPooling (None, 16, 16, 64)        0         
+max_pooling2d_4 (MaxPooling2 (None, 16, 16, 32)        0         
 _________________________________________________________________
-flatten_5 (Flatten)          (None, 16384)             0         
+flatten_1 (Flatten)          (None, 8192)              0         
 _________________________________________________________________
-dense_10 (Dense)             (None, 160)               2621600   
+dense_2 (Dense)              (None, 32)                262176    
 _________________________________________________________________
-activation_23 (Activation)   (None, 160)               0         
+activation_7 (Activation)    (None, 32)                0         
 _________________________________________________________________
-dropout_3 (Dropout)          (None, 160)               0         
+dense_3 (Dense)              (None, 5)                 165       
 _________________________________________________________________
-dense_11 (Dense)             (None, 6)                 966       
+dropout_1 (Dropout)          (None, 5)                 0         
 _________________________________________________________________
-activation_24 (Activation)   (None, 6)                 0         
+activation_8 (Activation)    (None, 5)                 0         
 =================================================================
-Total params: 2,717,542
-Trainable params: 2,717,542
+Total params: 281,733
+Trainable params: 281,733
+Non-trainable params: 0
+
+##### AE 1 Results
+
+*Validation Accuracy: **74.7%**
+*Test Accuracy: **77.3%**
+
+<br>
+
+![alt text](/img/posts/LF1_Train_Val_Metrics.png "Toy Robot AE1 Plot")
+
+<br>
+
+Training and Validation Accuracy seem to be converging nicely here, which is good news for our training parameters. However, the training loss is now slightly outpacing the validation loss. I'll experiment with a filter number change before adjusting training parameters again.
+
+<br>
+
+#### Architecture Experiment 2
+
+Increasing number of filters in the 3rd Convolutional Layer from 32 to 64: 
+
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_8 (Conv2D)            (None, 128, 128, 32)      896       
+_________________________________________________________________
+activation_14 (Activation)   (None, 128, 128, 32)      0         
+_________________________________________________________________
+max_pooling2d_8 (MaxPooling2 (None, 64, 64, 32)        0         
+_________________________________________________________________
+conv2d_9 (Conv2D)            (None, 64, 64, 32)        9248      
+_________________________________________________________________
+activation_15 (Activation)   (None, 64, 64, 32)        0         
+_________________________________________________________________
+max_pooling2d_9 (MaxPooling2 (None, 32, 32, 32)        0         
+_________________________________________________________________
+conv2d_10 (Conv2D)           (None, 32, 32, 64)        18496     
+_________________________________________________________________
+activation_16 (Activation)   (None, 32, 32, 64)        0         
+_________________________________________________________________
+max_pooling2d_10 (MaxPooling (None, 16, 16, 64)        0         
+_________________________________________________________________
+flatten_3 (Flatten)          (None, 16384)             0         
+_________________________________________________________________
+dense_6 (Dense)              (None, 32)                524320    
+_________________________________________________________________
+activation_17 (Activation)   (None, 32)                0         
+_________________________________________________________________
+dense_7 (Dense)              (None, 5)                 165       
+_________________________________________________________________
+dropout_3 (Dropout)          (None, 5)                 0         
+_________________________________________________________________
+activation_18 (Activation)   (None, 5)                 0         
+=================================================================
+Total params: 553,125
+Trainable params: 553,125
+Non-trainable params: 0
+
+<br>
+    
+##### AE 2 Results
+
+*Validation Accuracy: **%**
+*Test Accuracy: **%**
+
+<br>
+
+![alt text](/img/posts/.png "Toy Robot AE2 Plot")
+
+<br>
+
+NOTES
+
+<br>
+
+#### Architecture Experiment 3
+
+Increasing kernel size in third layer:
+
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_5 (Conv2D)            (None, 128, 128, 32)      896       
+_________________________________________________________________
+activation_9 (Activation)    (None, 128, 128, 32)      0         
+_________________________________________________________________
+max_pooling2d_5 (MaxPooling2 (None, 64, 64, 32)        0         
+_________________________________________________________________
+conv2d_6 (Conv2D)            (None, 64, 64, 32)        9248      
+_________________________________________________________________
+activation_10 (Activation)   (None, 64, 64, 32)        0         
+_________________________________________________________________
+max_pooling2d_6 (MaxPooling2 (None, 32, 32, 32)        0         
+_________________________________________________________________
+conv2d_7 (Conv2D)            (None, 32, 32, 64)        51264     
+_________________________________________________________________
+activation_11 (Activation)   (None, 32, 32, 64)        0         
+_________________________________________________________________
+max_pooling2d_7 (MaxPooling2 (None, 16, 16, 64)        0         
+_________________________________________________________________
+flatten_2 (Flatten)          (None, 16384)             0         
+_________________________________________________________________
+dense_4 (Dense)              (None, 32)                524320    
+_________________________________________________________________
+activation_12 (Activation)   (None, 32)                0         
+_________________________________________________________________
+dense_5 (Dense)              (None, 5)                 165       
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 5)                 0         
+_________________________________________________________________
+activation_13 (Activation)   (None, 5)                 0         
+=================================================================
+Total params: 585,893
+Trainable params: 585,893
 Non-trainable params: 0
 _________________________________________________________________
 
-```
+##### AE 3 Results
+
+*Validation Accuracy: **75.3%**
+*Test Accuracy: **76%**
 
 <br>
-Our optimised architecture has a total of 2.7 million parameters, a step up from 1.1 million in the baseline architecture.
+
+![alt text](/img/posts/LF3_Train_Val_Metrics.png "Toy Robot Experiment 3 Plot")
 
 <br>
-#### Training The Updated Network
 
-We run the exact same code to train this updated network as we did for the baseline network (50 epochs) - the only change is that we modify the filename for the saved network to ensure we have all network files for comparison.
 
-<br>
-#### Analysis Of Training Results
 
-As we again saved our training process to the *history* object, we can now analyse & plot the performance (Classification Accuracy, and Loss) of the updated network epoch by epoch.
+#### Architecture Experiment 4
 
-The below image shows the same two plots we analysed for the tuned network, the first showing the epoch by epoch **Loss** for both the training set (blue) and the validation set (orange) & the second show the epoch by epoch **Classification Accuracy** again, for both the training set (blue) and the validation set (orange).
+##### AE 4 Results
 
-<br>
-![alt text](/img/posts/cnn-tuned-accuracy-plot.png "CNN Tuned Accuracy Plot")
+*Validation Accuracy: **74.7%**
+*Test Accuracy: **77.3%**
 
 <br>
-Firstly, we can see a peak Classification Accuracy on the validation set of around **98%** which is the highest we have seen from all networks so far, just higher than the 97% we saw for the addition of Image Augmentation to our baseline network.
 
-As Dropout & Image Augmentation are in place here, we again see the elimination of overfitting.
-
-<br>
-#### Performance On The Test Set
-
-During training, we assessed our updated networks performance on both the training set and the validation set.  Here, like we did for the baseline & Dropout networks, we will get a view of how well our network performs when predict on data that was *no part* of the training process whatsoever - our test set.
-
-We run the exact same code as we did for the earlier networks, with the only change being to ensure we are loading in network file for the updated network
+![alt text](/img/posts/LF3_Train_Val_Metrics.png "Toy Robot Learning Rate Reducer Plot")
 
 <br>
-#### Test Set Classification Accuracy
 
-Our optimised network, with both Dropout & Image Augmentation in place, scored **95%** on the Test Set, again marginally higher than what we had seen from the other networks so far.
+NOTES
 
-<br>
-#### Test Set Confusion Matrix
-
-As mentioned each time, while overall Classification Accuracy is very useful, but it can hide what is really going on with the network's predictions!
-
-Our 95% Test Set accuracy at an *overall* level tells us that we don't have too much to worry about here, but let's take a look anyway and see if anything interesting pops up.
-
-Running the same code from the baseline section on results for our updated network, we get the following output:
 
 ```
 
@@ -1298,7 +1266,8 @@ ___
 # Transfer Learning With VGG16 <a name="cnn-transfer-learning"></a>
 
 <br>
-#### Transfer Learning Overview
+
+## Transfer Learning Overview
 
 Transfer Learning is an extremely powerful way for us to utilise pre-built, and pre-trained networks, and apply these in a clever way to solve *our* specific Deep Learning based tasks.  It consists of taking features learned on one problem, and leveraging them on a new, similar problem!
 
@@ -1319,6 +1288,7 @@ If we can get our hands on the fully trained VGG16 model object, built to differ
 All the hard work has been done, we just want to "transfer" those "learnings" to our own problem space.
 
 <br>
+
 #### Updated Data Pipeline
 
 Our data pipeline will remain *mostly* the same as it was when applying our own custom built networks - but there are some subtle changes.  In the code below we need to import VGG16 and the custom preprocessing logic that it uses.  We also need to send our images in with the size 224 x 224 pixels as this is what VGG16 expects.  Otherwise, the logic stays as is.
