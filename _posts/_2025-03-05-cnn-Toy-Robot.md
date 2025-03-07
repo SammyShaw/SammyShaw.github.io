@@ -719,9 +719,9 @@ Below I show a raw test set image alongside its corresponding grad-CAM image.
 First, we can clearly see whether or not the model is picking up on the features that would distinguish one class of object from another. We see in the first one, an ideal scenario, in which the model seems to have honed in on the Brio track itself, distinguishing the shape and the parallel grooves as its distinguishing features. Below that, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
 <br>
 
-![alt text](/img/posts/heatmap_conv2d_36_brios_IMG_8744.png "Grad-CAM_Good Feature Detection")
+![alt text](/img/posts/heatmap_conv2d_36_brios_IMG_8744.png "Grad-CAM Good Feature Detection")
 
-![alt text](/img/posts/heatmap_conv2d_36_bananagrams_IMG_7823.png "Grad-CAM_Bad Feature Detection")
+![alt text](/img/posts/heatmap_conv2d_36_bananagrams_IMG_7823.png "Grad-CAM Bad Feature Detection")
 
 <br>
 Bias is a pervasive issue in CNN tasks. At a basic level, bias happens when a model learns to predict on something other than the features that distinguish separate classes. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on train tracks it will have a better chance of predicting train tracks that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what class it belongs too, even if it does guess correctly. But if a model is biased, it is probably because it has learned to *correctly* predict on other features... features that are associated with the class in training, but not in real life. 
