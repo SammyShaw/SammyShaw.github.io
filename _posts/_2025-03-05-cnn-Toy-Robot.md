@@ -78,14 +78,14 @@ Then I will add or refine aspects to try to improve its predictability:
 
 ### Results <a name="overview-results"></a>
 
-The baseline network suffered badly from overfitting, but the addition of Dropout & Image Augmentation elimited this entirely (and also let to underfitting).
+The baseline network suffered badly from overfitting, but the addition of Dropout & Image Augmentation reduced or elimited this entirely (or led to underfitting).
 
-In terms of Classification Accuracy on the Test Set, we saw:
+In terms of Classification Accuracy on the Test Set:
 
 * Baseline Network: **74.7%**
 * Baseline + Dropout: **81%**
 * Baseline + Image Augmentation: **77.3%**
-* Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **74.7%**
+* Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **76%**
 * Experiment 2 (32, 32, 64, 32): **78.7%**
 * Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
 * MobilenetV2 base model: **100%**
@@ -745,8 +745,8 @@ Rather than reproduce all of the text and discussion above for each of the subse
 |---|---|---|---|---|
 | 1 | Baseline (see above) | 73.3% | 74.7% | 
 | 2 | Add Dropout (0.5) | 76% | 81% | 
-| 3 | Add Image Augmentation, *no Dropout* | 72% | 64% | 
-| 4 | Adjusted Learning Rate, w/Dropout & Image Augmentation | 78.7% | 74% | 
+| 3 | Add Image Augmentation, *no Dropout* | 77.3% | 74.7% | 
+| 4 | Adjusted Learning Rate, w/Dropout & Image Augmentation | 76.7% | 76% | 
 | 5 | Add 3rd Convolutional Layer with 64 filters (CV1_32, CV2_32, CV3_64, Dense_32), Reduce Dropout (0.25) | 78.7% | 78.7% | 
 | 6 | Reduce Filters in 1st Layer (CV1_16, CV2_32, CV3_64, Dense_32) | 73% | 72% |
 | 7 | Increase Filters and kernel size in 3rd layer (CV1_32, CV2_64, CV3_64 (kernel size = 5x5), Dense_32) | 76.7%  | 80% |
@@ -955,39 +955,57 @@ As before, I trained the same baseline network architecture, this time with both
 <br>
 
 PLACEHOLDER
-The best classification accuracy on the *validation set* was **72.7**, not higher than **75.3%** we saw for the baseline network. 
+The best classification accuracy on the *validation set* was **76.7**, only slightly higher than **75.3%** we saw for the baseline network. 
 
-Accuracy on the *test set* was **74.7%**, same as the **74.7%** test set accuracy from the baseline model,  and not as good as the **81%** accuracy from the Dropout model. 
+Accuracy on the *test set* was **76%**, also slightly higher than the **74.7%** test set accuracy from the baseline model, and not as good as the **81%** accuracy from the Dropout model. 
 
-The model appears to be slightly overfitting. Compared to the baseline model, the gap between the classification accuracy on the training set and the validation set has not been eliminated, but it is greatly reduced, which unfortunately in this case did not lead to better performance overall.  
+The Learning Rate Reducer kicked in first at epoch 18. After which the model slowly improved to find its best validation accuracy at epoch 28. So, the reduction in learning might have helped the model find a more accurate fit. The learning rate changed again at epochs 32, 36, 40, 44, and 48, with no further improvement to the model's performance. 
 
-Using Image Augmentation *and* applying Dropout together might be a powerful combination. I'll do so in later iterations. 
+Instead of overfitting, the model is now *underfitting,* as evidenced by the higher validation accuracy and lower validation loss, compared to the those metrics on the training set. This is likely due to the combination of both Dropout and Image Augmentation used in this model.
 
-Before turning to the model architecture, however, I'll try to increase the model's performance by adjusting the learning rate when the performance metrics plateau.  
+In future iterations, I will scale down the Dropout and Image Augmentation to try to get a better convergence of Test and Training Accuracy. Because the Learning Rate Reduction helped only after its first reduction, I will also lengthen the patience parameter in future models.  
 
+<br>
 
-#### Model architecture overview
+# Model architecture overview
 
-So far, I've used the same network archiecture for each of the Baseline, Dropout, Image Augmentation, and Learning Rate models: 
+So far, I've used the same network *archiecture* for each of the Baseline, Dropout, Image Augmentation, and Learning Rate models: 
 * 2 convolutional layers
 * Each with 32 filters
 * A single Dense layer with 32 neurons
 
-One way for us to figure out if there are *better* architectures, would be to use Keras_tuner, a Keras function that automates what I will do below. I plan to use Keras_tuner in Toy Robot 2.0, but for now, I want to lay out what benefits, if any, subtle tweeks to the model architecture might gain. 
+One to figure out if there are *better* architectures is to use Keras_tuner, a Keras function that automates what I will do below. I plan to use Keras_tuner in Toy Robot 2.0, but for now, I want to lay out what benefits, if any, subtle tweeks to the model architecture might gain. 
 
 First I'll discuss the parameters, and then I'll post the results, wholesale. 
 
-just try different things. Maybe we just double our number of filters to 64, or maybe we keep the first convolutional layer at 32, but we increase the second to 64.Perhaps we put a whole lot of neurons in our hidden layer, and then, what about things like our use of Adam as an optimizer, is this the best one for our particular problem, or should we use something else?
+##### Convolutional Layers
 
-As you can imagine, we could start testing all of these things, and noting down performances, but that would be quite messy.
+Convolutional Layers in CNNs detect patterns by *filtering* the image, or aggregating within small chunks (or, *kernels*) of the image. The filtering produces a *feature map,* which is then passed on to the next convolutional layer. Adding convolutional layers, or layer blocks, can help the network detect more complex patterns, but it can also risk overfitting if the model learns the training images too closely. 
 
-Here we will instead utlise *Keras Tuner* which will make this a whole lot easier for us!
+Below I'll experiment with adding a third and a fourth convolutional layer. For small data-sets like mine, however, it is usually recommended that fewer layers are better to prevent overfitting. 
 
-At a high level, with Keras Tuner, we will ask it to test, a whole host of different architecture and parameter options, based upon some specifications that we put in place.  It will go off and run some tests, and return us all sorts of interesting summary statistics, and of course information about what worked best.
+##### Filters
 
-Once we have this, we can then create that particular architecture, train the network just as we've always done - and analyse the performance against our original networks.
+There may be any number of filters in a convolutional layer - though we usually assign them in square multiples of the image dimension. Each filter picks up a distinct pattern, and learns, in training, what patterns are relevant or not. Adding filters to a convolutional layer can help a network find more detailed patterns, but it can also lead to overfitting. Further, more filters means more weights to adjust in training, which means it takes more time for a network to learn. 
 
-Our data pipeline will remain the same as it was when applying Image Augmentation.  The code below shows this, as well as the extra packages we need to load for Keras-Tuner.
+Below I'll experiment with increases and decreases of filters in select layers. Again, for small data-sets, less filters is generally recommended. 
+
+##### Kernel Size
+
+The kernel size is the dimension of image space that a filter is combing over and abstracting from. A larger kernel size might capture larger, contextual patterns, but it may also capture noise. Smaller kernels capture finer details, but may miss, larger contextual information. 
+
+Below I'll experiment with increasing the Kernel size in one of the layers, but it should be noted that a 3x3 pixel kernel size is standard practice, as it balances both detail and efficiency. 
+
+##### Pooling
+
+Pooling layers are usually part of a convolutional layer block. Pooling shrinks the dimensions of the (filtered) image for subsequent convolutional layers, which allow the network to then filter more abstract features. Pooling helps to reduce overfitting, but too much pooling can lead to losing information (network weights) that relate to important features. 
+
+Max Pooling is the standard technique, although other pooling methods can be used, such as Global Average Pooling. I will not experiment with other pooling methods here. 
+
+Other architecture parameters can be changed or added, including: 
+* Stride: how many pixels each filter moves at a time as it moves across the image. The default stride in Keras is 1. 
+* Activation Function: Applied to each layer - tells each neuron whether or not to send information (weight) to the next layer. I use the Relu (or Rectified Linear Unit) activation function here, which I've seen to be most common. It works by passing information neuron to neuron only if the weights reach a threshold positive value. 
+* Batch Normalization: Scales weight values 0-1 (usually before being activated) for every batch, usually once per convolutional layer. Although it is a standard practice to include Batch Normalization to stabilize training, I've found that the time costs are not worth the results. 
 
 ```python
 
