@@ -1151,12 +1151,12 @@ Non-trainable params: 0
     
 ##### AE 2 Results
 
-*Validation Accuracy: **%**
-*Test Accuracy: **%**
+*Validation Accuracy: **76.7%**
+*Test Accuracy: **73.3%**
 
 <br>
 
-![alt text](/img/posts/.png "Toy Robot AE2 Plot")
+![alt text](/img/posts/LF2_Train_Val_Metrics.png "Toy Robot AE2 Plot")
 
 <br>
 
@@ -1217,18 +1217,21 @@ _________________________________________________________________
 
 <br>
 
-
+Increasing the kernel size in the third layer did not help my model. In the next iteration, I'll change the kernel size back to 3x3. 
 
 #### Architecture Experiment 4
 
+So far adding a layer and increasing filters has not done much to improve the model's performance. 
+I'll experiment one more time, decreasing filters in the first layer, and increasing filters in the second layer. 
+
 ##### AE 4 Results
 
-*Validation Accuracy: **74.7%**
-*Test Accuracy: **77.3%**
+*Validation Accuracy: **%**
+*Test Accuracy: **%**
 
 <br>
 
-![alt text](/img/posts/LF3_Train_Val_Metrics.png "Toy Robot Learning Rate Reducer Plot")
+![alt text](/img/posts/LF4_Train_Val_Metrics.png "Toy Robot Learning Rate Reducer Plot")
 
 <br>
 
