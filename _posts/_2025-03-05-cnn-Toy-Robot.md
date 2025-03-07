@@ -133,7 +133,7 @@ At first glance, these toys appear distinct enough, but when considering how an 
 
 Solutions: 
 
-To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of toys in some classes, I separated the actual toys for the training, validation, and test set images.
+To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of some types of toys, I separated the actual toys for the training, validation, and test set images.
 
 I ended up with 145 images of each toy, separated as follows: 
 * 100 training set images (500 total)
