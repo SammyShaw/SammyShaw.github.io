@@ -745,7 +745,7 @@ In subsequent iterations, I'll tackle the many issues identified above with vari
 
 <br>
 
-## Model Improvements
+## Model Iterations
 
 Rather than reproduce all of the text and discussion above for each of the subsequent iterations, I'll describe basic changes and performance metrics in the table below. Then, in the sections that follow, I'll discuss what additions are made, the rationalle behind them, and the result that matters: test set accuracy. 
 
@@ -758,9 +758,10 @@ Rather than reproduce all of the text and discussion above for each of the subse
 | 5 | Add 3rd Convolutional Layer (CV1_32, CV2_32, CV3_32, Dense_32), Reduce Dropout (0.25) | 74.7% | 77.3% | 
 | 6 | Increase Filters in 3rd Layer (CV1_32, CV2_32, CV3_64, Dense_32) | 76.7% | 73.3% |
 | 7 | Increase kernel size in 3rd layer (CV1_32, CV2_32, CV3_64 (kernel size = 5x5), Dense_32) | 75.3%  | 76% |
-| 8 | Add 4th Convolutional Layer, reduce filters in 1st | (CV1_16, CV2_32, CV3_64, CV4_64 (kernel size = 3x3), Dense_32) | 80% | 80% |
+| 8 | Add 4th Convolutional Layer, reduce filters in 1st (CV1_16, CV2_32, CV3_64, CV4_64 (kernel size = 3x3), Dense_32) | 80% | 80% |
 | 9 | Use MobilenetV2 base model | 100% | 100% | 
 
+<br>
 
 ## Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
 
@@ -833,7 +834,7 @@ ___
 #### Image Augmentation Overview
 Image Augmentation means altering the training set images in random ways, so that the network will see each image, or feature within it, in a slightly different way each time it is passed through. Because the images are augmented slightly at each pass, the network can no longer memorize them. The aim is to increase the model's ability to generalize. 
 
-Image augmentation in CNN works like an image editor application: we can zoom, rotate, sheer, crop, alter the brightness, etc. But instead of doing this manually and adding nuanced versions of each image to our dataset, we simply set the parameters and let Keras randomly alter the images before they're passed through the training set. 
+Image augmentation in CNN works like an image editor application: we can zoom, rotate, shear, crop, alter the brightness, etc. But instead of doing this manually and adding nuanced versions of each image to our dataset, we simply set the parameters and let Keras randomly alter the images before they're passed through the training set. 
 
 <br>
 
