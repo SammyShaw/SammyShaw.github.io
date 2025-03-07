@@ -7,7 +7,7 @@ tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Pyt
 
 This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys on a bespoke, self-collected data set. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. CNN is all about optimizing model architecture and training parameters, but building a successful model has much to do with the nature and quality of the data too. 
 
-# Table of contents
+## Table of contents
 
 - [00. Project Overview](#overview-main)
     - [Context](#overview-context)
@@ -27,7 +27,7 @@ This project uses a Convolutional Neural Network to train a computer model to re
 
 ___
 
-# Project Overview  <a name="overview-main"></a>
+## Project Overview  <a name="overview-main"></a>
 
 ### Context <a name="overview-context"></a>
 
@@ -83,11 +83,11 @@ The baseline network suffered badly from overfitting, but the addition of Dropou
 In terms of Classification Accuracy on the Test Set:
 
 * Baseline Network: **74.7%**
-* Baseline + Dropout: **81%**
+* Baseline + Dropout: **80%**
 * Baseline + Image Augmentation: **77.3%**
 * Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **76%**
-* Experiment 2 (32, 32, 64, 32): **78.7%**
-* Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
+* Architecture Experiment 1 (32, 32, 64, 32): **75.7%**
+* Architecture Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
 * MobilenetV2 base model: **100%**
 
 The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. 
@@ -107,7 +107,7 @@ My current working hypothesis is that: with such limited data (100 images in eac
 <br>
 ___
 
-# Data Overview  <a name="data-overview"></a>
+## Data Overview  <a name="data-overview"></a>
 
 Although my kid has dozens of types of toys, I began with a modest set of five classes of toys: 
 * Bananagrams (a game for adults, which has become material for Teddy's garbage truck)
@@ -116,11 +116,15 @@ Although my kid has dozens of types of toys, I began with a modest set of five c
 * Duplos (big legos for younger builders)
 * Magnatiles
 
+<br>
+
+![alt text](/img/posts/toy_collage.png "Toy Robot Image Samples")
+
+<br>
+
 Problems: 
 
 At first glance, these toys appear distinct enough, but when considering how an algorithm might think about it, there are plenty of challenges. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels like the car toy set. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
-
-[IMAGES PLACEHOLDER] 
 
 Solutions: 
 
@@ -131,10 +135,7 @@ I ended up with 145 images of each toy, separated as follows:
 * 30 validation set images (150 total)
 * 15 test set images (75 total)
 
-<br>
-![alt text](/img/posts/toy_collage.png "Toy Robot Image Samples")
 
-<br>
 For ease of use in Keras, my data folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
 
 Images in the folders are varying sizes, but will be fed into the data pipeline as 128 x 128 pixel images. 
@@ -142,7 +143,7 @@ Images in the folders are varying sizes, but will be fed into the data pipeline 
 ___
 <br>
 
-# Data Pipeline  <a name="data-pipeline"></a>
+## Data Pipeline  <a name="data-pipeline"></a>
 
 Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for our images to flow from my local hard-drive through the network.
 
@@ -202,7 +203,7 @@ Raw pixel values (ranging between 0 and 255) are normalized to help gradient des
 ___
 <br>
 
-# Convolutional Neural Network Overview <a name="cnn-overview"></a>
+## Convolutional Neural Network Overview <a name="cnn-overview"></a>
 
 Convolutional Neural Networks (CNN) are an adaptation of Artificial Neural Networks and are primarily used for image data tasks.
 
@@ -221,7 +222,7 @@ There are many aspects of a CNN's architecture (combination of layers and filter
 ___
 <br>
 
-# Baseline Network <a name="cnn-baseline"></a>
+## Baseline Network <a name="cnn-baseline"></a>
 
 <br>
 
@@ -552,7 +553,7 @@ But that is just me guessing! To see what features the model actually is picking
 ___
 <br>
 
-### Grad-CAM Analysis
+#### Grad-CAM Analysis
 
 Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image!
 
@@ -739,21 +740,21 @@ In subsequent iterations, I'll tackle the many issues identified above with vari
 
 <br>
 
-# Model Improvements
+## Model Improvements
 
 Rather than reproduce all of the text and discussion above for each of the subsequent iterations, I'll describe basic changes and performance metrics in the table below. Then, in the sections that follow, I'll discuss what additions are made, the rationalle behind them, and the result that matters: test set accuracy. 
 
 | **Model** | **Changes Made** | **Validation Accuracy** | **Test Accuracy** |
 |---|---|---|---|---|
 | 1 | Baseline (see above) | 73.3% | 74.7% | 
-| 2 | Add Dropout (0.5) | 76% | 81% | 
+| 2 | Add Dropout (0.5) | 76% | 80% | 
 | 3 | Add Image Augmentation, *no Dropout* | 77.3% | 74.7% | 
 | 4 | Adjusted Learning Rate, w/Dropout & Image Augmentation | 76.7% | 76% | 
 | 5 | Add 3rd Convolutional Layer with 64 filters (CV1_32, CV2_32, CV3_64, Dense_32), Reduce Dropout (0.25) | 78.7% | 78.7% | 
 | 6 | Reduce Filters in 1st Layer (CV1_16, CV2_32, CV3_64, Dense_32) | 73% | 72% |
 | 7 | Increase Filters and kernel size in 3rd layer (CV1_32, CV2_64, CV3_64 (kernel size = 5x5), Dense_32) | 76.7%  | 80% |
 | 8 | Add 4th Convolutional Layer | (CV1_32, CV2_32, CV3_32, CV4_64 (kernel size = 3x3), Dense_32) | 75.3% |  |
-| 9 | Use MobilenetV2 base model | 98% | 100% | 
+| 9 | Use MobilenetV2 base model | 100% | 100% | 
 
 
 ## Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
@@ -804,14 +805,14 @@ Other than the above, the following output results from the same exact code as o
 
 <br>
 
-![alt text](/img/posts/DropoutModel_Train_Val_Metrics.png "Toy Robot Dropout Accuracy Plot")
+![alt text](/img/posts/Dropout_Train_Val_Metrics.png "Toy Robot Dropout Accuracy Plot")
 
 <br>
 
 The best classification accuracy on the *validation set* was **76%**, not significantly higher than the **75.3%** we saw for the baseline network. 
 Validation set accuracy plateaus early again, at about the 10th epoch. 
 
-Accuracy on the *test set* was **81%**, which is a nice bump from the **74.7%** test set accuracy from the baseline model. 
+Accuracy on the *test set* was **80%**, which is a nice bump from the **74.7%** test set accuracy from the baseline model. 
 
 The model is no longer over-fitting. The gap between the classification accuracy on the training set and the validation set has been eliminated. In fact, the model is consistently predicting better on the validation set, which might indicate that the validation set data is more consistent within each class. 
 
@@ -822,12 +823,9 @@ Next, I turn to another method for reducing overfitting, Image Augmentation.
 ___
 <br>
 
-# Image Augmentation <a name="cnn-augmentation"></a>
-
-<br>
+## Image Augmentation <a name="cnn-augmentation"></a>
 
 #### Image Augmentation Overview
-
 Image Augmentation means altering the training set images in random ways, so that the network will see each image, or feature within it, in a slightly different way each time it is passed through. Because the images are augmented slightly at each pass, the network can no longer memorize them. The aim is to increase the model's ability to generalize. 
 
 Image augmentation in CNN works like an image editor application: we can zoom, rotate, sheer, crop, alter the brightness, etc. But instead of doing this manually and adding nuanced versions of each image to our dataset, we simply set the parameters and let Keras randomly alter the images before they're passed through the training set. 
@@ -899,7 +897,7 @@ Before turning to the model architecture, however, I'll try to increase the mode
 ___
 <br>
 
-# Learning Rate Reduction <a name="cnn-learning rate"></a>
+## Learning Rate Reduction <a name="cnn-learning rate"></a>
 
 <br>
 
@@ -956,7 +954,6 @@ As before, I trained the same baseline network architecture, this time with both
 
 <br>
 
-PLACEHOLDER
 The best classification accuracy on the *validation set* was **76.7**, only slightly higher than **75.3%** we saw for the baseline network. 
 
 Accuracy on the *test set* was **76%**, also slightly higher than the **74.7%** test set accuracy from the baseline model, and not as good as the **81%** accuracy from the Dropout model. 
@@ -969,7 +966,7 @@ In future iterations, I will scale down the Dropout and Image Augmentation to tr
 
 <br>
 
-# Model architecture overview
+## Model architecture overview
 
 So far, I've used the same network *archiecture* for each of the Baseline, Dropout, Image Augmentation, and Learning Rate models: 
 * 2 convolutional layers
@@ -1011,7 +1008,7 @@ Other architecture parameters can be changed or added, including:
 
 <br>
 
-#### Architecture Experiment 1
+### Architecture Experiment 1
 
 For the first experiment, I modify the previous learning parameters, and add one identical convolutional layer. 
 In the code below, I only include what is changed so as to avoid long blocks of redundant information: 
@@ -1092,7 +1089,7 @@ Total params: 281,733
 Trainable params: 281,733
 Non-trainable params: 0
 
-##### AE 1 Results
+#### AE 1 Results
 
 *Validation Accuracy: **74.7%**
 *Test Accuracy: **77.3%**
@@ -1107,7 +1104,7 @@ Training and Validation Accuracy seem to be converging nicely here, which is goo
 
 <br>
 
-#### Architecture Experiment 2
+### Architecture Experiment 2
 
 Increasing number of filters in the 3rd Convolutional Layer from 32 to 64: 
 
@@ -1149,7 +1146,7 @@ Non-trainable params: 0
 
 <br>
     
-##### AE 2 Results
+#### AE 2 Results
 
 *Validation Accuracy: **76.7%**
 *Test Accuracy: **73.3%**
@@ -1160,11 +1157,13 @@ Non-trainable params: 0
 
 <br>
 
-NOTES
+Doubling the number of filters in the 3rd convolutional layer does not seem to have benefited the model's performance. We can see from the graphs that the model reached its highest validation accuracy somewhat early, and it did not improve after the 15th epoch. 
+
+Next I'll try increasing the kernel size. 
 
 <br>
 
-#### Architecture Experiment 3
+### Architecture Experiment 3
 
 Increasing kernel size in third layer:
 
@@ -1206,7 +1205,7 @@ Trainable params: 585,893
 Non-trainable params: 0
 _________________________________________________________________
 
-##### AE 3 Results
+#### AE 3 Results
 
 *Validation Accuracy: **75.3%**
 *Test Accuracy: **76%**
@@ -1217,9 +1216,10 @@ _________________________________________________________________
 
 <br>
 
-Increasing the kernel size in the third layer did not help my model. In the next iteration, I'll change the kernel size back to 3x3, and experiment with layers and filters again. 
+Increasing the kernel size in the third layer did not help my model, although the seems to be learning at steadier rate, as shown by the converging validation and loss metrics. 
+In the next iteration, I'll change the kernel size back to 3x3, and experiment with layers and filters again. 
 
-#### Architecture Experiment 4
+### Architecture Experiment 4
 
 So far adding a layer and increasing filters has not done much to improve the model's performance. 
 I'll experiment one more time, decreasing filters in the first layer, and increasing filters in the second layer. 
@@ -1269,7 +1269,7 @@ Non-trainable params: 0
 
 <br>
 
-##### AE 4 Results
+#### AE 4 Results
 
 *Validation Accuracy: **80%**
 *Test Accuracy: **80%**
@@ -1280,7 +1280,7 @@ Non-trainable params: 0
 
 <br>
 
-Adding a fourth convolutional layer and changing filters - 16 in the first, and now with 2 convolutional layers of 64 filters - seems to have given our model a nice bump in performance. 
+Adding a fourth convolutional layer and changing filters - 16 in the first, and now with 2 convolutional layers of 64 filters - seems to have given our model a little bump in performance. In fact, it is encouraging to see that the model is steadily learning throughout the 50 epochs (although slowly). Running this same model for more epochs might lead to further improvements. 
 
 ```python
 print(confusion_matrix)
@@ -1295,15 +1295,15 @@ magnatiles                 1      0     0       3          11
 ```
 <br>
 
-The current model is now fairly consistent within categories. It is perfect in its predictions of Cars on the test set, and much better and predicting Magnatiles, although slightly worse at predicting Brios. 
+The confustion matrix shows that the current model is now fairly consistent within categories, whereas the baseline model really struggled with Magnatiles. It is perfect in its predictions of Cars on the test set, and much better and predicting Magnatiles, although slightly worse at predicting Brios. 
 
 While these results are encouraging, I'll end my experiments here for now. In future versions of this project, I'll compare Keras_tuner results with this current model architecture. 
 
-I'm eager to see what other CNN models, which have been trained on much larger datasets, and can predict many more classes of images, can do with my Toy Robot task. 
+I'm eager to see what other CNN models - which have been trained on much larger datasets, and can predict many more classes of images - can do with my Toy Robot task. 
 ___
 <br>
 
-# Transfer Learning With MobiltnetV2 <a name="cnn-transfer-learning"></a>
+## Transfer Learning With MobiltnetV2 <a name="cnn-transfer-learning"></a>
 
 <br>
 
@@ -1392,15 +1392,12 @@ Test Set Accuracy: **100%**
 
 <br>
 
-I only ran the MobileNet model for 20 epochs. It acheived is Validation accuracy of 100% by the 7th epoch. 
-
-<br>
-
+I only ran the MobileNet model for 20 epochs. It acheived is Validation accuracy of 100% by the 7th epoch. It is hard to argue with 100 percent accuracy. 
 
 ___
 <br>
 
-# Overall Results Discussion <a name="cnn-results"></a>
+## Overall Results Discussion <a name="cnn-results"></a>
 
 After only modest improvements in my self-built model, there were stark improvements when implementing transfer learning with MobileNetV2. 
 
@@ -1420,7 +1417,7 @@ On the other hand, I was frustrated that the gains I made in training my own mod
 ___
 <br>
 
-# Growth & Next Steps <a name="growth-next-steps"></a>
+## Growth & Next Steps <a name="growth-next-steps"></a>
 
 The proof of concept was successful. I have shown that I can get very accurate predictions for what bins my kids' toys belong in, albeit on a small number of classes, but also with a very limited data set. Should this Toy Robot procede to the next phase of development, I'll know that I can employ MobileNetV2 to get accurate predictions. 
 
