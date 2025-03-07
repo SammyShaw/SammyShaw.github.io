@@ -21,9 +21,14 @@ This project uses a Convolutional Neural Network to train a computer model to re
 - [05. Tackling Overfitting With Dropout](#cnn-dropout)
 - [06. Image Augmentation](#cnn-augmentation)
 - [07. Learning Rate Reduction](#cnn-learning rate)
-- [08. Transfer Learning](#cnn-transfer-learning)
-- [09. Overall Results Discussion](#cnn-results)
-- [10. Next Steps & Growth](#growth-next-steps)
+- [08. Network Architecture]
+      - Architecture Experiment 1
+      - Architecture Experiment 2
+      - Architecture Experiment 3
+      - Architecture Experiment 4
+- [09. Transfer Learning](#cnn-transfer-learning)
+- [10. Overall Results Discussion](#cnn-results)
+- [11. Next Steps & Growth](#growth-next-steps)
 
 ___
 
