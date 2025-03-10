@@ -43,7 +43,6 @@ I'll use my own images of my kids' toys as a unique, albiet limited, custom data
 If this is successful and put into place on a larger scale, no parent will ever step on a Lego again! 
 
 <br>
-<br>
 
 ### Actions <a name="overview-actions"></a>
 
@@ -79,7 +78,6 @@ Then I will add or refine aspects to try to improve its predictability:
 9. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
 
 <br>
-<br>
 
 ### Results <a name="overview-results"></a>
 
@@ -98,7 +96,6 @@ In terms of Classification Accuracy on the Test Set:
 The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. 
 
 <br>
-<br>
 
 ### Growth/Next Steps <a name="overview-growth"></a>
 
@@ -108,7 +105,6 @@ I hold out that there is considerable room for improvement in my own self-built 
 
 My current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that the other image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
 
-<br>
 <br>
 ___
 
