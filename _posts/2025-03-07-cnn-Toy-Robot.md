@@ -75,7 +75,7 @@ Then I will add or refine aspects to try to improve its predictability:
     d. Increasing the kernel size
 
 9. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
-<br>
+
 
 ### Results <a name="overview-results"></a>
 
