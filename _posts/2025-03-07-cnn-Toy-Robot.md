@@ -34,7 +34,7 @@ ___
 # Project Overview  <a name="overview-main"></a>
 
 ### Context <a name="overview-context"></a>
-I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'm not a robotics engineer, but I can use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys), and I'll leave the rest to my friends in the robotics lab.
+I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old - Teddy - is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'm not a robotics engineer, but I can use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys), and I'll leave the rest to my friends in the robotics lab.
 
 I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, which will allow my to simulate the real world scenarios of toys scattered throughout the house. 
 
@@ -43,11 +43,12 @@ If this is successful and put into place on a larger scale, no parent will ever 
 
 ### Actions <a name="overview-actions"></a>
 
-Thanks to the *Keras* Deep Learning library, most of the tasks and procedures for building a computer vision model are made easy in Python. On the other hand, while Keras provides the tools, understanding and optimizing the model's architecture and training parameters is not so easy. In my case, since I will be taking my own pictures, I also have to think hard about what constitutes good, useful data. The process of building this model, broken into subsections below, is as follows:
+Thanks to the *Keras* Deep Learning library, most of the tasks and procedures for building a computer vision neural network are made easy in Python. On the other hand, while Keras provides the tools, understanding and optimizing the model's architecture and training parameters is not so simple. Since I will be taking my own pictures, I also have to think hard about what constitutes good, useful data. The process of building this model, broken into subsections below, is as follows:
 
 Generate Data: 
-1. Take images - This became a trial/error/experiment process throughout this project. 
-2. Structure the data into training, validation, and Test set folders.
+
+1. Take images.
+2. Structure the data into training, validation, and test set folders.
 3. Define the data flow parameters and set up data generator objects.
 
 Iterative Model Building Method: 
@@ -56,49 +57,45 @@ Iterative Model Building Method:
     **Two convolutional layers**, each with 
     **32 filters** and subsequent 
     **Max Pooling** Layers, 
-    A single **Dense (fully connected) layer** following flattening with 32 neurons 
-    followed by an output layer for five toy classes. 
+    A single **Dense (fully connected) layer** following flattening with 32 neurons, 
+    followed by an output layer for five toy classes,
     I use the **RELU** activation function on all layers, 
-    and I use the **'ADAM'** learning optimizer. 
-
-Then I will add or refine aspects to try to improve its predictability:
-
-5. Add a **Dropout** layer to reduce overfitting (which will be tweaked throughout). 
-6. Add **Image Augmentation** to the data pipeline to increase variation in the training data, as well as address overfitting.
-7. Add a Learning Rate Reducer to smooth convergence. 
+    and I use the **'ADAM'** learning optimizer
+5. Add a **Dropout** layer to reduce overfitting (which will be adjusted throughout) 
+6. Add **Image Augmentation** to the data pipeline to increase variation in the training data, as well as address overfitting
+7. Add a Learning Rate Reducer to smooth convergence 
 8. Experiment with Layers and Filters: 
     a. First adding more convolutional layer
     b. Increasing the filters in convolutional layers
     c. Deceasing the filters in the convolutional layers
     d. Increasing the kernel size
-
-9. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
+   
+10. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
 
 
 ### Results <a name="overview-results"></a>
 
-The baseline network suffered badly from overfitting, but the addition of Dropout & Image Augmentation reduced or elimited this entirely (or led to underfitting).
+The baseline network suffered badly from overfitting, but the addition of dropout & image augmentation reduced this entirely (and led to underfitting). The addition of these learning parameters, however, only led to slight gains in model performance. Adding convolutional layers and filters also led to slightly better results. Switching to transfer learning made a huge difference, leading to 100% classification accuracy on the test set. 
 
-In terms of Classification Accuracy on the Test Set:
-
+**Classification Accuracy on the Test Set:**
 * Baseline Network: **74.7%**
 * Baseline + Dropout: **80%**
 * Baseline + Image Augmentation: **77.3%**
 * Baseline + Dropout + Image Augmentation + Learning Rate Reducer: **76%**
-* Architecture Experiment 1 (32, 32, 64, 32): **75.7%**
-* Architecture Experiment 4 (32, 64, 64 (kernel = 5x5), 32): **80%**
+* Architecture Experiment 2: **75.7%**
+* Architecture Experiment 4: **80%**
 * MobilenetV2 base model: **100%**
 
-The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. 
-<br>
+The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. My small data set (500 training images) is less than ideal, but I've also learned to think very carefully about training data in CNNs. 
+
 
 ### Growth/Next Steps <a name="overview-growth"></a>
 
-The concept here is demonstrated, if not proven. We have shown that we can get very accurate predictions - that should this robot come to market, it will at least be able to accurately predict in what bins your childs' toys belong. 
+The concept here is demonstrated, if not proven. I've shown that I can get very accurate predictions - that should this robot come to market, it will at least be able to accurately predict in what bins a childs' toys belong. 
 
-I hold out that there is considerable room for improvement in my own self-built model. The experimental architectures that I tested here do not exhaust the possibilities. I can use the Keras Tuner to get an optimal network architecture. And/or, I can revisit my dataset, which is currently 'small' and is likely riddled with bias. 
+I hold out that there is considerable room for improvement in my own, self-built model. The experimental architectures that I tested here does not exhaust the possibilities. I can use the Keras_tuner function to get an optimal network architecture. And/or, I can revisit my dataset, which is currently 'small' and is likely riddled with bias. 
 
-My current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that the other image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
+My current working hypothesis is that: with such limited data (100 images in each of my 5 training classes), the model is both sensitive to bias and lacks depth required to help a robot distiguish certain toys. I'll explore this bias in the write up below. For now, I'll note that the other image datasets that I've seen are either extraordinarily deep and diverse (*Imagenet* contains over 14 million images), or if they are smaller,  appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
 
 ___
 # Data Overview  <a name="data-overview"></a>
@@ -116,29 +113,28 @@ Although my kid has dozens of types of toys, I began with a modest set of five c
 
 <br>
 
-**Problems**: At first glance, these toys appear distinct enough, but when considering how an algorithm might think about them, some challenges arise. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels like the car toy set. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
+**Problems**: At first glance, these toys appear distinct enough, but when considering how an algorithm might think about them, some challenges arise. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels, like cars. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
 
-**Solutions**: To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of some types of toys, I separated the actual toys for the training, validation, and test set images.
+**Solutions**: To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the image frame. Because of the limited number of some types of toys, I separated the actual toys for the training, validation, and test set images.
 
 I ended up with 145 images of each toy, separated as follows: 
 * 100 training set images (500 total)
 * 30 validation set images (150 total)
 * 15 test set images (75 total)
 
-For ease of use in Keras, my data folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
+For ease of use in Keras, my data folder structure first splits the image data into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
 
 Images in the folders are varying sizes, but will be fed into the data pipeline as 128 x 128 pixel images. 
 
 ___
 # Data Pipeline  <a name="data-pipeline"></a>
-Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for our images to flow from my local hard-drive through the network.
+Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for the data to flow from my local hard-drive through the network.
 
 In the code below, I will:
-
 * Import the required packages for the baseline model
 * Set up the parameters for the data pipeline
 * Set up the image generators to process the images as they come in
-* Set up the generator flow - specifying what we want to pass in for each iteration of training
+* Set up the generator flow - specifying what to pass in for each iteration of training
   
 ```python
 # import the required python libraries
@@ -179,26 +175,26 @@ print(validation_set.class_indices)
 
 ```
 
-Images are resized down to 128 x 128 pixels (of three RGB channels), and they will be input 32 at a time (batch size) for training. I have five toy classes (the labels will conveniently come from the folder names inside the training and validation sets). 
+Images are resized down to 128 x 128 pixels (of three RGB channels), and they will be input 32 at a time (batch size) for training. The labels for the five toy classes will conveniently come from the folder names inside the training and validation sets. 
 
 Raw pixel values (ranging between 0 and 255) are normalized to help gradient descent find an optimal solution more efficiently.
 
 ___
 # Convolutional Neural Network Overview <a name="cnn-overview"></a>
 
-Convolutional Neural Networks (CNN) are an adaptation of Artificial Neural Networks and are primarily used for image data tasks.
+Convolutional Neural Networks (CNN) are a type of Neural Network primarily used for image data tasks. To a computer, an image is a three-dimensional dataframe (or *tensor*), made of rows and columns of pixels (in our case 128x128), each with 3 'channels' for color-intensity values (Red, Green and Blue, hence RGB), that range from 0 to 255 (before normalizing). Thus, each pixel (all 16,384 of them in a 128x128 image) contains three values of its own, so there are 49,152 pixel-data-points in each image. 
 
-To a computer, an image is a three dimensional dataframe (or *tensor*), made of rows and columns of pixels (in our case 128x128), each with 3 'channels' for intensity values for colors (Red, Green, and Blue, hence RBG), that range from 0 to 255 (before normalizing). Thus, each pixel (all 1,024 of them in a 128x128 image) is a function of a 3x255 color value. 
+A Convolutional Neural Network tries to make sense of these values to make predictions about the image or to predict what the image is of — here, one of the five possible toy classes. Of course, the pixel values themselves are meaningless; they only make sense in relation to each other in spatial dimensions. The network tries to learn spatial relationships between pixels, turning the patterns that it finds into *features*, much like we do as humans. The network learns by trying to associate features with class labels. 
 
-A Convolutional Neural Network then tries to make sense of these values to make predictions about the image, or to predict what the image is of - here one of the five possible toy classes. Of course, the pixel values themselves are meaningless, they only make sense in relation to each other in spatial dimensions. The network tries to learn these relatinships - turning the patterns that it finds into *features* much like we do as humans. By learning to associate those feature-patterns with the class labels that it is provided, the network learns which features are meaningful for each class of object. 
+Convolution is the process in which images are scanned. Filters (or kernels) slide over the image, mapping its key features. Pooling layers follow convolutional layers, summarizing feature information while reducing dimensionality and producing a more generalizable (more abstract) representation. As such, the network can learn how two images are of the same object, even though the images are not exactly the same. 
 
-**Convolution** is the process in which images are scanned over with filters that detect patterns. **Pooling** compresses these into more generalizable representations. This process helps reduce the problem space (turning the image into a smaller and smaller generalizable representation of features), it also helps reduce the network's sensitivy to minor changes, in other words to know that two images are of the same object, even though the images are not *exactly* the same.
+CNNs consist of multiple convolutional layers, each made of a set of filters that specialize in detecting different patterns. As the network deepens, the filters progress from detecting simple patterns (like edges) to complex shapes (like wheels or faces). A simple CNN model of 2 convolutional layers of 32 filters each, 2 pooling layers, and a dense layer of 32 filters contains over a million trainable nuerons and connections, or weights and biases. Activation Functions are applied to the neurons as image data moves forward through the network, helping the network decide which neurons will fire and, ultimately, which features are more or less important for the different output classes.
 
-CNN's consist of multiple convolutional layers (each made of any number of filters), and pooling layers, and dense layers that compress and generalize the data in the image so that it can ultimately be turned into a probability of belonging to one class of object or another. 
+As a Convolutional Neural Network trains, it calculates how well it is predicting the class labels as **loss.** It then heads backward through the network in a process known as **backpropagation** to update the parameters within the network. The goal is to reduce the error, or in other words, improve the match between predicted outputs and actual outputs. Over time, the network learns to find a good mapping between the input data and the output classes.
 
-As a Convolutional Neural Network trains, it iteratively calculates how well it is predicting on class labels as **loss**. It then heads backward through the network in a process known as **Back Propagation** to update the paramaters within the network, trying to minimize error and improve predictive accuracy. Image can be sent through the network any number of times (or, *epochs*) during training. Over time, it learns to find a good mapping between the input data and the output classes.
+There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (such as activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's predictive accuracy. Many of these will be discussed below.
 
-There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (Activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. Many of these will be discussed below. I liken it to machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy. 
+I liken it to a machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy.
 
 ___
 # Baseline Network <a name="cnn-baseline"></a>
