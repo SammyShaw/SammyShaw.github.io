@@ -5,7 +5,7 @@ image: "/posts/ToyRobot_CoverImage.png"
 tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Python]
 ---
 
-This project uses a Convolutional Neural Network to train a computer model to recognize distinct classes of toys on a bespoke, self-collected data set. After experimenting with various model architectures and training parameters, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. CNN is all about optimizing model architecture and training parameters, but building a successful model has much to do with the nature and quality of the data too. 
+For this project I train a Convolutional Neural Network to recognize distinct classes of toys from a bespoke, self-collected data set. After experimenting with various training parameters and model architectures, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. I conclude that CNN is all about optimizing model architecture and training parameters for the task, but building a successful model has much to do with the nature and quality of the data too. 
 
 ## Table of contents
 
@@ -31,14 +31,12 @@ This project uses a Convolutional Neural Network to train a computer model to re
 - [11. Next Steps & Growth](#growth-next-steps)
 
 ___
-
 # Project Overview  <a name="overview-main"></a>
 
 ### Context <a name="overview-context"></a>
+I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'm not a robotics engineer, but I can use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys), and I'll leave the rest to my friends in the robotics lab.
 
-I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! Because my four-year old is better at playing with toys than picking them up, and because I'm better at throwing them all in one basket than sorting them, I'll use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys).
-
-I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, because I'll want to simulate the real-world scenarios of his toys scattered throughout the house. 
+I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, which will allow my to simulate the real world scenarios of toys scattered throughout the house. 
 
 If this is successful and put into place on a larger scale, no parent will ever step on a Lego again! 
 <br>
