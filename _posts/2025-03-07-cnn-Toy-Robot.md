@@ -32,7 +32,7 @@ This project uses a Convolutional Neural Network to train a computer model to re
 
 ___
 
-## Project Overview  <a name="overview-main"></a>
+# Project Overview  <a name="overview-main"></a>
 
 ### Context <a name="overview-context"></a>
 
@@ -104,7 +104,7 @@ My current working hypothesis is that: with such limited data (100 images in eac
 
 ___
 
-## Data Overview  <a name="data-overview"></a>
+# Data Overview  <a name="data-overview"></a>
 
 Although my kid has dozens of types of toys, I began with a modest set of five classes of toys: 
 * Bananagrams (a game for adults, which has become material for Teddy's garbage truck)
@@ -136,7 +136,7 @@ ___
 
 <br>
 
-## Data Pipeline  <a name="data-pipeline"></a>
+# Data Pipeline  <a name="data-pipeline"></a>
 
 Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for our images to flow from my local hard-drive through the network.
 
