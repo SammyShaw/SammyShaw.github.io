@@ -538,7 +538,7 @@ test_dir = "data/test"  # Directory with test images
 output_dir = "grad_cam"  # Directory to save Grad-CAM images
 os.makedirs(output_dir, exist_ok=True)
 
-# --- Grad-CAM Function ---
+# Grad-CAM Function 
 def grad_cam(model, img_array, target_layer_name):
     """Compute Grad-CAM heatmap for a specified convolutional layer."""
     # Get the target conv layer from the model
@@ -571,7 +571,7 @@ def grad_cam(model, img_array, target_layer_name):
     
     return heatmap
 
-# --- Image Preprocessing ---
+# Image Preprocessing 
 def preprocess_image(img_path):
     """Load and preprocess an image for the model."""
     img = load_img(img_path, target_size=img_size)
@@ -592,7 +592,7 @@ def overlay_heatmap(heatmap, img_path, alpha=0.4):
     superimposed_img = cv2.addWeighted(img, 1 - alpha, heatmap, alpha, 0)
     return superimposed_img
 
-# --- Apply Grad-CAM on Test Images ---
+# Apply Grad-CAM on Test Images 
 def run_grad_cam_on_test_set():
     """Run Grad-CAM on test images for specified convolutional layers."""
     for category in os.listdir(test_dir):
@@ -648,7 +648,8 @@ First, we can see whether or not the model is picking up on the features that wo
 ![alt text](/img/posts/gradCAM_bananagram.png "Grad-CAM Bad Feature Detection")
 
 <br>
-Bias is a pervasive issue in CNN tasks. Bias happens when a model learns to predict on *spurious features* - something in the data other than the features that would distinguish or separate classes in the real world. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on the unique circular connectors of Duplos, it will have a better chance of predicting Duplos that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what actually makes a Bananagram a Bananagram, even if it does guess correctly. 
+
+Bias is a pervasive issue in CNN tasks. Bias happens when a model learns to predict on *spurious features*, something in the data other than the features that would distinguish or separate classes in the real world. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on the unique circular connectors of Duplos, it will have a better chance of predicting Duplos that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what actually makes a Bananagram a Bananagram, even if it does guess correctly. 
 
 When a model is biased, it is often due to contextual, or background bias. That is, because it has learned to *correctly* predict on contextual features that are associated with the class in training (i.e., with biased images), but not in real life. 
 
@@ -694,11 +695,11 @@ Rather than reproduce all of the text and discussion above for each of the subse
 ### Dropout Overview
 Dropout is a technique used in Deep Learning primarily to reduce the effects of over-fitting. As we have seen, *over-fitting* happens when the network learns the patterns of the training data so specifically that it essentially memorizes those images as the class of object itself. Then when it sees the same class of object in a different image (in the validation or test set), it cannot recognize it. 
 
-*Dropout* is a technique in which, for each batch of observations that is sent forwards through the network, a pre-specified portion of the neurons in a hidden layer are randomly deactivated. This can be applied to any number of the hidden layers. When neurons are deactivated - they take no part in the passing of information through the network.
+*Dropout* is a technique in which, for each batch of observations that is sent forwards through the network, a pre-specified portion (typically 20-50%) of the neurons in a hidden layer are randomly deactivated. This can be applied to any number of the hidden layers. When neurons are temporarily deactivated - they take no part in the passing of information through the network.
 
 The math is the same, the network will process everything as it always would (taking the sum of the inputs multiplied by the weights, and adding a bias term, applying activation functions, and updating the network’s parameters using Back Propagation) - but now some of the neurons are simply turned off. If some neurons are turned off, then the other neurons have to jump in and pick up the slack (so to speak). If those other neurons were previously dedicated to certain very specific features of training images, they will now be forced to generalize a bit more. If over-trained neurons that were turned off in one epoch jump back in in the next, they now contend with a model that has found more generalizable patterns and will have to tune accordingly. 
 
-Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent - the network learns more robust features, and are less susceptible to noise.
+Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent, neurons cannot *co-adapt* - the network learns more robust features, and are less susceptible to noise.
 
 ### Implementing Dropout
 
@@ -731,7 +732,7 @@ Accuracy on the *test set* was **80%**, which is a nice bump from the **74.7%** 
 
 The model is no longer over-fitting. The gap between the classification accuracy on the training set and the validation set has been eliminated. In fact, the model is consistently predicting better on the validation set, which might indicate that the validation set data is more consistent within each class. 
 
-On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it is become less confident in its predictions. That is the probabilities output associated with its predictions are likely going down. It is becoming less confident in the validation preditions, and more confident in the training predictions. 
+On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it is become less confident in its predictions. That is the probabilities output associated with its predictions are likely going down. It is becoming less confident in the validation set preditions, and more confident in the training predictions. 
 
 Next, I turn to another method for reducing overfitting, Image Augmentation. 
 
