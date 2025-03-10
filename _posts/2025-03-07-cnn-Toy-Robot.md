@@ -20,12 +20,12 @@ This project uses a Convolutional Neural Network to train a computer model to re
 - [04. Baseline Network](#cnn-baseline)
 - [05. Tackling Overfitting With Dropout](#cnn-dropout)
 - [06. Image Augmentation](#cnn-augmentation)
-- [07. Learning Rate Reduction](#cnn-learning rate)
-- [08. Network Architecture]
-      - Architecture Experiment 1
-      - Architecture Experiment 2
-      - Architecture Experiment 3
-      - Architecture Experiment 4
+- [07. Learning Rate Reduction](#cnn-learning-rate)
+- [08. Network Architecture](#network-architecture)
+      - [Architecture Experiment 1])#architecture-experiment1)
+      - [Architecture Experiment 2])#architecture-experiment2)
+      - [Architecture Experiment 3])#architecture-experiment3)
+      - [Architecture Experiment 4])#architecture-experiment4)
 - [09. Transfer Learning](#cnn-transfer-learning)
 - [10. Overall Results Discussion](#cnn-results)
 - [11. Next Steps & Growth](#growth-next-steps)
@@ -105,7 +105,6 @@ I hold out that there is considerable room for improvement in my own self-built 
 
 My current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that the other image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
 
-<br>
 ___
 
 ## Data Overview  <a name="data-overview"></a>
@@ -142,6 +141,7 @@ For ease of use in Keras, my data folder structure first splits into training, v
 Images in the folders are varying sizes, but will be fed into the data pipeline as 128 x 128 pixel images. 
 
 ___
+
 <br>
 
 ## Data Pipeline  <a name="data-pipeline"></a>
@@ -968,9 +968,9 @@ Instead of overfitting, the model is now *underfitting,* as evidenced by the hig
 
 In future iterations, I will scale down the Dropout and Image Augmentation to try to get a better convergence of Test and Training Accuracy. Because the Learning Rate Reduction helped only after its first reduction, I will also lengthen the patience parameter in future models.  
 
-<br>
+___
 
-## Model architecture overview
+## Network Architecture  <a name="network-architecture"></a>
 
 So far, I've used the same network *archiecture* for each of the Baseline, Dropout, Image Augmentation, and Learning Rate models: 
 * 2 convolutional layers
