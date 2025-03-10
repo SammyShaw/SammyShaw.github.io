@@ -39,6 +39,7 @@ I want to build a robot that will pick up my kids' toys, AND put them in the cor
 I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, which will allow my to simulate the real world scenarios of toys scattered throughout the house. 
 
 If this is successful and put into place on a larger scale, no parent will ever step on a Lego again! 
+
 <br>
 
 ### Actions <a name="overview-actions"></a>
@@ -73,7 +74,7 @@ Then I will add or refine aspects to try to improve its predictability:
     d. Increasing the kernel size
 
 9. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
-
+<br>
 
 ### Results <a name="overview-results"></a>
 
