@@ -141,9 +141,8 @@ In the code below, I will:
 * Set up the parameters for the data pipeline
 * Set up the image generators to process the images as they come in
 * Set up the generator flow - specifying what we want to pass in for each iteration of training
-
+  
 ```python
-
 # import the required python libraries
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense
@@ -206,7 +205,6 @@ There are many aspects of a CNN's architecture (combination of layers and filter
 ___
 # Baseline Network <a name="cnn-baseline"></a>
 
-
 ### Baseline Network Architecture
 
 The baseline network architecture is simple, and gives us a starting point to refine from. This network contains:
@@ -218,7 +216,6 @@ The baseline network architecture is simple, and gives us a starting point to re
 * I use the **relu** activation function on all layers, and use the **adam** optimizer.
 
 ```python
-
 # network architecture
 model = Sequential()
 
@@ -247,7 +244,7 @@ model.compile(loss = 'categorical_crossentropy',
 model.summary()
 
 ```
-<br>
+
 The output printed below shows us more clearly our baseline architecture:
 
 ```
@@ -285,7 +282,6 @@ _________________________________________________________________
 
 ```
 
-
 ### Training The Network
 
 With the data pipeline and network architecture in place, we're ready to train the model. 
@@ -298,7 +294,6 @@ In the below code I:
 * Train the network and save the results to an object called *history*
 
 ```python
-
 # training parameters
 num_epochs = 50
 model_filename = 'models/toy_robot_basic_v01.h5'
@@ -318,16 +313,14 @@ history = model.fit(x = training_set,
                     callbacks = [save_best_model])
 
 ```
-<br>
-The ModelCheckpoint callback means that the *best* model is saved, in terms of validation set performance - from *any point* during training. That is, although I'm telling the network to train for 50 epochs, or 50 rounds of data, there is no guarantee that it will continue to find better weights and biases throughout those 50 rounds. Usually, in fact, it will find the best fit before it reaches the 50th epoch, even though it will continue to adjust parameters until I tell it to stop. So the ModelCheckpoint function ensures that we don't lose progress. 
 
+The ModelCheckpoint callback means that the *best* model is saved, in terms of validation set performance - from *any point* during training. That is, although I'm telling the network to train for 50 epochs, or 50 rounds of data, there is no guarantee that it will continue to find better weights and biases throughout those 50 rounds. Usually, in fact, it will find the best fit before it reaches the 50th epoch, even though it will continue to adjust parameters until I tell it to stop. So the ModelCheckpoint function ensures that we don't lose progress. 
 
 ### Analysis Of Training Results
 
 In addition to saving the *best* model (to model_filename), we can use the *history* object that we created to analyze the performance of the network epoch by epoch. In the following code, I'll plot the training and validation loss, and its classification accuracy. 
 
 ```python
-
 import matplotlib.pyplot as plt
 
 # plot validation results
@@ -377,7 +370,6 @@ In the code below, I will:
 * Create a Pandas DataFrame to hold all prediction data.
 
 ```python
-
 # import required packages
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
@@ -445,7 +437,7 @@ predictions_df = pd.DataFrame({"actual_label" : actual_labels,
 predictions_df['correct'] = np.where(predictions_df['actual_label'] == predictions_df['predicted_label'], 1, 0)
 
 ```
-<br>
+
 
 Thus we have a convenient, and very useful dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
 
@@ -462,13 +454,11 @@ This data can be used analyze the model's performance on specific images in a fe
 * Creating a confusion matrix (below).
 * Using a Grad-CAM analysis (below). 
 
-
 ### Test Set Classification Accuracy
 
 To calculate test set classification accuracy:
 
 ```python
-
 # overall test set accuracy
 test_set_accuracy = predictions_df['correct'].sum() / len(predictions_df)
 print(test_set_accuracy)
@@ -477,13 +467,11 @@ print(test_set_accuracy)
 
 The baseline network gets **74.7% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
 
-
 ### Test Set Confusion Matrix
 
 Overall Classification Accuracy is useful, but it can obscure where and why the model struggled. Maybe the network is predicting extremely well on Bananagrams, but it thinks that Magnatiles are Brios? A Confusion Matrix can show us these patterns, which I create using the predictions dataframe below.
 
 ```python
-
 # confusion matrix 
 confusion_matrix = pd.crosstab(predictions_df['predicted_label'], predictions_df['actual_label'])
 print(confusion_matrix)
@@ -501,7 +489,6 @@ magnatiles                 1      1     2       1           8
 
 ```
 
-
 So, while overall our test set accuracy was ~75%, for each individual class we see:
 
 * Bananagrams: 66.7%
@@ -510,13 +497,10 @@ So, while overall our test set accuracy was ~75%, for each individual class we s
 * Duplos: 86.7%
 * Magnatiles: 53.3%
 
-Insightful! I honestly thought the Magnatiles would be the most recognizable, but here the model thinks a big portion of them are Duplos. Perhaps its not surprising since Magnatiles and Duplos share common features. They are both square/blocky and made of solid colors, which combine to form multi-color, multi-block shapes. 
-
-But that is just me guessing! To see what features the model actually is picking up on, I use a grad-CAM analysis. 
+Insightful! I honestly thought the Magnatiles would be the most recognizable, but here the model thinks a big portion of them are Duplos. Perhaps its not surprising since Magnatiles and Duplos share common features. They are both square/blocky and made of solid colors, which combine to form multi-color, multi-block shapes. But that is just me guessing! To see what features the model actually is picking up on, I use a grad-CAM analysis. 
 
 
 ### Grad-CAM Analysis
-
 Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image! A heatmap is used to color-code the regions of the image that the model found most useful for classifying it as one thing or another. 
 
 In the code below, I: 
@@ -529,7 +513,6 @@ In the code below, I:
 * Define a function to plot the image and the heatmap.
 
 ```python
-
 import os
 import cv2
 import numpy as np
@@ -686,9 +669,8 @@ The issue gets more even more complicated. If four out of the five classes of im
 
 I'll address bias as a cocern with my self-collected data set again in the conclusion.
 
-<br>
 
-#### Depth Insight
+### Depth Insight
 Secondly, we can use the grad-CAM images to compare what the model predicted correctly and what it missed! In the images below it looks like the network learned the features of the Magnatiles quite well. The heat-map looks like it is focused on the whole shape, as well as the screws, and the magnets inside the object. 
 
 ![alt text](/img/posts/magnatile_baseline_gradcam_correct.png "Grad-CAM Correct Classification")
@@ -700,9 +682,7 @@ However, while the top image was correctly identified as a Magnatile, the bottom
 In subsequent iterations, I'll tackle the many issues identified above with various methods that should improve the model's overall performance. 
 
 ___
-<br>
-
-## Model Iterations
+# Model Iterations
 
 Rather than reproduce all of the text and discussion above for each of the subsequent iterations, I'll describe basic changes and performance metrics in the table below. Then, in the sections that follow, I'll discuss what additions are made, the rationalle behind them, and the result that matters: test set accuracy. 
 
