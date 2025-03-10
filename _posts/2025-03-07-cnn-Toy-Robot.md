@@ -5,7 +5,7 @@ image: "/posts/ToyRobot_CoverImage.png"
 tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Python]
 ---
 
-For this project I train a Convolutional Neural Network to recognize distinct classes of toys from a bespoke, self-collected data set. After experimenting with various training parameters and model architectures, however, I used transfer learning - and the power of MobilenetV2 - to acheive a 100 percent test set accuracy. I conclude that CNN is all about optimizing model architecture and training parameters for the task, but building a successful model has much to do with the nature and quality of the data too. 
+For this project I trained a Convolutional Neural Network to recognize distinct classes of toys from a bespoke, self-collected data set. After experimenting with various training parameters and model architectures, however, I used transfer learning - and the power of MobilenetV2 - to achieve a 100 percent test set accuracy. I conclude that CNN is all about optimizing model architecture and training parameters for the task, but building a successful model has much to do with the nature and quality of the data too. 
 
 ## Table of contents
 
@@ -36,7 +36,7 @@ ___
 ### Context <a name="overview-context"></a>
 I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old - Teddy - is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'm not a robotics engineer, but I can use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys), and I'll leave the rest to my friends in the robotics lab.
 
-I'll use my own images of my kids' toys as a unique, albiet limited, custom dataset, which will allow my to simulate the real world scenarios of toys scattered throughout the house. 
+I'll use my own images of my kids' toys as a unique, albeit limited, custom dataset, which will allow me to simulate the real world scenarios of toys scattered throughout the house. 
 
 If this is successful and put into place on a larger scale, no parent will ever step on a Lego again! 
 
@@ -67,7 +67,7 @@ Iterative Model Building Method:
 8. Experiment with Layers and Filters: 
     a. First adding more convolutional layer
     b. Increasing the filters in convolutional layers
-    c. Deceasing the filters in the convolutional layers
+    c. Decreasing the filters in the convolutional layers
     d. Increasing the kernel size
    
 10. Finally, I compare my network's results against a **Transfer Learning** model based on MobilenetV2, a powerful CNN model that uses some advanced layering techniques. 
@@ -86,7 +86,7 @@ The baseline network suffered badly from overfitting, but the addition of dropou
 * Architecture Experiment 4: **80%**
 * MobilenetV2 base model: **100%**
 
-The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but its hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. My small data set (500 training images) is less than ideal, but I've also learned to think very carefully about training data in CNNs. 
+The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but it is hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. My small data set (500 training images) is less than ideal, but I've also learned to think very carefully about training data in CNNs. 
 
 
 ### Growth/Next Steps <a name="overview-growth"></a>
@@ -247,32 +247,31 @@ Model: "sequential"
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
-conv2d (Conv2D)              (None, 128, 128, 32)      896       
+conv2d_6 (Conv2D)            (None, 128, 128, 32)      896       
 _________________________________________________________________
-activation (Activation)      (None, 128, 128, 32)      0         
+activation_10 (Activation)   (None, 128, 128, 32)      0         
 _________________________________________________________________
-max_pooling2d (MaxPooling2D) (None, 64, 64, 32)        0         
+max_pooling2d_7 (MaxPooling2 (None, 64, 64, 32)        0         
 _________________________________________________________________
-conv2d_1 (Conv2D)            (None, 64, 64, 32)        9248      
+conv2d_7 (Conv2D)            (None, 64, 64, 32)        9248      
 _________________________________________________________________
-activation_1 (Activation)    (None, 64, 64, 32)        0         
+activation_11 (Activation)   (None, 64, 64, 32)        0         
 _________________________________________________________________
-max_pooling2d_1 (MaxPooling2 (None, 32, 32, 32)        0         
+max_pooling2d_8 (MaxPooling2 (None, 32, 32, 32)        0         
 _________________________________________________________________
-flatten (Flatten)            (None, 32768)             0         
+flatten_2 (Flatten)          (None, 32768)             0         
 _________________________________________________________________
-dense (Dense)                (None, 32)                1048608   
+dense_18 (Dense)             (None, 32)                1048608   
 _________________________________________________________________
-activation_2 (Activation)    (None, 32)                0         
+activation_12 (Activation)   (None, 32)                0         
 _________________________________________________________________
-dense_1 (Dense)              (None, 6)                 198       
+dense_19 (Dense)             (None, 5)                 165       
 _________________________________________________________________
-activation_3 (Activation)    (None, 6)                 0         
+activation_13 (Activation)   (None, 5)                 0         
 =================================================================
-Total params: 1,058,950
-Trainable params: 1,058,950
+Total params: 1,058,917
+Trainable params: 1,058,917
 Non-trainable params: 0
-_________________________________________________________________
 
 ```
 
@@ -655,9 +654,9 @@ When a model is biased, it is often due to contextual, or background bias. That 
 
 In this case, the model may well have predicted this particular Banagram correctly (it did not, it gave it a 53% chance being a Duplo). It may actually associate the floor (or perhaps the shape of its cut out), with the class Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. This so-called *shortcut learning* is often the result of such *covariate shift*. In this particular case, I am concerned that it is the Duplo images that are biased, since having picked up on the floor background, the model chose Duplo instead of Bananagram. 
 
-The issue gets more even more complicated when considering *class imbalance*. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class (lets say Bananagrams) has a 70/30% split, the model might still be biased towards that 70% background because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distiguishing features in the other classes, then it might still guess Bananagram every time it sees a wood floor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
+The issue gets more even more complicated when considering *class imbalance*. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class (lets say Bananagrams) has a 70/30% split, the model might still be biased towards that 70% background because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distinguishing features in the other classes, then it might still guess Bananagram every time it sees a wood floor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
 
-I'll address bias as a cocern with my self-collected data set again in the conclusion.
+I'll address bias as a concern with my self-collected data set again in the conclusion.
 
 
 ### Depth Insight
@@ -784,7 +783,7 @@ I dropped Dropout from the model, so the Augmented Image model can be compared t
 <br>
 
 The best classification accuracy on the *validation set* was **77.3%**, slightly higher than the **75.3%** we saw for the baseline network. 
-Validation set accuracy plateaus again, but not as early, and its highest validation accuracy was found in the 39th epoch.
+Validation set accuracy plateaus again, but not as early, and its highest validation accuracy was achieved in the 39th epoch.
 
 Accuracy on the *test set* was **74.7%**, same as the **74.7%** test set accuracy from the baseline model,  and not as good as the **81%** accuracy from the Dropout model. 
 
@@ -1206,7 +1205,7 @@ from tensorflow.keras.applications import MobileNetV2
 
 # Load Pretrained Model
 base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(img_width, img_height, 3))
-base_model.trainable = False  # Freeze base layers initially
+base_model.trainable = False  # Freeze base layers
 
 # Build Model
 model = Sequential([
@@ -1214,8 +1213,8 @@ model = Sequential([
     GlobalAveragePooling2D(),  # Prefered in Transfer Learning, Preserves spatial relationships better than Flatten()
     BatchNormalization(), # Helps to stabilize training
     Dense(32, activation='relu'),
-    Dropout(0.5),  # Helps prevent overfitting
-    Dense(5, activation='softmax')  # Binary classification
+    Dropout(0.5),
+    Dense(5, activation='softmax') 
 ])
 
 # Compile Model
@@ -1258,7 +1257,7 @@ Test Set Accuracy: **100%**
 
 <br>
 
-I only ran the MobileNet model for 20 epochs. It acheived is Validation accuracy of 100% by the 7th epoch. It is hard to argue with 100 percent accuracy. 
+I only ran the MobileNet model for 20 epochs. It achieved 100% Validation accuracy by the 7th epoch. It is hard to argue with 100 percent accuracy. 
 
 ___
 # Overall Results Discussion <a name="cnn-results"></a>
@@ -1276,17 +1275,17 @@ In terms of Classification Accuracy on the Test Set, we saw:
 
 Tranfer Learning with MobileNetV2 was a big success. It was able to learn the features in my training data and map them to my validation and test set data with 100% accuracy, and in only 7 epochs of training. 
 
-On the other hand, I was frustrated that the gains I made in training my own model did not lead to a more robust model. 
+On the other hand, I was frustrated that the adjustments that I made to my own model did not lead to a more improvements. 
 
 ___
 # Growth & Next Steps <a name="growth-next-steps"></a>
 
-The proof of concept was successful. I have shown that I can get very accurate predictions for what bins my kids' toys belong in, albeit on a small number of classes, but also with a very limited data set. Should this Toy Robot procede to the next phase of development, I'll know that I can employ MobileNetV2 to get accurate predictions. 
+The proof of concept was successful. I have shown that I can get very accurate predictions for what bins my kids' toys belong in, albeit on a small number of classes, but also with a very limited data set. Should this Toy Robot proceed to the next phase of development, I'll know that I can always employ MobileNetV2 to get accurate predictions. 
 
-On the other hand, the process has left me more curious about building a CNN of my own, and I have two grand ambitions for future versions of this project. 
+On the other hand, the process has left me more curious about building a CNN of my own, and I have two ambitions for future versions of this project. 
 
-1. Use Keras_tuner: Keras Tuner is available for optimizing the many levers and buttons that make CNNs work. I did not try it here in part because it is time intensive (it works like I have here, making one change at a time, but trying out a greater range of learning and architectural parameters), but mostly because I wanted to see for myself how varying the details of the network architecture can change its performance. I found that it didn't change much, but there is some hope that adding layers and filters does make a difference, even though for small data sets, it is generally recommended that less equals more. 
+1. **Use Keras_tuner:** Keras Tuner is available for optimizing the many levers and buttons that make CNNs work. I did not try it here in part because it is time intensive (it works like I have here, making one change at a time, but allows for a greater range of learning and architectural parameters), but mostly because I wanted to see for myself how varying the details of the network architecture can change its performance. I found that it didn't change much, but there is some hope that adding layers and filters does make a difference, even though for small data sets, it is generally recommended that "less equals more." 
    
-2. Get Scientific about the Data: CNN in Data Science is usually treated as an exercise in optimizing algorithms for the data that is already at hand, and that is how I have approached it here (albiet after taking my own images). But one aspect that has not been optimized in this project so far is the images themselves! Earlier I said that I was systematic about the images, but I'll amend that here to say I was quasi-systematic. aI balanced the classes; I aimed to balance the backgrounds within the classes; I aimed to balance closeup, cropped images with distant ones, etc. But I started by taking images of toys strewn - as if haphazardly - across the floor in an effort to mimic real world scenarios. If a Toy Robot can't see toys as they exist in my house, I thought, what chance does it have to put them in the right bins? But it occured to me that while this impulse is correct for test set data, training and validation data should be easier to differentiate. In fact, they should be taken for the purpose of teaching the model to recognize the specific features that would allow it to differentiate one class from another in the wild. Identifying features should be emphasized in training images, not burried. Care should also be taken to minimize bias, however. Some image datasets include real-world photographs alongside drawings, while others appear to have been carefully curated in laboratory like settings to minimize the effect of lighting or background bias. More data is better for generalization, although it takes more time to train. The 500 training images I used here make a decidedly "small" dataset. Before I add more images to my Toy Robot dataset for further development, I will carefully study best practices for creating image data sets. 
+2. **Get Scientific about the Data:** CNN in Data Science is usually treated as an exercise in optimizing algorithms for the data that is already at hand, and that is how I have approached it here. But one aspect that has not been optimized in this project so far is the images themselves! Earlier I said that I was systematic about the images, but I'll amend that here to say I was quasi-systematic. I balanced the classes; I aimed to balance the backgrounds within the classes; I aimed to balance closeup, cropped images with distant ones, etc. But I started by taking images of toys strewn - as if haphazardly - across the floor in an effort to mimic real world scenarios. If a Toy Robot can't see toys as they exist in my house, I thought, what chance does it have to put them in the right bins? But it occured to me that while this impulse is correct for test set data, training and validation data should be easier to differentiate. In fact, they should be taken for the purpose of teaching the model to recognize the specific features that would allow it to differentiate one class from another in the wild. key identifying features should be emphasized in training images, not burried. Care should also be taken to minimize bias, however. Some image datasets include real-world photographs alongside drawings, while others appear to have been carefully curated in laboratory like settings to minimize the effect of lighting or background bias. More data is better for generalization, although it takes more time to train. The 500 training images I used here make a decidedly "small" dataset. Before I add more images to my Toy Robot dataset for further development, I will carefully study best practices for creating image data sets. 
 
 
