@@ -22,10 +22,10 @@ This project uses a Convolutional Neural Network to train a computer model to re
 - [06. Image Augmentation](#cnn-augmentation)
 - [07. Learning Rate Reduction](#cnn-learning-rate)
 - [08. Network Architecture](#network-architecture)
-      - [Architecture Experiment 1])#architecture-experiment1)
-      - [Architecture Experiment 2])#architecture-experiment2)
-      - [Architecture Experiment 3])#architecture-experiment3)
-      - [Architecture Experiment 4])#architecture-experiment4)
+    - [Architecture Experiment 1](#architecture-experiment1)
+    - [Architecture Experiment 2](#architecture-experiment2)
+    - [Architecture Experiment 3](#architecture-experiment3)
+    - [Architecture Experiment 4](#architecture-experiment4)
 - [09. Transfer Learning](#cnn-transfer-learning)
 - [10. Overall Results Discussion](#cnn-results)
 - [11. Next Steps & Growth](#growth-next-steps)
@@ -1012,7 +1012,7 @@ Other architecture parameters can be changed or added, including:
 
 <br>
 
-### Architecture Experiment 1
+### Architecture Experiment 1 <a name="architecture-experiment1"></a>
 
 For the first experiment, I modify the previous learning parameters, and add one identical convolutional layer. 
 In the code below, I only include what is changed so as to avoid long blocks of redundant information: 
@@ -1115,7 +1115,7 @@ Training and Validation Accuracy seem to be converging nicely here, which is goo
 
 <br>
 
-### Architecture Experiment 2
+### Architecture Experiment 2 <a name="architecture-experiment2"></a>
 
 Increasing number of filters in the 3rd Convolutional Layer from 32 to 64: 
 
@@ -1176,7 +1176,7 @@ Next I'll try increasing the kernel size.
 
 <br>
 
-### Architecture Experiment 3
+### Architecture Experiment 3 <a name="architecture-experiment3"></a>
 
 Increasing kernel size in third layer:
 
@@ -1234,7 +1234,7 @@ _________________________________________________________________
 Increasing the kernel size in the third layer did not help my model, although the seems to be learning at steadier rate, as shown by the converging validation and loss metrics. 
 In the next iteration, I'll change the kernel size back to 3x3, and experiment with layers and filters again. 
 
-### Architecture Experiment 4
+### Architecture Experiment 4 <a name="architecture-experiment4"></a>
 
 So far adding a layer and increasing filters has not done much to improve the model's performance. 
 I'll experiment one more time, decreasing filters in the first layer, and increasing filters in the second layer. 
