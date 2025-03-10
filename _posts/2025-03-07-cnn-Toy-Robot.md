@@ -115,23 +115,18 @@ Although my kid has dozens of types of toys, I began with a modest set of five c
 
 <br>
 
-![alt text](/img/posts/toy_collage.png "Toy Robot Image Samples")
+![alt text](/img/posts/collage3.png "Toy Robot Image Samples")
 
 <br>
 
-Problems: 
+**Problems**: At first glance, these toys appear distinct enough, but when considering how an algorithm might think about them, some challenges arise. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels like the car toy set. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
 
-At first glance, these toys appear distinct enough, but when considering how an algorithm might think about them, some challenges arise. Duplos are mostly made of building blocks, but there are plenty of figurines, animals, and other structures that belong in the same toy bin. Duplos have distinct circular connectors, but they are also square-shaped, like bananagrams and magnatiles, and they are made of solid colors, like magnatiles and Brio cars. Brios, likewise, come with both natural-colored wooden train tracks and multi-colored train cars, which have wheels like the car toy set. Cars and Bananagrams are relatively small, which makes capturing images of the same proportions as the other toys quite difficult. While Teddy does have hundreds of Duplos and Brios to photograph, there are limited numbers of cars and magnatiles, which means my training, validation, and test sets will have multiple (however different) images of the same objects. 
-
-Solutions: 
-
-To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of some types of toys, I separated the actual toys for the training, validation, and test set images.
+**Solutions**: To simplify, I removed the Duplo figurines and the Brio train cars from the sample population. After some trial and error, I also diversified and stratified the backgrounds for images in each toy class. Finally, I cropped most images so that the toy occupies the majority of the frame. Because of the limited number of some types of toys, I separated the actual toys for the training, validation, and test set images.
 
 I ended up with 145 images of each toy, separated as follows: 
 * 100 training set images (500 total)
 * 30 validation set images (150 total)
 * 15 test set images (75 total)
-
 
 For ease of use in Keras, my data folder structure first splits into training, validation, and test directories, and within each of those is split again into directories based upon the five toy classes.
 
