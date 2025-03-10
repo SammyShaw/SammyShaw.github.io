@@ -551,7 +551,6 @@ Insightful! I honestly thought the Magnatiles would be the most recognizable, bu
 
 But that is just me guessing! To see what features the model actually is picking up on, I use a grad-CAM analysis. 
 
-___
 <br>
 
 #### Grad-CAM Analysis
@@ -741,6 +740,7 @@ However, while the top image was correctly identified as a Magnatile, the bottom
 
 In subsequent iterations, I'll tackle the many issues identified above with various methods that should improve the model's overall performance. 
 
+___
 <br>
 
 ## Model Iterations
