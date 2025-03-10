@@ -103,7 +103,6 @@ I hold out that there is considerable room for improvement in my own self-built 
 My current working hypothesis is that: with such limited data (100 images in each of my 5 training sets), the model is extremely sensitive to bias. I'll explore this bias in the write up below. For now, suffice it to say that the other image datasets that I've seen appear to be produced in laboratory like conditions, with carefully controlled lighting and background. Although I was systematic in collecting the data for this project, my house (and my iphone camera) are far from laboratory conditions. 
 
 ___
-
 # Data Overview  <a name="data-overview"></a>
 
 Although my kid has dozens of types of toys, I began with a modest set of five classes of toys: 
@@ -133,9 +132,6 @@ For ease of use in Keras, my data folder structure first splits into training, v
 Images in the folders are varying sizes, but will be fed into the data pipeline as 128 x 128 pixel images. 
 
 ___
-
-<br>
-
 # Data Pipeline  <a name="data-pipeline"></a>
 
 Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for our images to flow from my local hard-drive through the network.
@@ -193,10 +189,9 @@ print(validation_set.class_indices)
 Images are resized down to 128 x 128 pixels (of three RGB channels), and they will be input 32 at a time (batch size) for training. I have five toy classes (the labels will conveniently come from the folder names inside the training and validation sets). 
 
 Raw pixel values (ranging between 0 and 255) are normalized to help gradient descent find an optimal solution more efficiently.
-___
-<br>
 
-## Convolutional Neural Network Overview <a name="cnn-overview"></a>
+___
+# Convolutional Neural Network Overview <a name="cnn-overview"></a>
 
 Convolutional Neural Networks (CNN) are an adaptation of Artificial Neural Networks and are primarily used for image data tasks.
 
