@@ -208,10 +208,10 @@ As a Convolutional Neural Network trains, it iteratively calculates how well it 
 There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (Activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. Many of these will be discussed below. I liken it to machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy. 
 
 ___
-## Baseline Network <a name="cnn-baseline"></a>
+# Baseline Network <a name="cnn-baseline"></a>
 
 
-### Network Architecture
+### Baseline Network Architecture
 
 The baseline network architecture is simple, and gives us a starting point to refine from. This network contains:
 * **2 Convolutional Layers**, each with **32 filters** 
