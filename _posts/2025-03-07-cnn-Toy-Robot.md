@@ -457,7 +457,6 @@ predictions_df['correct'] = np.where(predictions_df['actual_label'] == predictio
 
 Thus we have a convenient, and very useful dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
 
-<br>
 
 | **actual_label** | **predicted_label** | **predicted_probability** | **filename** | **correct** |
 |---|---|---|---|---|
@@ -467,12 +466,11 @@ Thus we have a convenient, and very useful dataframe storing our prediction data
 | duplos | bananagrams | 0.6900331 | IMG_8532.jpg | 0 |
 | magnatiles | magnatiles | 0.994294 | IMG_8635.jpg | 1 |
 
-<br>
 
-This data can be used to calculate the test set classification accuracy (below). 
-We can also use the data to figure out where and why the model struggled or failed, by: 
-* creating a confusion matrix (below).
-* using a Grad-CAM analysis (below). 
+This data can be used analyze the model's performance on specific images in a few different ways: 
+* Calculate the test set classification accuracy (below).
+* Creating a confusion matrix (below).
+* Using a Grad-CAM analysis (below). 
 
 <br>
 
@@ -487,7 +485,6 @@ test_set_accuracy = predictions_df['correct'].sum() / len(predictions_df)
 print(test_set_accuracy)
 
 ```
-<br>
 
 The baseline network gets **74.7% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
 
@@ -495,11 +492,7 @@ The baseline network gets **74.7% classification accuracy** on the test set.  Th
 
 ### Test Set Confusion Matrix
 
-Overall Classification Accuracy is useful, but it can obscure where and why the model struggled.
-
-Maybe the network is predicting extremely well on Bananagrams, but it thinks that Magnatiles are Brios? 
-
-A Confusion Matrix can show us these patterns, which I create using the predictions dataframe below.
+Overall Classification Accuracy is useful, but it can obscure where and why the model struggled. Maybe the network is predicting extremely well on Bananagrams, but it thinks that Magnatiles are Brios? A Confusion Matrix can show us these patterns, which I create using the predictions dataframe below.
 
 ```python
 
@@ -520,7 +513,6 @@ magnatiles                 1      1     2       1           8
 
 ```
 
-<br>
 
 So, while overall our test set accuracy was ~75%, for each individual class we see:
 
@@ -534,13 +526,10 @@ Insightful! I honestly thought the Magnatiles would be the most recognizable, bu
 
 But that is just me guessing! To see what features the model actually is picking up on, I use a grad-CAM analysis. 
 
-<br>
 
 ### Grad-CAM Analysis
 
-Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image!
-
-A heatmap is used to color-code the regions of the image that the model found most useful for classifying it as one thing or another. 
+Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image! A heatmap is used to color-code the regions of the image that the model found most useful for classifying it as one thing or another. 
 
 In the code below, I: 
 
@@ -687,17 +676,16 @@ def run_grad_cam_on_test_set():
 run_grad_cam_on_test_set()
 
 ```
-<br>
 
 Grad-CAM images offer two important insights, which I'll call *Bias insight* and *Depth insight*, 
-
-Below I show a raw test set image alongside its corresponding grad-CAM image.
 
 ### Bias Insight
 First, we can see whether or not the model is picking up on the features that would distinguish one class of object from another. In the first image below the model seems to have honed in on the duplo object very well, with the most important feature being the top texture with the circular connectors. In the second image, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
 <br>
 
 ![alt text](/img/posts/gradCAM_duplo.png "Grad-CAM Good Feature Detection")
+
+<br>
 
 ![alt text](/img/posts/gradCAM_bananagram.png "Grad-CAM Bad Feature Detection")
 
