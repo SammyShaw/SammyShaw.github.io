@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Toy Robot: Toy Classification Using CNN
+title: "Toy Robot: Toy Classification Using CNN"
 image: "/posts/ToyRobot_CoverImage.png"
 tags: [Deep Learning, CNN, Data Science, Computer Vision, Transfer Learning, Python]
 ---
