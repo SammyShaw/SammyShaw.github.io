@@ -208,13 +208,10 @@ As a Convolutional Neural Network trains, it iteratively calculates how well it 
 There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (Activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's performance. Many of these will be discussed below. I liken it to machine with a control panel that contains a series of buttons and dials; all of which can be adjusted to optimize the big red dial at the end: predictive accuracy. 
 
 ___
-<br>
-
 ## Baseline Network <a name="cnn-baseline"></a>
 
-<br>
 
-#### Network Architecture
+### Network Architecture
 
 The baseline network architecture is simple, and gives us a starting point to refine from. This network contains:
 * **2 Convolutional Layers**, each with **32 filters** 
@@ -291,10 +288,9 @@ Non-trainable params: 0
 _________________________________________________________________
 
 ```
-
 <br>
 
-#### Training The Network
+### Training The Network
 
 With the data pipeline and network architecture in place, we're ready to train the model. 
 
@@ -331,7 +327,7 @@ The ModelCheckpoint callback means that the *best* model is saved, in terms of v
 
 <br>
 
-#### Analysis Of Training Results
+### Analysis Of Training Results
 
 In addition to saving the *best* model (to model_filename), we can use the *history* object that we created to analyze the performance of the network epoch by epoch. In the following code, I'll plot the training and validation loss, and its classification accuracy. 
 
@@ -372,7 +368,7 @@ In the following sections, I'll add features to the model that address the overf
 
 <br>
 
-#### Performance On The Test Set
+### Performance On The Test Set
 
 The model trains only on the training data, but the validation data does inform this training, because the model saves its progress (its weights and bias values) every time the validation set accuracy improves. To get a truly 'real world' taste of how the model peforms, we can use it to predict on images that it has not seen at all during training - the test set.
 
@@ -480,7 +476,7 @@ We can also use the data to figure out where and why the model struggled or fail
 
 <br>
 
-#### Test Set Classification Accuracy
+### Test Set Classification Accuracy
 
 To calculate test set classification accuracy:
 
@@ -497,7 +493,7 @@ The baseline network gets **74.7% classification accuracy** on the test set.  Th
 
 <br>
 
-#### Test Set Confusion Matrix
+### Test Set Confusion Matrix
 
 Overall Classification Accuracy is useful, but it can obscure where and why the model struggled.
 
@@ -540,7 +536,7 @@ But that is just me guessing! To see what features the model actually is picking
 
 <br>
 
-#### Grad-CAM Analysis
+### Grad-CAM Analysis
 
 Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image!
 
@@ -697,7 +693,7 @@ Grad-CAM images offer two important insights, which I'll call *Bias insight* and
 
 Below I show a raw test set image alongside its corresponding grad-CAM image.
 
-#### Bias Insight
+### Bias Insight
 First, we can see whether or not the model is picking up on the features that would distinguish one class of object from another. In the first image below the model seems to have honed in on the duplo object very well, with the most important feature being the top texture with the circular connectors. In the second image, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
 <br>
 
