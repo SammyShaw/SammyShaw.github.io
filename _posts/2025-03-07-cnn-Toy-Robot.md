@@ -700,32 +700,22 @@ Rather than reproduce all of the text and discussion above for each of the subse
 
 <br>
 
-## Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
+# Overcoming Overfitting With Dropout <a name="cnn-dropout"></a>
 
-<br>
+### Dropout Overview
+Dropout is a technique used in Deep Learning primarily to reduce the effects of over-fitting. As we have seen, *over-fitting* happens when the network learns the patterns of the training data so specifically that it essentially memorizes those images as the class of object itself. Then when it sees the same class of object in a different image (in the validation or test set), it cannot recognize it. 
 
-#### Dropout Overview
-
-Dropout is a technique used in Deep Learning primarily to reduce the effects of over-fitting. 
-
-As we have seen, *over-fitting* happens when the network learns the patterns of the training data so specifically that it essentially memorizes those images as the class of object itself. Then when it sees the same class of object in a different image (in the validation or test set), it cannot recognize it. 
-
-*Dropout* is a technique in which, for each batch of observations that is sent forwards through the network, a pre-specified portion of the neurons in a hidden layer are randomly deactivated. This can be applied to any number of the hidden layers. 
-
-When neurons are deactivated - they take no part in the passing of information through the network.
+*Dropout* is a technique in which, for each batch of observations that is sent forwards through the network, a pre-specified portion of the neurons in a hidden layer are randomly deactivated. This can be applied to any number of the hidden layers. When neurons are deactivated - they take no part in the passing of information through the network.
 
 The math is the same, the network will process everything as it always would (taking the sum of the inputs multiplied by the weights, and adding a bias term, applying activation functions, and updating the network’s parameters using Back Propagation) - but now some of the neurons are simply turned off. If some neurons are turned off, then the other neurons have to jump in and pick up the slack (so to speak). If those other neurons were previously dedicated to certain very specific features of training images, they will now be forced to generalize a bit more. If over-trained neurons that were turned off in one epoch jump back in in the next, they now contend with a model that has found more generalizable patterns and will have to tune accordingly. 
 
 Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent - the network learns more robust features, and are less susceptible to noise.
 
-<br>
-
-#### Implementing Dropout
+### Implementing Dropout
 
 Adding dropout using Keras is as simple as installing the function and adding a line of code. I saved a new code sheet with the three following changes:
 
 ```python
-
 # import
 from tensorflow.keras.layers import Dropout
 
@@ -740,20 +730,13 @@ model.add(Activation('softmax'))
 model_filename = 'models/toy_robot_dropout_v01.h5'
 
 ```
-<br>
 
-#### Results with Dropout
-
+### Results with Dropout
 Other than the above, the following output results from the same exact code as our baseline model. Adding dropout was the only change. 
-
-<br>
 
 ![alt text](/img/posts/Dropout_Train_Val_Metrics.png "Toy Robot Dropout Accuracy Plot")
 
-<br>
-
-The best classification accuracy on the *validation set* was **76%**, not significantly higher than the **75.3%** we saw for the baseline network. 
-Validation set accuracy plateaus early again, at about the 10th epoch. 
+The best classification accuracy on the *validation set* was **76%**, not significantly higher than the **75.3%** we saw for the baseline network. Validation set accuracy plateaus early again, at about the 10th epoch. 
 
 Accuracy on the *test set* was **80%**, which is a nice bump from the **74.7%** test set accuracy from the baseline model. 
 
@@ -764,23 +747,18 @@ On the other hand, we still see a divergence with respect to training vs. valida
 Next, I turn to another method for reducing overfitting, Image Augmentation. 
 
 ___
-<br>
+# Image Augmentation <a name="cnn-augmentation"></a>
 
-## Image Augmentation <a name="cnn-augmentation"></a>
-
-#### Image Augmentation Overview
+### Image Augmentation Overview
 Image Augmentation means altering the training set images in random ways, so that the network will see each image, or feature within it, in a slightly different way each time it is passed through. Because the images are augmented slightly at each pass, the network can no longer memorize them. The aim is to increase the model's ability to generalize. 
 
 Image augmentation in CNN works like an image editor application: we can zoom, rotate, shear, crop, alter the brightness, etc. But instead of doing this manually and adding nuanced versions of each image to our dataset, we simply set the parameters and let Keras randomly alter the images before they're passed through the training set. 
 
-<br>
-
-#### Implementing Image Augmentation
+### Implementing Image Augmentation
 
 When setting up and training the baseline and dropout models - we used the ImageGenerator function to rescale the pixel values. Now we will use it to add in the Image Augmentation parameters as well. In the code below, we add these transformations in and specify the magnitudes that we want each applied:
 
 ```python
-
 # image generators
 training_generator = ImageDataGenerator(rescale = 1./255,
                                         rotation_range = 20,
@@ -798,29 +776,18 @@ validation_generator = ImageDataGenerator(rescale = 1./255)
 model_filename = 'models/toy_robot_augmented_v01.h5'
 
 ```
-<br>
 
-A **rotation_range** of 20 refers to the *maximum* degrees of rotation we want. Every time an image is passed, the ImageDataGenerator will randomly rotate it between 0-20 degrees.
+* **Rotation_range** of 20 refers to the *maximum* degrees of rotation we want. Every time an image is passed, the ImageDataGenerator will randomly rotate it between 0-20 degrees.
+* **Width_shift_range** and **height_shift_range** of 0.2 refer to the maximum width and height that we are happy to shift. The ImageDataGenerator will randomly shift our image *up to* 20% both vertically and horizonally.
+* **Zoom_range** of 0.1 means a maximum of 10% inward or outward zoom.
+* **Horizontal_flip** = True means that each time an image flows in, there is a 50/50 chance of it being flipped.
+* **Brightness_range** between 0.5 and 1.5 means our images can become brighter or darker.
+* **Fill_mode** set to "nearest" means that when images are shifted and/or rotated, we'll just use the *nearest pixel* to fill in any new pixels that are required - and it means our images still resemble the scene. 
 
-**Width_shift_range** and **height_shift_range** of 0.2 refer to the maximum width and height that we are happy to shift. The ImageDataGenerator will randomly shift our image *up to* 20% both vertically and horizonally.
-
-A **zoom_range** of 0.1 means a maximum of 10% inward or outward zoom.
-
-**Horizontal_flip** = True means that each time an image flows in, there is a 50/50 chance of it being flipped.
-
-**Brightness_range** between 0.5 and 1.5 means our images can become brighter or darker.
-
-Finally, **fill_mode** set to "nearest" means that when images are shifted and/or rotated, we'll just use the *nearest pixel* to fill in any new pixels that are required - and it means our images still resemble the scene. 
-
-<br>
-
-#### Results with Augmentation
-
+### Results with Augmentation
 As before, I trained the same baseline network architecture, this time only changing the images flowing in. 
 
 I dropped Dropout from the model, so the Augmented Image model can be compared to both the baseline model and the dropout model. 
-
-<br>
 
 ![alt text](/img/posts/Augmented_Train_Val_Metrics.png "Toy Robot Augmentation Accuracy Plot")
 
@@ -838,23 +805,17 @@ Using Image Augmentation *and* applying Dropout together might be a powerful com
 Before turning to the model architecture, however, I'll try to increase the model's performance by adjusting the learning rate when the performance metrics plateau.  
 
 ___
-<br>
 
-## Learning Rate Reduction <a name="cnn-learning rate"></a>
+# Learning Rate Reduction <a name="cnn-learning rate"></a>
 
-<br>
-
-#### Learning Rate Overview
-
+### Learning Rate Overview
 The learning rate in a Convolutional Neural Network refers to how big a step the model takes during **gradient descent** in its effort to minimize error. For each weight, the model applies gradient descent to find the best value that minimizes the overall loss across all layers. The **minima** is the point at which a weight's value acheives minimum loss for the model as a whole. Because image data present complex (not linear) patterns, each weight might positively contribute to the model at different values, but we want it to find the best overall weight value for the entire model, or the **global minima,** among contending minima. Along the way, the model might encounters **local minima**, which are suboptimal, or *misleading* low points that can trap the model's learning process. 
 
 If the gradient descent algorithm moves too quickly, the model risks overshooting the global minima. On the other hand, if it moves too slowly, it risks getting stuck in local minima and never getting out. 
 
 Keras' LearningRateReducer allows us to reduce learning (the rate of gradient descent) in the training process if and when the learning starts to plateau. That is, we can tell the model to slow down if, epoch-to-epoch, it is not making any improvements in terms of accuracy or loss. 
 
-<br>
-
-#### Implementing Learning Rate Reducer
+### Implementing Learning Rate Reducer
 
 Keras' ReduceLROnPlateau function allows this as a model callback. 
 The code belongs with our other "training parameters", and is passed in our model.fit() "history" object. 
@@ -864,7 +825,6 @@ In the code below, I:
 * If (patience) Validation Accuracy does not increase in 4 epochs. 
 
 ```python
-
 # install packages
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 
@@ -887,11 +847,8 @@ history = model.fit(x = training_set,
 
 ```
 
-#### Results with Learning Rate Reduction
-
+### Results with Learning Rate Reduction
 As before, I trained the same baseline network architecture, this time with both Image Augmentation and Dropout (0.5)
-
-<br>
 
 ![alt text](/img/posts/LRreducer_Train_Val_Metrics.png "Toy Robot Learning Rate Reducer Plot")
 
@@ -908,8 +865,7 @@ Instead of overfitting, the model is now *underfitting,* as evidenced by the hig
 In future iterations, I will scale down the Dropout and Image Augmentation to try to get a better convergence of Test and Training Accuracy. Because the Learning Rate Reduction helped only after its first reduction, I will also lengthen the patience parameter in future models.  
 
 ___
-
-## Network Architecture  <a name="network-architecture"></a>
+# Network Architecture  <a name="network-architecture"></a>
 
 So far, I've used the same network *archiecture* for each of the Baseline, Dropout, Image Augmentation, and Learning Rate models: 
 * 2 convolutional layers
@@ -920,25 +876,25 @@ One to figure out if there are *better* architectures is to use Keras_tuner, a K
 
 First I'll discuss the parameters, and then I'll post the results, wholesale. 
 
-##### Convolutional Layers
+#### Convolutional Layers
 
 Convolutional Layers in CNNs detect patterns by *filtering* the image, or aggregating within small chunks (or, *kernels*) of the image. The filtering produces a *feature map,* which is then passed on to the next convolutional layer. Adding convolutional layers, or layer blocks, can help the network detect more complex patterns, but it can also risk overfitting if the model learns the training images too closely. 
 
 Below I'll experiment with adding a third and a fourth convolutional layer. For small data-sets like mine, however, it is usually recommended that fewer layers are better to prevent overfitting. 
 
-##### Filters
+#### Filters
 
 There may be any number of filters in a convolutional layer - though we usually assign them in square multiples of the image dimension. Each filter picks up a distinct pattern, and learns, in training, what patterns are relevant or not. Adding filters to a convolutional layer can help a network find more detailed patterns, but it can also lead to overfitting. Further, more filters means more weights to adjust in training, which means it takes more time for a network to learn. 
 
 Below I'll experiment with increases and decreases of filters in select layers. Again, for small data-sets, less filters is generally recommended. 
 
-##### Kernel Size
+#### Kernel Size
 
 The kernel size is the dimension of image space that a filter is combing over and abstracting from. A larger kernel size might capture larger, contextual patterns, but it may also capture noise. Smaller kernels capture finer details, but may miss, larger contextual information. 
 
 Below I'll experiment with increasing the Kernel size in one of the layers, but it should be noted that a 3x3 pixel kernel size is standard practice, as it balances both detail and efficiency. 
 
-##### Pooling
+#### Pooling
 
 Pooling layers are usually part of a convolutional layer block. Pooling shrinks the dimensions of the (filtered) image for subsequent convolutional layers, which allow the network to then filter more abstract features. Pooling helps to reduce overfitting, but too much pooling can lead to losing information (network weights) that relate to important features. 
 
@@ -949,15 +905,12 @@ Other architecture parameters can be changed or added, including:
 * Activation Function: Applied to each layer - tells each neuron whether or not to send information (weight) to the next layer. I use the Relu (or Rectified Linear Unit) activation function here, which I've seen to be most common. It works by passing information neuron to neuron only if the weights reach a threshold positive value. 
 * Batch Normalization: Scales weight values 0-1 (usually before being activated) for every batch, usually once per convolutional layer. Although it is a standard practice to include Batch Normalization to stabilize training, I've found that the time costs are not worth the results. 
 
-<br>
 
-### Architecture Experiment 1 <a name="architecture-experiment1"></a>
-
+## Architecture Experiment 1 <a name="architecture-experiment1"></a>
 For the first experiment, I modify the previous learning parameters, and add one identical convolutional layer. 
 In the code below, I only include what is changed so as to avoid long blocks of redundant information: 
 
 ```python
-
 # Decrease Image Augmentation
 training_generator = ImageDataGenerator(
     rescale=1./255,
@@ -1037,22 +990,15 @@ Trainable params: 281,733
 Non-trainable params: 0
 ```
 
-<br>
 
-#### AE 1 Results
-
-*Validation Accuracy: **74.7%**
-*Test Accuracy: **77.3%**
-
-<br>
+### AE 1 Results:
+* Validation Accuracy: **74.7%**
+* Test Accuracy: **77.3%**
 
 ![alt text](/img/posts/LF1_Train_Val_Metrics.png "Toy Robot AE1 Accuracy Plot")
 
 <br>
-
 Training and Validation Accuracy seem to be converging nicely here, which is good news for our training parameters. However, the training loss is now slightly outpacing the validation loss. I'll experiment with a filter number change before adjusting training parameters again.
-
-<br>
 
 ### Architecture Experiment 2 <a name="architecture-experiment2"></a>
 
@@ -1096,14 +1042,9 @@ Trainable params: 553,125
 Non-trainable params: 0
 ```
 
-<br>
-    
-#### AE 2 Results
-
-*Validation Accuracy: **76.7%**
-*Test Accuracy: **73.3%**
-
-<br>
+### AE 2 Results:
+* Validation Accuracy: **76.7%**
+* Test Accuracy: **73.3%**
 
 ![alt text](/img/posts/LF2_Train_Val_Metrics.png "Toy Robot AE2 Accuracy Plot")
 
@@ -1112,8 +1053,6 @@ Non-trainable params: 0
 Doubling the number of filters in the 3rd convolutional layer does not seem to have benefited the model's performance. We can see from the graphs that the model reached its highest validation accuracy somewhat early, and it did not improve after the 15th epoch. 
 
 Next I'll try increasing the kernel size. 
-
-<br>
 
 ### Architecture Experiment 3 <a name="architecture-experiment3"></a>
 
@@ -1159,12 +1098,9 @@ Non-trainable params: 0
 _________________________________________________________________
 ```
 
-#### AE 3 Results
-
-*Validation Accuracy: **75.3%**
-*Test Accuracy: **76%**
-
-<br>
+### AE 3 Results:
+* Validation Accuracy: **75.3%**
+* Test Accuracy: **76%**
 
 ![alt text](/img/posts/LF3_Train_Val_Metrics.png "Toy Robot AE 3 Accuracy Plot")
 
@@ -1223,14 +1159,9 @@ Trainable params: 191,781
 Non-trainable params: 0
 ```
 
-<br>
-
-#### AE 4 Results
-
-*Validation Accuracy: **80%**
-*Test Accuracy: **80%**
-
-<br>
+### AE 4 Results:
+* Validation Accuracy: **80%**
+* Test Accuracy: **80%**
 
 ![alt text](/img/posts/LF4_Train_Val_Metrics.png "Toy Robot AE4 Accuracy Plot")
 
@@ -1249,7 +1180,6 @@ duplos                     0      0     0      11           2
 magnatiles                 1      0     0       3          11
 
 ```
-<br>
 
 The confustion matrix shows that the current model is now fairly consistent within categories, whereas the baseline model really struggled with Magnatiles. It is perfect in its predictions of Cars on the test set, and much better and predicting Magnatiles, although slightly worse at predicting Brios. 
 
@@ -1257,14 +1187,10 @@ While these results are encouraging, I'll end my experiments here for now. In fu
 
 I'm eager to see what other CNN models - which have been trained on much larger datasets, and can predict many more classes of images - can do with my Toy Robot task. 
 ___
-<br>
 
-## Transfer Learning With MobiltnetV2 <a name="cnn-transfer-learning"></a>
+# Transfer Learning With MobiltnetV2 <a name="cnn-transfer-learning"></a>
 
-<br>
-
-#### Transfer Learning Overview
-
+### Transfer Learning Overview
 Transfer Learning means using a pre-built, pre-trained neural network, and applying it to another specific Deep Learning task. It consists of taking features learned on one problem to solve a new, similar problem!
 
 For image based tasks this means using all the *pre-learned* convolutional filter values and feature maps from a large network, and instead of using it to predict what the network was originally designed for, piggybacking it, and training it again for another task
@@ -1273,8 +1199,7 @@ One such pre-trained, large network, is **MobileNetV2.** MobileNetV2 was develop
 
 Other pretrained networks are available in Keras' Applications library. At this point, it is not my purpose to compare them all, so much as it is to compare what a larger, pre-built network like MobilenetV2 can do for my limited dataset.
 
-#### Implementing MobileNetV2
-
+### Implementing MobileNetV2
 Again, the Keras functionality makes transfer learning easy in Python, but there are some caveats in the way we set up our model to infer from pretrained features. I've learned to use Global Average Pooling in the place of the Flatten layer, and add Batch Normalization to stabilze training. The affect of these tweaks may be left to experiment, but I'll be sure to include them here. Otherwise, training this model is as simple as: 
 
 All we need to do is: 
@@ -1284,10 +1209,8 @@ All we need to do is:
 * Add our Dense and Output layers as we would otherwise
 * Compile the Model as we would otherwise
 
-<br>
 
 ```python
-
 # Import
 from tensorflow.keras.applications import MobileNetV2
 
@@ -1316,7 +1239,6 @@ model.summary()
 ```
 
 ```
-<br>
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
@@ -1338,14 +1260,9 @@ Non-trainable params: 2,260,544
 _________________________________________________________________
 ```
 
-<br>
-
-#### MobileNetV2 Results
-
+### MobileNetV2 Results:
 Validation Set Accuracy: **100%**
 Test Set Accuracy: **100%**
-
-<br>
 
 ![alt text](/img/posts/MobileNetV2_Train_Val_Metrics.png "MobileNetV2 Accuracy Plot")
 
@@ -1354,9 +1271,7 @@ Test Set Accuracy: **100%**
 I only ran the MobileNet model for 20 epochs. It acheived is Validation accuracy of 100% by the 7th epoch. It is hard to argue with 100 percent accuracy. 
 
 ___
-<br>
-
-## Overall Results Discussion <a name="cnn-results"></a>
+# Overall Results Discussion <a name="cnn-results"></a>
 
 After only modest improvements in my self-built model, there were stark improvements when implementing transfer learning with MobileNetV2. 
 
@@ -1374,9 +1289,7 @@ Tranfer Learning with MobileNetV2 was a big success. It was able to learn the fe
 On the other hand, I was frustrated that the gains I made in training my own model did not lead to a more robust model. 
 
 ___
-<br>
-
-## Growth & Next Steps <a name="growth-next-steps"></a>
+# Growth & Next Steps <a name="growth-next-steps"></a>
 
 The proof of concept was successful. I have shown that I can get very accurate predictions for what bins my kids' toys belong in, albeit on a small number of classes, but also with a very limited data set. Should this Toy Robot procede to the next phase of development, I'll know that I can employ MobileNetV2 to get accurate predictions. 
 
