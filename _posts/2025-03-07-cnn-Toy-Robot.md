@@ -133,7 +133,6 @@ Images in the folders are varying sizes, but will be fed into the data pipeline 
 
 ___
 # Data Pipeline  <a name="data-pipeline"></a>
-
 Before building the network architecture and then training and testing it - I use Keras' Image Data Generator to set up a pipeline for our images to flow from my local hard-drive through the network.
 
 In the code below, I will:
@@ -142,8 +141,6 @@ In the code below, I will:
 * Set up the parameters for the data pipeline
 * Set up the image generators to process the images as they come in
 * Set up the generator flow - specifying what we want to pass in for each iteration of training
-
-<br>
 
 ```python
 
@@ -184,7 +181,6 @@ print(validation_set.class_indices)
 {'bananagrams': 0, 'brios': 1, 'cars': 2, 'duplos': 3, 'magnatiles': 4}
 
 ```
-<br>
 
 Images are resized down to 128 x 128 pixels (of three RGB channels), and they will be input 32 at a time (batch size) for training. I have five toy classes (the labels will conveniently come from the folder names inside the training and validation sets). 
 
@@ -288,7 +284,7 @@ Non-trainable params: 0
 _________________________________________________________________
 
 ```
-<br>
+
 
 ### Training The Network
 
@@ -325,7 +321,6 @@ history = model.fit(x = training_set,
 <br>
 The ModelCheckpoint callback means that the *best* model is saved, in terms of validation set performance - from *any point* during training. That is, although I'm telling the network to train for 50 epochs, or 50 rounds of data, there is no guarantee that it will continue to find better weights and biases throughout those 50 rounds. Usually, in fact, it will find the best fit before it reaches the 50th epoch, even though it will continue to adjust parameters until I tell it to stop. So the ModelCheckpoint function ensures that we don't lose progress. 
 
-<br>
 
 ### Analysis Of Training Results
 
@@ -351,13 +346,11 @@ plt.show()
 max(history.history['val_accuracy'])
 
 ```
-
 <br>
 
 ![alt text](/img/posts/Baseline_Train_Val_Metrics.png "Toy Robot Baseline Accuracy Plot")
 
 <br>
-
 These results are not great. In terms of validation accuracy (bottom orange line), the plot shows that the model learns quickly, but then plateaus by the 5th epoch. It also quickly learns to predict the training data. Reaching 100% accuracy by the 12th epoch. But 100% on the training data is not a good thing, if the validation accuracy does not keep pace. 
 
 The more important pattern revealed by these graphs is the significant gap between performance on the training and validation sets. This gap means that the model is **over-fitting.**
@@ -365,7 +358,6 @@ The more important pattern revealed by these graphs is the significant gap betwe
 That is, the network is learning the features of the training data *so well* that it cannot see very far beyond it. In other words, it is memorizing the training data, and failing to find the generalizable patterns that would allow it to recognize similar objects in the validation set. This is not good, because it means that in the real world, my Toy Robot will get confused if it sees a lego that doesn't perfectly match the images that it was trained on. I want the model to be able to *generalize* about what makes a lego a lego, so that it can recognize a previously unseen lego from a bananagram. 
 
 In the following sections, I'll add features to the model that address the overfitting problem, attempting to close the gap between the training and validation accuracy scores. 
-
 <br>
 
 ### Performance On The Test Set
@@ -457,7 +449,6 @@ predictions_df['correct'] = np.where(predictions_df['actual_label'] == predictio
 
 Thus we have a convenient, and very useful dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
 
-
 | **actual_label** | **predicted_label** | **predicted_probability** | **filename** | **correct** |
 |---|---|---|---|---|
 | bananagrams | bananagrams | 0.65868604 | IMG_7817.jpg | 1 |
@@ -466,13 +457,11 @@ Thus we have a convenient, and very useful dataframe storing our prediction data
 | duplos | bananagrams | 0.6900331 | IMG_8532.jpg | 0 |
 | magnatiles | magnatiles | 0.994294 | IMG_8635.jpg | 1 |
 
-
 This data can be used analyze the model's performance on specific images in a few different ways: 
 * Calculate the test set classification accuracy (below).
 * Creating a confusion matrix (below).
 * Using a Grad-CAM analysis (below). 
 
-<br>
 
 ### Test Set Classification Accuracy
 
@@ -488,7 +477,6 @@ print(test_set_accuracy)
 
 The baseline network gets **74.7% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
 
-<br>
 
 ### Test Set Confusion Matrix
 
