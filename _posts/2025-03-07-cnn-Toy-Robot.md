@@ -277,13 +277,12 @@ _________________________________________________________________
 ```
 
 ### Training The Network
-
 With the data pipeline and network architecture in place, we're ready to train the model. 
 
 In the below code I:
 
 * Specify the number of epochs for training
-* Set a location for the trained network to be saved (architecture & parameters)
+* Set a location for the trained network to be saved
 * Set a *ModelCheckPoint* callback to save the best network at any point during training (based upon validation accuracy)
 * Train the network and save the results to an object called *history*
 
@@ -308,11 +307,10 @@ history = model.fit(x = training_set,
 
 ```
 
-The ModelCheckpoint callback means that the *best* model is saved, in terms of validation set performance - from *any point* during training. That is, although I'm telling the network to train for 50 epochs, or 50 rounds of data, there is no guarantee that it will continue to find better weights and biases throughout those 50 rounds. Usually, in fact, it will find the best fit before it reaches the 50th epoch, even though it will continue to adjust parameters until I tell it to stop. So the ModelCheckpoint function ensures that we don't lose progress. 
+The ModelCheckpoint callback means that the *best* model is saved, in terms of validation set performance - from *any point* during training. That is, although I'm telling the network to train for 50 epochs, or 50 rounds of data, there is no guarantee that it will continue to find better weights and biases throughout those 50 rounds. Usually it will find the best fit before it reaches the 50th epoch, even though it will continue to adjust parameters until I tell it to stop. So the ModelCheckpoint function ensures that we don't lose progress. 
 
 ### Analysis Of Training Results
-
-In addition to saving the *best* model (to model_filename), we can use the *history* object that we created to analyze the performance of the network epoch by epoch. In the following code, I'll plot the training and validation loss, and its classification accuracy. 
+In addition to saving the *best* model (to model_filename), we can use the *history* object that we created to analyze the performance of the network epoch by epoch. In the following code, I plot the training and validation loss, and its classification accuracy. 
 
 ```python
 import matplotlib.pyplot as plt
@@ -338,20 +336,18 @@ max(history.history['val_accuracy'])
 ![alt text](/img/posts/Baseline_Train_Val_Metrics.png "Toy Robot Baseline Accuracy Plot")
 
 <br>
-These results are not great. In terms of validation accuracy (bottom orange line), the plot shows that the model learns quickly, but then plateaus by the 5th epoch. It also quickly learns to predict the training data. Reaching 100% accuracy by the 12th epoch. But 100% on the training data is not a good thing, if the validation accuracy does not keep pace. 
+These results are not great. In terms of validation accuracy (bottom orange line), the plot shows that the model learns quickly, but then plateaus by the 5th epoch. It also quickly learns to predict the validation data. Reaching 100% accuracy by the 12th epoch. But 100% on the training data is not a good thing if the validation accuracy does not keep pace. 
 
 The more important pattern revealed by these graphs is the significant gap between performance on the training and validation sets. This gap means that the model is **over-fitting.**
 
-That is, the network is learning the features of the training data *so well* that it cannot see very far beyond it. In other words, it is memorizing the training data, and failing to find the generalizable patterns that would allow it to recognize similar objects in the validation set. This is not good, because it means that in the real world, my Toy Robot will get confused if it sees a lego that doesn't perfectly match the images that it was trained on. I want the model to be able to *generalize* about what makes a lego a lego, so that it can recognize a previously unseen lego from a bananagram. 
+That is, the network is learning the features of the training data *so well* that it cannot see very far beyond it. In other words, it is memorizing the training data, and failing to find the generalizable patterns that would allow it to recognize similar objects in the validation set. This is not good, because it means that in the real world, my Toy Robot will get confused if it sees a Lego that doesn't perfectly match the images that it was trained on. I want the model to be able to *generalize* about what makes a Lego a Lego, so that it can recognize a previously unseen Lego from a Bananagram. 
 
-In the following sections, I'll add features to the model that address the overfitting problem, attempting to close the gap between the training and validation accuracy scores. 
+In the following sections, I'll add features to the model that address the overfitting problem, attempting to close the gap between the training and validation accuracy scores. First, let's take a closer look at what the model sees. 
 <br>
 
 ### Performance On The Test Set
 
-The model trains only on the training data, but the validation data does inform this training, because the model saves its progress (its weights and bias values) every time the validation set accuracy improves. To get a truly 'real world' taste of how the model peforms, we can use it to predict on images that it has not seen at all during training - the test set.
-
-The model's predictive accuracy on the test set thus provides a good metric of how well the many iterations of our model performs relative to each other. 
+The model trains only on the training data. The validation data informs this training, because the model saves its progress (its weights and bias values) every time the validation accuracy improves. To get a truly 'real world' taste of how the model peforms, however, we can use it to predict on images that it has not seen at all during training - the test set. The model's accuracy on the test set then, will provide a good metric of how well the many iterations of our model compare to each other.
 
 In the code below, I will:
 
@@ -432,8 +428,7 @@ predictions_df['correct'] = np.where(predictions_df['actual_label'] == predictio
 
 ```
 
-
-Thus we have a convenient, and very useful dataframe storing our prediction data (predictions_df). A small sample of those 75 rows looks like this: 
+Thus we have a convenient dataframe storing our test set prediction data (predictions_df). A small sample of those 75 rows in that dataframe looks like this: 
 
 | **actual_label** | **predicted_label** | **predicted_probability** | **filename** | **correct** |
 |---|---|---|---|---|
@@ -443,13 +438,12 @@ Thus we have a convenient, and very useful dataframe storing our prediction data
 | duplos | bananagrams | 0.6900331 | IMG_8532.jpg | 0 |
 | magnatiles | magnatiles | 0.994294 | IMG_8635.jpg | 1 |
 
-This data can be used analyze the model's performance on specific images in a few different ways: 
+This data can be used to analyze the model's performance on specific images in a few different ways: 
 * Calculate the test set classification accuracy (below).
 * Creating a confusion matrix (below).
 * Using a Grad-CAM analysis (below). 
 
 ### Test Set Classification Accuracy
-
 To calculate test set classification accuracy:
 
 ```python
@@ -459,10 +453,9 @@ print(test_set_accuracy)
 
 ```
 
-The baseline network gets **74.7% classification accuracy** on the test set.  This is the metric I'll be trying to improve in subsequent iterations. 
+The baseline network gets **74.7% classification accuracy** on the test set. This is the metric I'll be trying to improve in subsequent iterations. 
 
 ### Test Set Confusion Matrix
-
 Overall Classification Accuracy is useful, but it can obscure where and why the model struggled. Maybe the network is predicting extremely well on Bananagrams, but it thinks that Magnatiles are Brios? A Confusion Matrix can show us these patterns, which I create using the predictions dataframe below.
 
 ```python
@@ -495,16 +488,16 @@ Insightful! I honestly thought the Magnatiles would be the most recognizable, bu
 
 
 ### Grad-CAM Analysis
-Gradient-weighted Class Activation Mapping, or Grad-CAM, is a way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image! A heatmap is used to color-code the regions of the image that the model found most useful for classifying it as one thing or another. 
+Gradient-weighted Class Activation Mapping, or Grad-CAM, is a great way to visualize what the model sees by overlaying the activated features from the last convolutional layer onto the actual image! A heatmap is used to color-code the regions of the image that the model found most useful for classifying it as one thing or another. 
 
 In the code below, I: 
 
-* Find the name of the last convolutional layer (layers are named as saved in Keras as part of the model object) (Any convolutional layer can be used, but the last one should be the most meaningful).
-* Set the image properties and directory paths (as we did when calling test images) (Any image can be analyzed).
-* Define the Grad-CAM function to turn activated features into mappable objects (I use a script I found, not fully sure what "tape" and "GradientTape" refer to).
-* Define a function to preprocess image(s) to analyze.
+* Find the name of the last convolutional layer (layers are named and saved in Keras as part of the model object) (Any convolutional layer can be used, but the last one should be the most meaningful)
+* Set the image properties and directory paths (as we did when calling test images) (Any image can be analyzed)
+* Define the Grad-CAM function to turn activated features into mappable objects (I use a script I found, not fully sure what "tape" and "GradientTape" refer to)
+* Define a function to preprocess image(s) to analyze
 * Define a function to overlay the heat-map on the images
-* Define a function to plot the image and the heatmap.
+* Define a function to plot the image and the heatmap
 
 ```python
 import os
@@ -536,7 +529,7 @@ def find_last_conv_layer(model):
 last_conv_layer_name = find_last_conv_layer(model)
 print("Last conv layer name:", last_conv_layer_name)
 
-# Define which conv layers to use for Grad-CAM (here we just use the last conv layer)
+# Define which conv layers to use for Grad-CAM (here we just use the last convolutional layer)
 conv_layers = [last_conv_layer_name]
 
 # Define image properties and directories
@@ -645,7 +638,7 @@ run_grad_cam_on_test_set()
 Grad-CAM images offer two important insights, which I'll call *Bias insight* and *Depth insight*, 
 
 ### Bias Insight
-First, we can see whether or not the model is picking up on the features that would distinguish one class of object from another. In the first image below the model seems to have honed in on the duplo object very well, with the most important feature being the top texture with the circular connectors. In the second image, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
+First, we can see whether or not the model is picking up on the features that would distinguish one class of object from another. In the first image below, the model seems to have honed in on the duplo object very well, with the most important feature being the top texture with the circular connectors. In the second image, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
 <br>
 
 ![alt text](/img/posts/gradCAM_duplo.png "Grad-CAM Good Feature Detection")
@@ -655,11 +648,13 @@ First, we can see whether or not the model is picking up on the features that wo
 ![alt text](/img/posts/gradCAM_bananagram.png "Grad-CAM Bad Feature Detection")
 
 <br>
-Bias is a pervasive issue in CNN tasks. Bias happens when a model learns to predict on something other than the features that would distinguish separate classes. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on the unique circular connectors of Duplos, it will have a better chance of predicting Duplos that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what class it belongs too, even if it does guess correctly. But when a model is biased, it is because it has learned to *correctly* predict on other features... features that are associated with the class in training (i.e., with biased images), but not in real life. 
+Bias is a pervasive issue in CNN tasks. Bias happens when a model learns to predict on *spurious features* - something in the data other than the features that would distinguish or separate classes in the real world. Whether or not the model predicted these first two images correctly is not exactly my concern here. We know that if a model focuses on the unique circular connectors of Duplos, it will have a better chance of predicting Duplos that it hasn't seen before, but if the model can't recognize a Bananagram from the floor, it probably does not know what actually makes a Bananagram a Bananagram, even if it does guess correctly. 
 
-In fact, the model may well have predicted this particular Banagram correctly (it did not, it gave it a 53% chance being a Duplo). It may actually associate the floor (or perhaps the shape of its cut out), with the class Bananagram. If so, it is perhaps because the other backgrounds in the Bananagram training set include the same background, so when it sees wooden floor background it thinks that it is a Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. In this particular case, I am concerned instead that it is the Duplo images that are biased, since having picked up on the floor background, the model chose Duplo instead of Bananagram. 
+When a model is biased, it is often due to contextual, or background bias. That is, because it has learned to *correctly* predict on contextual features that are associated with the class in training (i.e., with biased images), but not in real life. 
 
-The issue gets more even more complicated. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class, lets say Bananagrams, has a 70/30% split, the model might still be biased towards that 70% background because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distiguishing features in the other classes, then it might still guess Bananagram every time it sees a wood floor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
+In this case, the model may well have predicted this particular Banagram correctly (it did not, it gave it a 53% chance being a Duplo). It may actually associate the floor (or perhaps the shape of its cut out), with the class Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. This so-called *shortcut learning* is often the result of such *covariate shift*. In this particular case, I am concerned that it is the Duplo images that are biased, since having picked up on the floor background, the model chose Duplo instead of Bananagram. 
+
+The issue gets more even more complicated when considering *class imbalance*. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class (lets say Bananagrams) has a 70/30% split, the model might still be biased towards that 70% background because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distiguishing features in the other classes, then it might still guess Bananagram every time it sees a wood floor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
 
 I'll address bias as a cocern with my self-collected data set again in the conclusion.
 
