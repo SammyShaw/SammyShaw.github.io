@@ -34,9 +34,9 @@ ___
 # Project Overview  <a name="overview-main"></a>
 
 ### Context <a name="overview-context"></a>
-I want to build a robot that will pick up my kids' toys, AND put them in the correct bins! My four-year old - Teddy - is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'm not a robotics engineer, but I can use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys), and I'll leave the rest to my friends in the robotics lab.
+I want to build a robot that will pick up my kid's toys, AND put them in the correct bins! My four-year old - Teddy - is better at playing with toys than picking them up. I'm better at throwing them all in one basket than sorting them. I'm not a robotics engineer, but I can use Deep Learning techniques to train a computer to recognize a Brio from a Bananagram (among other toys), and I'll leave the rest to my friends in the robotics lab.
 
-I'll use my own images of my kids' toys as a unique, albeit limited, custom dataset, which will allow me to simulate the real world scenarios of toys scattered throughout the house. 
+I'll use my own images of my kid's toys as a unique, albeit limited, custom dataset, which will allow me to simulate the real world scenarios of toys scattered throughout the house. 
 
 If this is successful and put into place on a larger scale, no parent will ever step on a Lego again! 
 
@@ -86,7 +86,7 @@ The baseline network suffered badly from overfitting, but the addition of dropou
 * Architecture Experiment 4: **80%**
 * MobilenetV2 base model: **100%**
 
-The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but it is hard to argue with the efficiency and predictive power of a network that will predict my kids toys 100% of the time. My small data set (500 training images) is less than ideal, but I've also learned to think very carefully about training data in CNNs. 
+The use of Transfer Learning with the MobilenetV2 base architecture was a bittersweet success. I wanted a more accurate model of my own, but it is hard to argue with the efficiency and predictive power of a network that will predict my kid's toys 100% of the time. My small data set (500 training images) is less than ideal, but I've also learned to think very carefully about training data in CNNs. 
 
 
 ### Growth/Next Steps <a name="overview-growth"></a>
@@ -188,9 +188,9 @@ A Convolutional Neural Network tries to make sense of these values to make predi
 
 Convolution is the process in which images are scanned. Filters (or kernels) slide over the image, mapping its key features. Pooling layers follow convolutional layers, summarizing feature information while reducing dimensionality and producing a more generalizable (more abstract) representation. As such, the network can learn how two images are of the same object, even though the images are not exactly the same. 
 
-CNNs consist of multiple convolutional layers, each made of a set of filters that specialize in detecting different patterns. As the network deepens, the filters progress from detecting simple patterns (like edges) to complex shapes (like wheels or faces). A simple CNN model of 2 convolutional layers of 32 filters each, 2 pooling layers, and a dense layer of 32 filters contains over a million trainable nuerons and connections, or weights and biases. Activation Functions are applied to the neurons as image data moves forward through the network, helping the network decide which neurons will fire and, ultimately, which features are more or less important for the different output classes.
+CNNs consist of multiple convolutional layers, each made of a set of filters that specialize in detecting different patterns. As the network deepens, the filters progress from detecting simple patterns (like edges) to complex shapes (like wheels or faces). A simple CNN model of 2 convolutional layers of 32 filters each, 2 pooling layers, and a dense layer of 32 filters contains over a million trainable nuerons and connections or, weights and biases. Activation functions are applied to the neurons as image data moves forward through the network, helping the network decide which neurons will fire and, ultimately, which features are more or less important for the different output classes.
 
-As a Convolutional Neural Network trains, it calculates how well it is predicting the class labels as **loss.** It then heads backward through the network in a process known as **backpropagation** to update the parameters within the network. The goal is to reduce the error, or in other words, improve the match between predicted outputs and actual outputs. Over time, the network learns to find a good mapping between the input data and the output classes.
+As a Convolutional Neural Network trains, it calculates how well it is predicting the class labels as **loss.** It then heads backward through the network in a process known as **back propagation** to update the parameters (weights and biases) within the network. The goal is to reduce the error, or in other words, improve the match between predicted classes and actual classes. Over time, the network learns to find a good mapping between the input data and the output classes.
 
 There are many aspects of a CNN's architecture (combination of layers and filters) and learning parameters (such as activation function, learning rate, image augmentation, etc.) that can be changed to affect a model's predictive accuracy. Many of these will be discussed below.
 
@@ -206,8 +206,8 @@ The baseline network architecture is simple, and gives us a starting point to re
 * each with subsequent **Max Pooling** Layers
 * Flatten layer
 * One **single Dense (Fully Connected) layer** with **32 neurons**
-* Output layer for five class predictions.
-* I use the **relu** activation function on all layers, and use the **adam** optimizer.
+* Output layer for five class predictions
+* I use the **relu** activation function on all layers, and use the **adam** optimizer
 
 ```python
 # network architecture
@@ -335,11 +335,11 @@ max(history.history['val_accuracy'])
 ![alt text](/img/posts/Baseline_Train_Val_Metrics.png "Toy Robot Baseline Accuracy Plot")
 
 <br>
-These results are not great. In terms of validation accuracy (bottom orange line), the plot shows that the model learns quickly, but then plateaus by the 5th epoch. It also quickly learns to predict the validation data. Reaching 100% accuracy by the 12th epoch. But 100% on the training data is not a good thing if the validation accuracy does not keep pace. 
+These results are not great. In terms of validation accuracy (bottom orange line), the plot shows that the model learns quickly, but then plateaus by the 5th epoch. It also quickly learns to predict the validation data, reaching 100% accuracy by the 12th epoch. But 100% on the training data is not a good thing if the validation accuracy does not keep pace. 
 
 The more important pattern revealed by these graphs is the significant gap between performance on the training and validation sets. This gap means that the model is **over-fitting.**
 
-That is, the network is learning the features of the training data *so well* that it cannot see very far beyond it. In other words, it is memorizing the training data, and failing to find the generalizable patterns that would allow it to recognize similar objects in the validation set. This is not good, because it means that in the real world, my Toy Robot will get confused if it sees a Lego that doesn't perfectly match the images that it was trained on. I want the model to be able to *generalize* about what makes a Lego a Lego, so that it can recognize a previously unseen Lego from a Bananagram. 
+That is, the network is learning the features of the training images *so well* that it cannot see very far beyond them. In other words, it is memorizing the training data, and failing to find the generalizable patterns that would allow it to recognize similar objects in the validation images. This is not good, because it means that in the real world, my Toy Robot will get confused if it sees a Lego that doesn't perfectly match the images that it was trained on. I want the model to be able to *generalize* about what makes a Lego a Lego, so that it can recognize a previously unseen Lego from a Bananagram. 
 
 In the following sections, I'll add features to the model that address the overfitting problem, attempting to close the gap between the training and validation accuracy scores. First, let's take a closer look at what the model sees. 
 <br>
@@ -350,13 +350,13 @@ The model trains only on the training data. The validation data informs this tra
 
 In the code below, I will:
 
-* Import the required packages for importing the test set images.
-* Set up the parameters for the predictions.
-* Load in the saved model file from training.
-* Create a function for preprocessing the test set images in the same way that training and validation images were.
-* Create a function for making predictions, returning both predicted class label, and predicted class probability.
-* Iterate through our test set images, preprocessing each and passing to the network for prediction.
-* Create a Pandas DataFrame to hold all prediction data.
+* Import the required packages for importing the test set images
+* Set up the parameters for the predictions
+* Load in the saved model file from training
+* Create a function for preprocessing the test set images in the same way that training and validation images were
+* Create a function for making predictions, returning both predicted class label, and predicted class probability
+* Iterate through our test set images, preprocessing each and passing to the network for prediction
+* Create a Pandas DataFrame to hold all prediction data
 
 ```python
 # import required packages
@@ -540,7 +540,6 @@ os.makedirs(output_dir, exist_ok=True)
 # Grad-CAM Function 
 def grad_cam(model, img_array, target_layer_name):
     """Compute Grad-CAM heatmap for a specified convolutional layer."""
-    # Get the target conv layer from the model
     conv_layer = model.get_layer(target_layer_name)
     
     # Create a model that maps the input image to the conv layer output and predictions
@@ -637,7 +636,7 @@ run_grad_cam_on_test_set()
 Grad-CAM images offer two important insights, which I'll call *Bias insight* and *Depth insight*, 
 
 ### Bias Insight
-First, we can see whether or not the model is picking up on the features that would distinguish one class of object from another. In the first image below, the model seems to have honed in on the duplo object very well, with the most important feature being the top texture with the circular connectors. In the second image, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
+First, we can see whether or not the model is picking up on the features that would distinguish one class of object from another. In the first image below, the model seems to have honed in on the Duplo very well, with the most important feature being the top texture with the circular connectors. In the second image, however, we see the opposite, where the model seems to have found the floor around the actual Bananagram as the important feature for classification. 
 <br>
 
 ![alt text](/img/posts/gradCAM_duplo.png "Grad-CAM Good Feature Detection")
@@ -652,7 +651,7 @@ Bias is a pervasive issue in CNN tasks. Bias happens when a model learns to pred
 
 When a model is biased, it is often due to contextual, or background bias. That is, because it has learned to *correctly* predict on contextual features that are associated with the class in training (i.e., with biased images), but not in real life. 
 
-In this case, the model may well have predicted this particular Banagram correctly (it did not, it gave it a 53% chance being a Duplo). It may actually associate the floor (or perhaps the shape of its cut out), with the class Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. This so-called *shortcut learning* is often the result of such *covariate shift*. In this particular case, I am concerned that it is the Duplo images that are biased, since having picked up on the floor background, the model chose Duplo instead of Bananagram. 
+In this case, the model might have predicted the Banagram correctly (it did not, it gave it a 53% chance being a Duplo) if it associated the floor (or perhaps the shape of its cut out) with the class Bananagram. If all my Bananagram images were taken against a wood floor background, and all the Duplos were taken against a white table backdrop, the model could correctly guess the class of each just by identifying the features of the background. This so-called *shortcut learning* is often the result of such *covariate shift*. In this particular case, I should be concerned that the Duplo images are biased, since having picked up on the floor not the object, the model chose Duplo instead of Bananagram. 
 
 The issue gets more even more complicated when considering *class imbalance*. If four out of the five classes of images have a 50/50% split in wood floor vs. white table backgrounds, but one class (lets say Bananagrams) has a 70/30% split, the model might still be biased towards that 70% background because all other things being equal, it is at least 70% correct for one class of objects if it identifies the background alone as its defining feature. Further, if is has trouble identifying distinguishing features in the other classes, then it might still guess Bananagram every time it sees a wood floor background. Finally, it may be that the proportion of backgrounds is the same in each class of images, but because Bananagrams are smaller, they take up less space in the frame, and therefore there is more (wood floor) background evident in the class Bananagrams than there is in other classes. 
 
@@ -698,7 +697,7 @@ Dropout is a technique used in Deep Learning primarily to reduce the effects of 
 
 The math is the same, the network will process everything as it always would (taking the sum of the inputs multiplied by the weights, and adding a bias term, applying activation functions, and updating the network’s parameters using Back Propagation) - but now some of the neurons are simply turned off. If some neurons are turned off, then the other neurons have to jump in and pick up the slack (so to speak). If those other neurons were previously dedicated to certain very specific features of training images, they will now be forced to generalize a bit more. If over-trained neurons that were turned off in one epoch jump back in in the next, they now contend with a model that has found more generalizable patterns and will have to tune accordingly. 
 
-Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalising and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent, neurons cannot *co-adapt* - the network learns more robust features, and are less susceptible to noise.
+Over time, with different combinations of neurons being ignored for each mini-batch of data - the network becomes more adept at generalizing and thus is less likely to overfit to the training data. Since no particular neuron can rely on the presence of other neurons, and the features with which they represent, neurons cannot *co-adapt* - the network learns more robust features, and are less susceptible to noise.
 
 ### Implementing Dropout
 
@@ -731,7 +730,7 @@ Accuracy on the *test set* was **80%**, which is a nice bump from the **74.7%** 
 
 The model is no longer over-fitting. The gap between the classification accuracy on the training set and the validation set has been eliminated. In fact, the model is consistently predicting better on the validation set, which might indicate that the validation set data is more consistent within each class. 
 
-On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it is become less confident in its predictions. That is the probabilities output associated with its predictions are likely going down. It is becoming less confident in the validation set preditions, and more confident in the training predictions. 
+On the other hand, we still see a divergence with respect to training vs. validation loss. This means that even though the network is consistently predicting the validation set at about 72-76%, it becomes less confident in its predictions. Or, it is becoming less confident in the validation set preditions, while its confidence in training predictions plateaus. 
 
 Next, I turn to another method for reducing overfitting, Image Augmentation. 
 
@@ -766,12 +765,12 @@ model_filename = 'models/toy_robot_augmented_v01.h5'
 
 ```
 
-* **Rotation_range** of 20 refers to the *maximum* degrees of rotation we want. Every time an image is passed, the ImageDataGenerator will randomly rotate it between 0-20 degrees.
-* **Width_shift_range** and **height_shift_range** of 0.2 refer to the maximum width and height that we are happy to shift. The ImageDataGenerator will randomly shift our image *up to* 20% both vertically and horizonally.
-* **Zoom_range** of 0.1 means a maximum of 10% inward or outward zoom.
-* **Horizontal_flip** = True means that each time an image flows in, there is a 50/50 chance of it being flipped.
-* **Brightness_range** between 0.5 and 1.5 means our images can become brighter or darker.
-* **Fill_mode** set to "nearest" means that when images are shifted and/or rotated, we'll just use the *nearest pixel* to fill in any new pixels that are required - and it means our images still resemble the scene. 
+* **Rotation_range** of 20 refers to the *maximum* degrees of rotation we want. Every time an image is passed, the ImageDataGenerator will randomly rotate it between 0-20 degrees
+* **Width_shift_range** and **height_shift_range** of 0.2 refer to the maximum width and height that we are happy to shift. The ImageDataGenerator will randomly shift our image *up to* 20% both vertically and horizonally
+* **Zoom_range** of 0.1 means a maximum of 10% inward or outward zoom
+* **Horizontal_flip** = True means that each time an image flows in, there is a 50/50 chance of it being flipped
+* **Brightness_range** between 0.5 and 1.5 means our images can become brighter or darker
+* **Fill_mode** set to "nearest" means that when images are shifted and/or rotated, we'll just use the *nearest pixel* to fill in any new pixels that are required - and it means our images still resemble the scene 
 
 ### Results with Augmentation
 As before, I trained the same baseline network architecture, this time only changing the images flowing in. 
