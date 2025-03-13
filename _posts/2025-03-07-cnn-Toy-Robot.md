@@ -784,7 +784,7 @@ I dropped Dropout from the model, so the Augmented Image model can be compared t
 The best classification accuracy on the *validation set* was **77.3%**, slightly higher than the **75.3%** we saw for the baseline network. 
 Validation set accuracy plateaus again, but not as early, and its highest validation accuracy was achieved in the 39th epoch.
 
-Accuracy on the *test set* was **74.7%**, same as the **74.7%** test set accuracy from the baseline model,  and not as good as the **81%** accuracy from the Dropout model. 
+Accuracy on the *test set* was **74.7%**, same as the **74.7%** test set accuracy from the baseline model,  and not as good as the **80%** accuracy from the Dropout model. 
 
 The model appears to be slightly overfitting. Compared to the baseline model, the gap between the classification accuracy on the training set and the validation set has not been eliminated, but it is greatly reduced, which unfortunately in this case did not lead to better performance overall.  
 
@@ -805,12 +805,12 @@ Keras' LearningRateReducer allows us to reduce learning (the rate of gradient de
 
 ### Implementing Learning Rate Reducer
 
-Keras' ReduceLROnPlateau function allows this as a model callback. 
-The code belongs with our other "training parameters", and is passed in our model.fit() "history" object. 
+Keras' ReduceLROnPlateau function allows this as a model callback. The code belongs with our other "training parameters", and is passed in our model.fit() "history" object. 
+
 In the code below, I: 
-* Set it to monitor the validation accuracy.
-* Decrease by speed by 0.5
-* If (patience) Validation Accuracy does not increase in 4 epochs. 
+* Set it to monitor the validation accuracy
+* Decrease speed by 0.5...
+* If (patience) Validation Accuracy does not increase in 4 epochs 
 
 ```python
 # install packages
@@ -844,13 +844,13 @@ As before, I trained the same baseline network architecture, this time with both
 
 The best classification accuracy on the *validation set* was **76.7**, only slightly higher than **75.3%** we saw for the baseline network. 
 
-Accuracy on the *test set* was **76%**, also slightly higher than the **74.7%** test set accuracy from the baseline model, and not as good as the **81%** accuracy from the Dropout model. 
+Accuracy on the *test set* was **76%**, also slightly higher than the **74.7%** test set accuracy from the baseline model, and not as good as the **80%** accuracy from the Dropout model. 
 
 The Learning Rate Reducer kicked in first at epoch 18. After which the model slowly improved to find its best validation accuracy at epoch 28. So, the reduction in learning might have helped the model find a more accurate fit. The learning rate changed again at epochs 32, 36, 40, 44, and 48, with no further improvement to the model's performance. 
 
 Instead of overfitting, the model is now *underfitting,* as evidenced by the higher validation accuracy and lower validation loss, compared to the those metrics on the training set. This is likely due to the combination of both Dropout and Image Augmentation used in this model.
 
-In future iterations, I will scale down the Dropout and Image Augmentation to try to get a better convergence of Test and Training Accuracy. Because the Learning Rate Reduction helped only after its first reduction, I will also lengthen the patience parameter in future models.  
+In future iterations, I will scale down the Dropout and Image Augmentation to try to get a better convergence of test and training accuracy. Because the learning rate reduction helped only after its first reduction, I will also lengthen the patience parameter in future models.  
 
 ___
 # Network Architecture  <a name="network-architecture"></a>
@@ -860,7 +860,7 @@ So far, I've used the same network *archiecture* for each of the Baseline, Dropo
 * Each with 32 filters
 * A single Dense layer with 32 neurons
 
-One to figure out if there are *better* architectures is to use Keras_tuner, a Keras function that automates what I will do below. I plan to use Keras_tuner in Toy Robot 2.0, but for now, I want to lay out what benefits, if any, subtle tweeks to the model architecture might gain. 
+One to figure out if there are *better* architectures is to use Keras_tuner, a Keras function that automates what I will do below. I plan to use Keras_tuner in Toy Robot 2.0, but for now, I want to lay out what benefits, if any, subtle changes to the model architecture might gain. 
 
 First I'll discuss the parameters, and then I'll post the results, wholesale. 
 
@@ -872,25 +872,25 @@ Below I'll experiment with adding a third and a fourth convolutional layer. For 
 
 #### Filters
 
-There may be any number of filters in a convolutional layer - though we usually assign them in square multiples of the image dimension. Each filter picks up a distinct pattern, and learns, in training, what patterns are relevant or not. Adding filters to a convolutional layer can help a network find more detailed patterns, but it can also lead to overfitting. Further, more filters means more weights to adjust in training, which means it takes more time for a network to learn. 
+There may be any number of filters in a convolutional layer - though we usually assign them in square multiples of the image dimensions. Each filter picks up a distinct pattern, and learns, in training, what patterns are relevant or not. Adding filters to a convolutional layer can help a network find more detailed patterns, but it can also lead to overfitting. Further, more filters means more weights to adjust in training, which means it takes more time for a network to learn. 
 
 Below I'll experiment with increases and decreases of filters in select layers. Again, for small data-sets, less filters is generally recommended. 
 
 #### Kernel Size
 
-The kernel size is the dimension of image space that a filter is combing over and abstracting from. A larger kernel size might capture larger, contextual patterns, but it may also capture noise. Smaller kernels capture finer details, but may miss, larger contextual information. 
+The kernel size is the dimension of image space that a filter is combing over and abstracting from. A larger kernel size might capture larger, contextual patterns, but it may also capture noise. Smaller kernels capture finer details, but may miss larger contextual information. 
 
-Below I'll experiment with increasing the Kernel size in one of the layers, but it should be noted that a 3x3 pixel kernel size is standard practice, as it balances both detail and efficiency. 
+Below I'll experiment with increasing the Kernel size in one of the layers, but it should be noted that a 3x3 pixel kernel size is standard practice, as it balances detail and efficiency. 
 
 #### Pooling
 
-Pooling layers are usually part of a convolutional layer block. Pooling shrinks the dimensions of the (filtered) image for subsequent convolutional layers, which allow the network to then filter more abstract features. Pooling helps to reduce overfitting, but too much pooling can lead to losing information (network weights) that relate to important features. 
+Pooling layers are usually part of a convolutional layer block. Pooling shrinks the dimensions of the (filtered) image for subsequent convolutional layers, which allow the network to then filter more abstract features. Pooling helps to reduce overfitting, but too much pooling can lead to losing information that relate to important features. 
 
 Max Pooling is the standard technique, although other pooling methods can be used, such as Global Average Pooling. I will not experiment with other pooling methods here. 
 
 Other architecture parameters can be changed or added, including: 
 * Stride: how many pixels each filter moves at a time as it moves across the image. The default stride in Keras is 1. 
-* Activation Function: Applied to each layer - tells each neuron whether or not to send information (weight) to the next layer. I use the Relu (or Rectified Linear Unit) activation function here, which I've seen to be most common. It works by passing information neuron to neuron only if the weights reach a threshold positive value. 
+* Activation Function: Applied to each layer - tells each neuron whether or not (and how) to send information (weight value) to the next layer. I use the Relu (or Rectified Linear Unit) activation function here, which I've seen to be most common. It works by passing information neuron to neuron only if the weights reach a threshold positive value. 
 * Batch Normalization: Scales weight values 0-1 (usually before being activated) for every batch, usually once per convolutional layer. Although it is a standard practice to include Batch Normalization to stabilize training, I've found that the time costs are not worth the results. 
 
 
@@ -1169,28 +1169,27 @@ magnatiles                 1      0     0       3          11
 
 ```
 
-The confustion matrix shows that the current model is now fairly consistent within categories, whereas the baseline model really struggled with Magnatiles. It is perfect in its predictions of Cars on the test set, and much better and predicting Magnatiles, although slightly worse at predicting Brios. 
+The confusion matrix shows that the current model is now fairly consistent within categories, whereas the baseline model really struggled with Magnatiles. It is perfect in its predictions of Cars on the test set, and much better and predicting Magnatiles, although slightly worse at predicting Brios. 
 
 While these results are encouraging, I'll end my experiments here for now. In future versions of this project, I'll compare Keras_tuner results with this current model architecture. 
 
-I'm eager to see what other CNN models - which have been trained on much larger datasets, and can predict many more classes of images - can do with my Toy Robot task. 
+Next, I'm eager to see what other CNN models - which have been trained on much larger datasets, and can predict many more classes of images - can do with my Toy Robot task. 
 ___
 
 # Transfer Learning With MobiltnetV2 <a name="cnn-transfer-learning"></a>
 
 ### Transfer Learning Overview
-Transfer Learning means using a pre-built, pre-trained neural network, and applying it to another specific Deep Learning task. It consists of taking features learned on one problem to solve a new, similar problem!
+Transfer Learning means using a pre-built, pre-trained neural network, and applying it to another specific Deep Learning task. It consists of taking features learned on one problem to solve a new, similar problem.
 
-For image based tasks this means using all the *pre-learned* convolutional filter values and feature maps from a large network, and instead of using it to predict what the network was originally designed for, piggybacking it, and training it again for another task
+For image based tasks this means using all the *pre-learned* convolutional filter values and feature maps from a large network, and instead of using it to predict what the network was originally designed for, piggybacking it, and training it again for another task.
 
-One such pre-trained, large network, is **MobileNetV2.** MobileNetV2 was developed by Google in 2018, for the purpose creating a 'lightweight' CNN architecture that can be used in applications on smaller devices like iphones. Its architecture is slightly different than what I have layed out above, using techniques, depthwise convolutions and inverted residuals, which together reduces the number of trainable parameters to efficiently extract image features. It also uses a *linear* (as opposed to *relu*) activation function to preserve fine-grained information between layers. 
+One such pre-trained, large network, is **MobileNetV2.** MobileNetV2 was developed by Google in 2018, for the purpose creating a 'lightweight' CNN architecture that can be used in applications on smaller devices like iphones. Its architecture is slightly different than what I have layed out above, using techniques - depthwise convolutions and inverted residuals - that reduces the number of trainable parameters to efficiently extract image features. It also uses a *linear* (as opposed to *relu*) activation function to preserve fine-grained information between layers. 
 
 Other pretrained networks are available in Keras' Applications library. At this point, it is not my purpose to compare them all, so much as it is to compare what a larger, pre-built network like MobilenetV2 can do for my limited dataset.
 
 ### Implementing MobileNetV2
 Again, the Keras functionality makes transfer learning easy in Python, but there are some caveats in the way we set up our model to infer from pretrained features. I've learned to use Global Average Pooling in the place of the Flatten layer, and add Batch Normalization to stabilze training. The affect of these tweaks may be left to experiment, but I'll be sure to include them here. Otherwise, training this model is as simple as: 
 
-All we need to do is: 
 * Import MobileNetV2
 * Define our "base" model as the MobileNetV2 network
 * Make its existing weights and biases untrainable
@@ -1279,12 +1278,12 @@ On the other hand, I was frustrated that the adjustments that I made to my own m
 ___
 # Growth & Next Steps <a name="growth-next-steps"></a>
 
-The proof of concept was successful. I have shown that I can get very accurate predictions for what bins my kids' toys belong in, albeit on a small number of classes, but also with a very limited data set. Should this Toy Robot proceed to the next phase of development, I'll know that I can always employ MobileNetV2 to get accurate predictions. 
+The proof of concept was successful. I have shown that I can get very accurate predictions for what bins my kid's toys belong in, albeit on a small number of classes, but also with a very limited data set. Should this Toy Robot proceed to the next phase of development, I'll know that I can always employ MobileNetV2 to get accurate predictions. 
 
 On the other hand, the process has left me more curious about building a CNN of my own, and I have two ambitions for future versions of this project. 
 
 1. **Use Keras_tuner:** Keras Tuner is available for optimizing the many levers and buttons that make CNNs work. I did not try it here in part because it is time intensive (it works like I have here, making one change at a time, but allows for a greater range of learning and architectural parameters), but mostly because I wanted to see for myself how varying the details of the network architecture can change its performance. I found that it didn't change much, but there is some hope that adding layers and filters does make a difference, even though for small data sets, it is generally recommended that "less equals more." 
    
-2. **Get Scientific about the Data:** CNN in Data Science is usually treated as an exercise in optimizing algorithms for the data that is already at hand, and that is how I have approached it here. But one aspect that has not been optimized in this project so far is the images themselves! Earlier I said that I was systematic about the images, but I'll amend that here to say I was quasi-systematic. I balanced the classes; I aimed to balance the backgrounds within the classes; I aimed to balance closeup, cropped images with distant ones, etc. But I started by taking images of toys strewn - as if haphazardly - across the floor in an effort to mimic real world scenarios. If a Toy Robot can't see toys as they exist in my house, I thought, what chance does it have to put them in the right bins? But it occured to me that while this impulse is correct for test set data, training and validation data should be easier to differentiate. In fact, they should be taken for the purpose of teaching the model to recognize the specific features that would allow it to differentiate one class from another in the wild. key identifying features should be emphasized in training images, not burried. Care should also be taken to minimize bias, however. Some image datasets include real-world photographs alongside drawings, while others appear to have been carefully curated in laboratory like settings to minimize the effect of lighting or background bias. More data is better for generalization, although it takes more time to train. The 500 training images I used here make a decidedly "small" dataset. Before I add more images to my Toy Robot dataset for further development, I will carefully study best practices for creating image data sets. 
+2. **Get Scientific about the Data:** CNN in Data Science is usually treated as an exercise in optimizing algorithms for the data that is already at hand, and that is how I have approached it here. But one aspect that has not been optimized in this project so far is the images themselves! Earlier I said that I was systematic about the images, but I'll amend that here to say I was quasi-systematic. I balanced the classes; I aimed to balance the backgrounds within the classes; I aimed to balance closeup, cropped images with distant ones, etc. But I started by taking images of toys strewn - as if haphazardly - across the floor in an effort to mimic real world scenarios. If a Toy Robot can't see toys as they exist in my house, I thought, what chance does it have to put them in the right bins? But it occured to me that while this impulse is correct for test set data, training and validation data should be easier to differentiate. In fact, they should be taken for the purpose of teaching the model to recognize the specific features that would allow it to differentiate one class from another in the wild. Key identifying features should be emphasized in training images, not burried. Care should also be taken to minimize bias, however. Some image datasets include real-world photographs alongside drawings, while others appear to have been carefully curated in laboratory like settings to minimize the effect of lighting or background bias. More data is better for generalization, although it takes more time to train. The 500 training images I used here make a decidedly "small" dataset. Before I add more images to my Toy Robot dataset for further development, I will carefully study best practices for creating image data sets. 
 
 
