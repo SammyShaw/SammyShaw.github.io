@@ -149,12 +149,13 @@ The result is a more modest 400 + player pool, with the large number of zeros el
 ![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
 
 
-## Percentage Categories
+## SHAW Percentage Transformations
 
-Percentage categories need to be treated differently because they are a function of two distributions: makes and attempts. That is, we don’t simply add percentages like we do the other categories to get a final percentage score, we divide total team makes by total team attempts. So to evaluate a player’s value in a percentage category, their shot volume needs to be considered alongside their percentage. 
+Percentage distributions need to be treated differently because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score. A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. 
+
 I assume that the ordinary way of doing this is to standardize the percentage, then multiply by standardized attempts, and then standardize the product. At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers, especially for rare players that are high in attempts, and low in percentage. 
 
-[IMAGE Free Throw Attempts and Percentage Distributions]
+![alt text](/img/posts/FT_PCT_vs_A.png "Free Throw Distributions")
 
 The test case here is Giannis Antetokounmpo’s Free Throw Percentage. He shoots a (very) sub-par 60% from the free throw line, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). 
 His volume-weighted free throw percentage Z-score would be close to -6. But by the same math, the best free throw shooters would have weighted percentage Z-scores of no higher than 2.  But is Giannis THAT much worse? Would Giannis’s negative impact ‘cancel out’ the top three shooters if all four were on your team? 
