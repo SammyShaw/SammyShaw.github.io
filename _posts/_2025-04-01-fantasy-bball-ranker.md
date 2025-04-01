@@ -142,9 +142,12 @@ Most NBA stat categories are positively skewed. That is, few players get the mos
 ![alt text](/img/posts/PTS_REB_raw.png "Raw Distributions, Points & Rebounds")
 
 At the same time, a large number of players accumulate very little, if any, stats at all. THIS fact is important, although it is hardly considered among the experts. When we start to transform distributions, there is a huge difference in comparing the fantasy-relevant players vs. the entirety of the league. That is, the relative value of a player for fantasy purposes should be considered only in relation to other plausible options, and NOT in relation to the bulk of players that get little or no playing time. 
-Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. This has the effect of eliminating the ‘garbage time’ players as well as those with season defining injuries (e.g., Embiid in 24-25). Then, I scale by games played. Most relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
-The result is a more modest 400 + player pool, with the large number of zeros mostly eliminated. 
-[IMAGE: PER GAME POINTS & REBOUNDS]
+
+Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. This has the effect of eliminating the ‘garbage time’ players as well as those with season defining injuries (e.g., Embiid in 24-25). Then, I scale by games played. Most fantasy relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
+The result is a more modest 400 + player pool, with the large number of zeros eliminated. 
+
+![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
+
 
 ## Percentage Categories
 
