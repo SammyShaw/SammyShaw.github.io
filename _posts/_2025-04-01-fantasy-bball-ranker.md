@@ -133,7 +133,9 @@ In a typical fantasy basketball league, a team’s weekly score is the sum of pl
 From there, leagues can keep score in one of two ways: a weekly ‘head-to-head’ matchup win (for the team that wins the most categories), or a win for each category (with all nine categories at stake). Leagues can be customized to include more or less categories, but the default is nine, and the main platforms’ rankings are based on these categories. 
 
 The goal is to turn raw NBA statistics from the relevant categories into a single player ranking metric that will help team managers understand a single player’s relative fantasy value. It would be easy if there was one statistical category to keep track of – players would be ranked by the number of points they get, for example. [In fact, *Points* leagues are an alternative scoring format that assigns every statistical category a uniform ‘point’ value, which is too easy to be any fun.] But category leagues require comparisons across 9 different measures. How can you value a player that gets a lot of points and few rebounds vs. one that gets a lot of rebounds and few assists? How do you compare a player that shoots an average free throw percentage on high volume, to a player that shoots above average on low volume?
+
 Before we get into that, it is important to understand the distributions. 
+
 
 ### Distributions
 
@@ -146,6 +148,22 @@ At the same time, a large number of players accumulate very little, if any, stat
 Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. This has the effect of eliminating the ‘garbage time’ players as well as those with season defining injuries (e.g., Embiid in 24-25). Then, I scale by games played. Most fantasy relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
 The result is a more modest 400 + player pool, with the large number of zeros eliminated. 
 
+```python
+
+# Set Games Played threshold for counting stats
+minimum_games_threshold_quantile = 0.25
+min_games = stats["GP"].quantile(minimum_games_threshold_quantile)
+
+pg_stats = stats[stats["GP"] >= min_games].copy()
+
+raw_categories = ['FGA', 'FGM', 'FTA', 'FTM', 'FG3M', 'PTS',
+             'REB', 'AST', 'STL', 'BLK', 'TOV']
+
+for cat in raw_categories:
+    pg_stats[cat + "_pg"] = pg_stats[cat] / pg_stats['GP'] 
+
+```
+
 ![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
 
 
@@ -153,14 +171,38 @@ The result is a more modest 400 + player pool, with the large number of zeros el
 
 Percentage distributions need to be treated differently because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score. A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. 
 
-I assume that the ordinary way of doing this is to standardize the percentage, then multiply by standardized attempts, and then standardize the product. At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers, especially for rare players that are high in attempts, and low in percentage. 
-
 ![alt text](/img/posts/FT_PCT_vs_A.png "Free Throw Distributions")
 
-The test case here is Giannis Antetokounmpo’s Free Throw Percentage. He shoots a (very) sub-par 60% from the free throw line, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). 
-His volume-weighted free throw percentage Z-score would be close to -6. But by the same math, the best free throw shooters would have weighted percentage Z-scores of no higher than 2.  But is Giannis THAT much worse? Would Giannis’s negative impact ‘cancel out’ the top three shooters if all four were on your team? 
+The recieved method for doing this is to measure a player's *impact* by finding the difference between their number of makes and what is expected given their number of attempts and league percentage averages. Standardizing the impact thus gives a comparable value score for that category. For example: 
 
-[Table comparing Giannis, Curry, Shae, Harden.]
+```python
+
+league_pct = stats["FTM"].sum() / stats["FTA"].sum()
+FT_impact = stats["FTM"] - (stats["FTA"] * league_pct)
+
+def z(stat):
+    return (stat - stat.mean()) / stat.std()
+
+FT_impact_z = z(FT_impact)
+
+```
+
+At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers in both tails. 
+
+![alt text](/img/posts/FT_Impact_Z.png "Free Throw Distributions")
+
+The test case here is Giannis Antetokounmpo. He shoots a (very) sub-par 60% from the free throw line, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). Giannis's Free Throw impact Z-Score is -8. 
+
+| **Player Name** | **FT%** | **FTM** | **FTA** | **FT_Impact_Z_Score** |
+|-----------------|---------|---------|---------|-----------------------|
+| Giannis Antetokounmpo | 60.2 | 369 | 613 | -8.12 | 
+| Steph Curry | 92.9 | 252 | 234 | 2.73 | 
+| Shae Gilgeous-Alexander | 90.1 | 563 | 625 | 5.50 | 
+| James Harden | 87.4 | 515 | 450 | 3.51 | 
+| LeBron James | 76.8 | 289 | 222 | -0.23 | 
+
+
+
 
 Probably not. The percentages seem to regress differently than other categories. If Giannis is terrible one night, he may bounce back the next night, and likewise, great shooter like Steph Curry can get cold from time to time. Surely this is an intuitive call from my experience: Percentage categories end up varying week to week more so than do the cumulative (and especially the rare) stats like blocks. 
 SHAW percentage transformation
