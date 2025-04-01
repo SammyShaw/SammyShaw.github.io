@@ -27,7 +27,7 @@ In this project I create six unique fantasy basketball ranking algorithms and co
     - [Top-N players](#top-n)
     - [Snake-Draft Ranking Tournament](#tournament)
 - [04. VORP](#value-over-replacement)
-- [05. Load: Streamlit App](#streamlit app)
+- [05. Load: Streamlit App](#streamlit-app)
 - [06. Discussion & Conclusion](#discussion)
 
 
@@ -71,8 +71,48 @@ As a research and data science project, I could not be happier. My rankings beat
 # Extraction
 
 I use the NBA api. An unofficial but widely used source for up-to-date NBA statistics. 
-[PYTHON CODE]
-[TABLE: RAW NBA data] 
+
+```python
+from nba_api.stats import endpoints
+from nba_api.stats.endpoints import LeagueDashPlayerStats
+import pandas as pd
+import os 
+
+os.chdir("C:/...Projects/NBA")
+
+season = "2024-25"
+
+def fetch_player_stats():
+    player_stats = LeagueDashPlayerStats(season=season)
+    df = player_stats.get_data_frames()[0]  # Convert API response to DataFrame
+    return df
+
+nba_24_25 = fetch_player_stats()
+
+nba_24_25.to_csv("data/nba_2024_25.csv", index=False)
+
+```
+
+The code above returns a dataframe of 66 columns and 500+ rows, which get added every time a new players sees the court. We're interested in the following columns: 
+
+```python
+
+stats = nba[['PLAYER_NAME', 'GP', 'FGA', 'FGM', 'FTA', 'FTM','FG3A', 'FG3M', 
+             'REB', 'AST', 'TOV', 'STL', 'BLK', 'PTS', 'DD2', 
+             'FG_PCT', 'FG3_PCT', 'FT_PCT']].copy()
+
+```
+
+A select sample of the data, showing three superstars and one lesser-known player. 
+
+| **Player Name** | **GP** | **FGA** | **FGM** | **REB** | **AST** | **TOV** | **STL** | **BLK** | **PTS** |
+|-----------------|--------|---------|---------|---------|---------|---------|---------|---------|---------|
+| LeBron James | 62 | 1139 | 583 | 506 | 525 | 238 | 58 | 35 | 1521 |
+| Nikola Jokic | 63 | 1226 | 706 | 806 | 647 | 206 | 109 | 43 | 1845 |
+| Victor Wembanyama | 46 | 857 | 408 | 506 | 168 | 149 | 52 | 176 | 1116 |
+| Jordan Goodwin | 20 | 104 | 50 | 77 | 29 | 16 | 23 | 11 | 130 |
+
+
 
 # Transformations
 
