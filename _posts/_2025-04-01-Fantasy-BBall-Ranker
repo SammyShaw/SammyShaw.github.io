@@ -48,7 +48,6 @@ In a recent Medium article, Giora Omer offers an alternative min-max normalizati
 Here, I develop and describe six different ranking algorithms of my own, and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. 
 Each of my ranking methods applies a Sigmoid Transformation to shot-attempts, weighting deficits for percentage categories based on their underlying distribution (hence SHAW – Sigmoid-Hierarchical Attempts-Weighted - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
-Table LIST & DESCRIBE ALGORITHMS HERE
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** | 
 |---|---|---|---|
 | SHAW-Z | Sum of standardized counting stats and sigmoid weighted percentages | Preserves spread while setting category distributions to like terms | May over-value outliers | 
