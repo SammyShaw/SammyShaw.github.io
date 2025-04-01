@@ -117,18 +117,20 @@ A select sample of the data, showing three superstars and one lesser-known playe
 # Transformations
 
 In a typical fantasy basketball league, a team’s weekly score is the sum of players’ cumulative stats in each of the following 9 categories: 
-•	Field Goal Percentage
-•	Free Throw Percentage
-•	Points
-•	3-pointers made
-•	Rebounds
-•	Assists 
-•	Steals
-•	Blocks
-•	Turnovers (which count negatively) 
+- Field Goal Percentage (FG_PCT = FGM/FGA)
+- Free Throw Percentage (FT_PCT = FTM/FTA)
+- Points (PTS)
+- 3-point Field Goals made (FG3M)
+- Rebounds (REB)
+- Assists (AST)
+- Steals (STL)
+- Blocks (BLK)
+- Turnovers (TOV) (which count negatively) 
+
 
 From there, leagues can keep score in one of two ways: a weekly ‘head-to-head’ matchup win (for the team that wins the most categories), or a win for each category (with all nine categories at stake). Leagues can be customized to include more or less categories, but the default is nine, and the main platforms’ rankings are based on these categories. 
-The goal is to turn raw NBA statistics from the relevant categories into a single player ranking metric that will help team managers understand a single player’s relative fantasy value. It would be easy if there was one statistical category to keep track of – players would be ranked by the number of points they get, for example. [In fact, Points leagues work by assigning every statistical category a uniform ‘point’ value, which is too easy to be any fun.] But category leagues require comparisons across 9 different measures. How can you value a player that gets a lot of points and few rebounds vs. one that gets a lot of rebounds and few assists? How do you compare a player that shoots an average free throw percentage on high volume, to a player that shoots above average on low volume?
+
+The goal is to turn raw NBA statistics from the relevant categories into a single player ranking metric that will help team managers understand a single player’s relative fantasy value. It would be easy if there was one statistical category to keep track of – players would be ranked by the number of points they get, for example. [In fact, *Points* leagues are an alternative scoring format that assigns every statistical category a uniform ‘point’ value, which is too easy to be any fun.] But category leagues require comparisons across 9 different measures. How can you value a player that gets a lot of points and few rebounds vs. one that gets a lot of rebounds and few assists? How do you compare a player that shoots an average free throw percentage on high volume, to a player that shoots above average on low volume?
 Before we get into that, it is important to understand the distributions. 
 
 ### Distributions
