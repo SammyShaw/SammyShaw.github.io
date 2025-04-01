@@ -49,6 +49,14 @@ Here, I develop and describe six different ranking algorithms of my own, and com
 Each of my ranking methods applies a Sigmoid Transformation to shot-attempts, weighting deficits for percentage categories based on their underlying distribution (hence SHAW – Sigmoid-Hierarchical Attempts-Weighted - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
 Table LIST & DESCRIBE ALGORITHMS HERE
+| **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** | 
+|---|---|---|---|
+| SHAW-Z | Sum of standardized counting stats and sigmoid weighted percentages | Preserves spread while setting category distributions to like terms | May over-value outliers | 
+| SHAW-mm | Sum of Min-Max (0-1) scaled counting stats and sigmoid weighted percentages | Preserves spread and normalizes without overvaluing outliers | May under-value real differences | 
+| SHAW-Scarce-mm | SHAW-mm ranking with weights applied to scarce categories | Rewards scarce category producers | Scarce categories might also vary unstablly from week to week | 
+| SHAW-rank-sum | reverse-ranked sum of each-category ranks (using sigmoid weighted percentages) | Simple math; preserves relative player *position* in each category | Treats categories uniformly without accounting for variance | 
+| SHAW-H2H-each | Ranked sum of total categories won vs. the field (using sigmoid weighted percentages) | Rewards balance across categories | Treats categories uniformly without accounting for variance |
+| SHAW-H2H-most | Ranked sum of total matchups won vs. the field (using sigmoid weighted percentages) | Rewards consistency in top categories | Treats categories uniformly without accounting for variance | 
 
 Rankings are then compared using two methods: 1. A top-n players list for each ranking, comparing players head-to-head across the nine, standard, categories; 2. A head-to-head super-tournament of 10 simulated (snake-drafted) teams from each metric, counting the category and matchup wins for each team and for each metric that the team came from. 
 Along the way, I build an ETL (Extract, Transform, Load) pipeline that starts with up-to-date NBA player stats and ends with an interactive player-ranker dashboard. 
