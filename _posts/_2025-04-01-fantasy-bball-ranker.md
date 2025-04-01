@@ -64,13 +64,15 @@ Along the way, I build an ETL (Extract, Transform, Load) pipeline that starts wi
 ### Results
 
 All six SHAW-transformation algorithms beat ESPN’s rankings and three of the six beat Yahoo’s rankings when comparing the top 100 players from each.  In a separate test, two of the six beat Basketball Monster when comparing the top 100 players. Surprisingly, the top performing algorithm was the SHAW-Z ranking, which is most like the oft-criticized method that the other platforms use. The fact that mine came out on top attests to the novel treatment of percentages. The second most successful algorithm was the SHAW-Scarcity-Boosted-mm ranking, a model based on min-max scaling that adds a modest bonus for players that outperform in scarce categories. Although I don’t compare my rankings to Rosenof’s G-Score ranking method, I note that we come to opposite conclusions regarding the value of high performers in scarce categories. 
-Growth/Next Steps
+
+### Growth/Next Steps
 As a research and data science project, I could not be happier. My rankings beat the competition, but I also hope that by publishing the actual ranking methods AND their systematic comparisons that this project inspires further research and discussion. Still, a lot more work can be done here, in terms of metric construction, comparison, and especially on the front-end.
 
+<br>
 
 # Extraction
 
-I use the NBA api. An unofficial but widely used source for up-to-date NBA statistics. 
+I use the [NBA API](https://github.com/swar/nba_api/blob/master/README.md?utm_source=chatgpt.com). An unofficial but widely used source for up-to-date NBA statistics. 
 
 ```python
 from nba_api.stats import endpoints
@@ -93,7 +95,7 @@ nba_24_25.to_csv("data/nba_2024_25.csv", index=False)
 
 ```
 
-The code above returns a dataframe of 66 columns and 500+ rows, which get added every time a new players sees the court. We're interested in the following columns: 
+The code above returns a dataframe of 66 columns and 550+ rows, which get added every time a new players sees the court. We're interested in the following columns: 
 
 ```python
 
