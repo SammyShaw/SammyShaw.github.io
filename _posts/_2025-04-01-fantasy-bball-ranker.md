@@ -17,7 +17,8 @@ In this project I create six unique fantasy basketball ranking algorithms and co
 - [01. Extract: Data Overview](#extract)
 - [02. Transform: Goals](#transformation-overview)
     - [Distributions & Redistributions](#distributions)
-    - [SHAW Percentage Transformations](#shaw-tranformation)
+    - [Percentages](#percentages)
+    - [SHAW-Transformation](#shaw-tranformation)
     - [Standardization](#standardization)
     - [Min-Max Normalization](#min-max)
     - [Scarcity Index](#scarcity)
@@ -167,9 +168,9 @@ for cat in raw_categories:
 ![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
 
 
-## SHAW Percentage Transformations
+## Percentages
 
-Percentage distributions need to be treated differently because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score. A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. 
+Percentage distributions need to be treated differently because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score. A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. I illustrate using Free Throws.
 
 ![alt text](/img/posts/FT_PCT_vs_A.png "Free Throw Distributions")
 
@@ -180,18 +181,13 @@ The recieved method for doing this is to measure a player's *impact* by finding 
 league_pct = stats["FTM"].sum() / stats["FTA"].sum()
 FT_impact = stats["FTM"] - (stats["FTA"] * league_pct)
 
-def z(stat):
-    return (stat - stat.mean()) / stat.std()
-
-FT_impact_z = z(FT_impact)
-
 ```
 
 At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers in both tails. 
 
 ![alt text](/img/posts/FT_Impact_Z.png "Free Throw Distributions")
 
-The test case here is Giannis Antetokounmpo. He shoots a (very) sub-par 60% from the free throw line, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). Giannis's Free Throw impact Z-Score is -8. 
+The test case here is Giannis Antetokounmpo. The league average Free Throw percentage (among eligible players) is 78.1% Antetokounmpo shoots a sub-par 60% from, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). The league average Free Throw percentage (among eligible players) is 78.2% Giannis's Free Throw impact Z-Score is -8. 
 
 | **Player Name** | **FT%** | **FTM** | **FTA** | **FT_Impact_Z_Score** |
 |-----------------|---------|---------|---------|-----------------------|
@@ -201,13 +197,17 @@ The test case here is Giannis Antetokounmpo. He shoots a (very) sub-par 60% from
 | James Harden | 87.4 | 515 | 450 | 3.51 | 
 | LeBron James | 76.8 | 289 | 222 | -0.23 | 
 
+A critical question for fantasy category valuations is thus, does Giannis hurt you THAT much? Does Shae Gilgeous Alexander *help* you that much? 
 
+For other, counting statistics, I will argue that skewed distributions are meaningful, but - and call it a hunch - although percentage and attempt distributions vary similarly, a percentage statistic is bound between 0 and 1, so positive and negative constributions to it are limited. Realistically, a week-to-week Free-Throw Percentage for an average fantasy team will orbit the league average, plus or minus 0.10% 
 
+## SHAW Percentage Transformation
 
-Probably not. The percentages seem to regress differently than other categories. If Giannis is terrible one night, he may bounce back the next night, and likewise, great shooter like Steph Curry can get cold from time to time. Surely this is an intuitive call from my experience: Percentage categories end up varying week to week more so than do the cumulative (and especially the rare) stats like blocks. 
-SHAW percentage transformation
+Rather than standardizing impact, I apply a more modest, sigmoidal weighting formula to attempts, 
 
-Rather than standardizing attempts, I apply a more modest, sigmoidal weighting formula that is muted around the mean (of attempts) and only starts to proportionally affect high volume shooters at the positive tail of the attempts distribution. Lambda, which defines the shape of the sigmoid curve, is found dynamically in relation to the skew of the attempts distribution. 
+that is muted around the mean (of attempts) and only starts to proportionally affect high volume shooters at the positive tail of the attempts distribution. Lambda, which defines the shape of the sigmoid curve, is found dynamically in relation to the skew of the attempts distribution. This ends up being a low number, which 
+
+The result is that Percentage category player valuations 
 
 [IMAGE: Sigmoidal Transformation Formula] 
 
