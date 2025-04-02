@@ -106,7 +106,7 @@ stats = nba[['PLAYER_NAME', 'GP', 'FGA', 'FGM', 'FTA', 'FTM','FG3A', 'FG3M',
 
 ```
 
-A select sample of the data, showing three superstars and one lesser-known player. 
+A select sample of the raw data, showing three superstars and one lesser-known player. 
 
 | **Player Name** | **GP** | **FGA** | **FGM** | **REB** | **AST** | **TOV** | **STL** | **BLK** | **PTS** |
 |-----------------|--------|---------|---------|---------|---------|---------|---------|---------|---------|
@@ -170,7 +170,7 @@ for cat in raw_categories:
 
 ## Percentages
 
-Percentage distributions need to be treated differently because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score. A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. I illustrate using Free Throws.
+Percentage categories need to be treated differently because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score. A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. I illustrate using Free Throws.
 
 ![alt text](/img/posts/FT_PCT_vs_A.png "Free Throw Distributions")
 
@@ -178,14 +178,14 @@ The recieved method for doing this is to measure a player's *impact* by finding 
 
 ```python
 
-league_pct = stats["FTM"].sum() / stats["FTA"].sum()
-FT_impact = stats["FTM"] - (stats["FTA"] * league_pct)
+league_pct = pg_stats["FTM"].sum() / pg_stats["FTA"].sum()
+FT_impact = pg_stats["FTM"] - (pg_stats["FTA"] * league_pct)
 
 ```
 
 At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers in both tails. 
 
-![alt text](/img/posts/FT_Impact_Z.png "Free Throw Distributions")
+![alt text](/img/posts/FT_impact.png "Free Throw Distributions")
 
 The test case here is Giannis Antetokounmpo. The league average Free Throw percentage (among eligible players) is 78.1% Antetokounmpo shoots a sub-par 60% from, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). The league average Free Throw percentage (among eligible players) is 78.2% Giannis's Free Throw impact Z-Score is -8. 
 
@@ -213,7 +213,7 @@ The result is that Percentage category player valuations
 
 [IMAGE: Sigmoidal Transformation Graph]
 
-[IMAGE: Graph raw percentages, raw attempts, sigmoid-weighted deficits]. 
+![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
 
 [PYTHON CODE BLOCK] 
 
