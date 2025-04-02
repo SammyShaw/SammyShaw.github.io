@@ -205,9 +205,6 @@ It seems reasonable, then, that percentage categories should be treated with thi
 
 I apply a Sigmoid-transformation to attempts to get a weight value, where:
 
-- **`S`** (or, sensitivity) = \( 1 + \text{CoV} \)
-- **`k`** (or, lambda) = \( \frac{1}{1 + |\text{Skewness}|} \)
-
 The **Sigmoid transformation** is defined as follows:
 
 $$
@@ -216,19 +213,14 @@ $$
 
 Where:
 
-- \( x = \frac{\text{Attempts}}{\text{Average Attempts}} \)
-- \( S \) sets the **maximum possible weight**, which occurs for high-volume shooters.
-- \( k \) determines the **sharpness** or **steepness** of the curve.
+- x = Attempts / Average Attempts
+- S = 1 + CoV (Coefficient of Variation)
+- k = 1 / (1 + |Skewness|)
 
-
-Applying to attempts in a percentage category, this yeilds weight values of 1 when a player's attempts are at the league average, and maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a negative weight value, which theoretically approaches zero for players with zero attempts. 
+Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a negative weight value, which theoretically approaches zero for players with zero attempts.
 
 I then apply the weight directly to the percentage *deficit*, or difference from the mean, which I cap at 3 standard deviations on both sides of the mean, effectively limiting the impact that a few terrible shooters have on the rest of the distribution. 
 
-
-[IMAGE: Sigmoidal Transformation Formula] 
-
-[IMAGE: Sigmoidal Transformation Graph]
 
 ![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
 
