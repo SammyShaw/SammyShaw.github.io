@@ -205,7 +205,7 @@ It seems reasonable, then, that percentage categories should be treated with thi
 
 I apply a Sigmoid-transformation to attempts to get a weight value, where:
 
-- **`S`** (or, sensitivity) = \( 1 + \text{Coefficient of Variation (CoV)} \)
+- **`S`** (or, sensitivity) = \( 1 + \text{CoV} \)
 - **`k`** (or, lambda) = \( \frac{1}{1 + |\text{Skewness}|} \)
 
 The **Sigmoid transformation** is defined as follows:
