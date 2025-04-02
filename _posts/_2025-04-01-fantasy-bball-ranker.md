@@ -69,7 +69,6 @@ All six SHAW-transformation algorithms beat ESPN’s rankings and three of the s
 ### Growth/Next Steps
 As a research and data science project, I could not be happier. My rankings beat the competition, but I also hope that by publishing the actual ranking methods AND their systematic comparisons that this project inspires further research and discussion. Still, a lot more work can be done here, in terms of metric construction, comparison, and especially on the front-end.
 
-<br>
 
 # Extraction
 
@@ -116,7 +115,6 @@ A select sample of the raw data, showing three superstars and one lesser-known p
 | Jordan Goodwin | 20 | 104 | 50 | 77 | 29 | 16 | 23 | 11 | 130 |
 
 
-
 # Transformations
 
 In a typical fantasy basketball league, a team’s weekly score is the sum of players’ cumulative stats in each of the following 9 categories: 
@@ -135,7 +133,7 @@ From there, leagues can keep score in one of two ways: a weekly ‘head-to-head�
 
 The goal is to turn raw NBA statistics from the relevant categories into a single player ranking metric that will help team managers understand a single player’s relative fantasy value. It would be easy if there was one statistical category to keep track of – players would be ranked by the number of points they get, for example. [In fact, *Points* leagues are an alternative scoring format that assigns every statistical category a uniform ‘point’ value, which is too easy to be any fun.] But category leagues require comparisons across 9 different measures. How can you value a player that gets a lot of points and few rebounds vs. one that gets a lot of rebounds and few assists? How do you compare a player that shoots an average free throw percentage on high volume, to a player that shoots above average on low volume?
 
-Before we get into that, it is important to understand the distributions. 
+As mentioned above, standardization is the accepted - and criticized - method for comparing different distributions. Before we get into that, it is important to understand the distributions. 
 
 
 ### Distributions
@@ -183,11 +181,11 @@ FT_impact = pg_stats["FTM"] - (pg_stats["FTA"] * league_pct)
 
 ```
 
-At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers in both tails. 
+At first glance this would seem fair, a player’s percentage impacts a team’s total to the extent that they take above or below average shot attempts. But because attempts are positively skewed, and percentages are negatively skewed, this method can produce some extreme numbers in both tails. Standardizing yeilds the following Z-Score distribution:
 
-![alt text](/img/posts/FT_impact.png "Free Throw Distributions")
+![alt text](/img/posts/FT_Impact_z.png "Free Throw Distributions")
 
-The test case here is Giannis Antetokounmpo. The league average Free Throw percentage (among eligible players) is 78.1% Antetokounmpo shoots a sub-par 60% from, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). The league average Free Throw percentage (among eligible players) is 78.2% Giannis's Free Throw impact Z-Score is -8. 
+One test case here is Giannis Antetokounmpo. The league average Free Throw percentage (among eligible players) is 78.1% Antetokounmpo shoots a sub-par 60% from, AND he takes the most attempts (he is an elite scorer otherwise, so he gets fouled a lot). The league average Free Throw percentage (among eligible players) is 78.2% Giannis's Free Throw Z-Score is -8. 
 
 | **Player Name** | **FT%** | **FTM** | **FTA** | **FT_Impact_Z_Score** |
 |-----------------|---------|---------|---------|-----------------------|
@@ -199,15 +197,34 @@ The test case here is Giannis Antetokounmpo. The league average Free Throw perce
 
 A critical question for fantasy category valuations is thus, does Giannis hurt you THAT much? Does Shae Gilgeous Alexander *help* you that much? 
 
-For other, counting statistics, I will argue that skewed distributions are meaningful, but - and call it a hunch - although percentage and attempt distributions vary similarly, a percentage statistic is bound between 0 and 1, so positive and negative constributions to it are limited. Realistically, a week-to-week Free-Throw Percentage for an average fantasy team will orbit the league average, plus or minus 0.10% 
+For other, counting statistics, I will argue later that skewed distributions are meaningful and useful, but a percentage statistic is bound between 0 and 1, so positive and negative constributions to it are limited: they are asymptotic, not linear! 
 
 ## SHAW Percentage Transformation
 
-Rather than standardizing impact, I apply a more modest, sigmoidal weighting formula to attempts, 
+It seems reasonable, then, that percentage categories should be treated with this observation in mind. Attempts should be weighted within limits defined by its own distribution. 
 
-that is muted around the mean (of attempts) and only starts to proportionally affect high volume shooters at the positive tail of the attempts distribution. Lambda, which defines the shape of the sigmoid curve, is found dynamically in relation to the skew of the attempts distribution. This ends up being a low number, which 
+I apply a Sigmoid-transformation to attempts to get a weight value, where:
 
-The result is that Percentage category player valuations 
+- **`S`** (or, sensitivity) = \( 1 + \text{Coefficient of Variation (CoV)} \)
+- **`k`** (or, lambda) = \( \frac{1}{1 + |\text{Skewness}|} \)
+
+The **Sigmoid transformation** is defined as follows:
+
+$$
+\text{Weight} = \left( \frac{S - 1}{0.5} \right) \left( \frac{1}{1 + e^{-k (x - 1)}} - 0.5 \right) + 1
+$$
+
+Where:
+
+- \( x = \frac{\text{Attempts}}{\text{Average Attempts}} \)
+- \( S \) sets the **maximum possible weight**, which occurs for high-volume shooters.
+- \( k \) determines the **sharpness** or **steepness** of the curve.
+
+
+Applying to attempts in a percentage category, this yeilds weight values of 1 when a player's attempts are at the league average, and maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a negative weight value, which theoretically approaches zero for players with zero attempts. 
+
+I then apply the weight directly to the percentage *deficit*, or difference from the mean, which I cap at 3 standard deviations on both sides of the mean, effectively limiting the impact that a few terrible shooters have on the rest of the distribution. 
+
 
 [IMAGE: Sigmoidal Transformation Formula] 
 
@@ -311,11 +328,13 @@ Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
 
 
-I.	Conclusion/Growth
+# Conclusion/Growth
 
 think it is safe to conclude that rankings only make up a small part fantasy success. Even when using the most competitive method (z scores), there is still intransitivity among players, and then the draft order generates noise that rankings may not be able to overcome. 
 Even more confounding would be the actual position requirements in fantasy leagues, which my simulated matchups do not account for. Savvy fantasy managers know as well that building a team is equally art and science. Knowing that you only need 5 of 9 categories to win, for example, you can elect to ‘punt’ or exclude one or more categories from your ideal team build. Knowing which categories to punt depends on what players are available at what order during draft day. A ranking system that accounted for every punt scenario in real time during a player draft would be overwhelming to say the least. 
 And finally, I have not addressed factor that all fantasy managers know to be the one the real difference maker basketball – injuries. This year, perennial MVP favorite Nikola Jokic missed 5 straight games during fantasy playoff weeks. If you had him on your team, you were likely in the playoffs, and then you likely lost because he was injured. 
+
+PERCENTAGES DO NOT SCALE LINEARLY
 
 COMMENTS ON STANDARDIZATION and its CRITICS. 
 The criticism that Z-scores over-value outliers in skewed distributions turns out to be wrong. My standardized rankings beat all the other rankings, but WHY? It turns out that standardization, like my scarcity boost formula, rewards scarcity. When a distribution is highly skewed, that may be because the event is scarce, or because elite producers in that category are scarce. In fact, eliteness produces skew, and thus scarcity. Victor Wembanyama pushes out the tail of the distribution because he is a unique talent; the skew results from the fact that there is no one else out there with him. Wembanyma’s Z-score of 8 in Blocks, or Dyson Daniel’s Z-score of 6 in Steals not only reflect those player’s ability in relation to those categories, but they reflect their scarcity in relation to other players as well. 
