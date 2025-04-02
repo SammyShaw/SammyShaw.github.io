@@ -151,8 +151,11 @@ min_games = stats["GP"].quantile(minimum_games_threshold_quantile)
 
 pg_stats = stats[stats["GP"] >= min_games].copy()
 
+# reverse code turnovers
+pg_stats['tov'] = pg_stats['TOV'].max() - pg_stats['TOV']
+
 raw_categories = ['FGA', 'FGM', 'FTA', 'FTM', 'FG3M', 'PTS',
-             'REB', 'AST', 'STL', 'BLK', 'TOV']
+             'REB', 'AST', 'STL', 'BLK', 'tov']
 
 for cat in raw_categories:
     pg_stats[cat + "_pg"] = pg_stats[cat] / pg_stats['GP'] 
@@ -289,7 +292,8 @@ The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, wh
 
 ![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
 
-The 
+SHAW-transformed percentages thus follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, note that the extremes that are produced in the tails (Giannis vs. Shai G-A for example) using Impact scores are muted by SHAW-tranformations. This method thus undervalues SGA and overvalues Giannis relative to existing rankings. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
+
 
 | **Player Name** | **FT%** | **FTM** | **FTA** | **X: atts/avg** | **FT_Impact_Z_Score** | **Deficit** | **Sig-weight** | **SHAW-percentage** | **SHAW-Z-Score** | 
 |-----------------|---------|---------|---------|-----------------|-----------------------|-------------|----------------|---------------------|------------------|
@@ -302,69 +306,184 @@ The
 
 ## Standardization
 
-Standardization works because it puts all category distributions in the same theoretical range so that they can be easily compared. A player’s standardized-, or Z-score is their relative difference (above or below the mean) divided by the standard deviation of the distribution.
+Standardization is the dominant method because is works. It transforms unique distributions to the same theoretical range so that they can be easily compared. A player’s standardized-, or *Z*-score is their relative difference (above or below average), divided by the standard deviation of the distribution.
 
-[mathematical formula] 
+In Python: 
 
-In Python: [CODE BLOCK]
+```python
 
-And that operation leads to the following: 
+def Z(stat):
+    return (stat - stat.mean())/stat.std()
 
-[IMAGE:  standardized points/rebounds per game] 
-As we can see the spread remains the same AND now the ranges are congruent. From here, we can compare points, rebounds, and SHAW transformed percentages in like terms. AT a Z-score of ~3, 28 Points per game is comparatively equivalent to 11 rebounds per game.
+```
 
-The SHAW-Z ranking is simply the sum the standardized categories, after SHAW-transforming percentages. 
-[PYTHON CODE CHUNK]
+I create a SHAW-Z ranking by including my SHAW-tranformed percentages in the set of categories to be standardized, taking the sum of those Z-Scores, and returning a rank-order. 
+
+```python
+
+nine_cat = ['SHAW_FT_PCT', 'SHAW_FG_PCT', 'PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'tov']
+
+def Z_rank(df, categories, metric_label):
+    df[metric_label] = Z(df[categories]).sum(axis=1) # rank and add the categories 
+    df[metric_label + "_rank"] = df[metric_label].rank(ascending=False, method='min').reindex(df.index) # return rank order
+    return df
+
+pg_stats = Z_rank(pg_stats, nine_cat, 'SHAW-Z')
+
+```
+
 
 ## Min-Max Scaling
-Similar to standardization, min-max scaling (transforming the range to 0 – 1) preserves the spread, but it also limits the range, so that outlier values are not so extreme. 
-[IMAGE: Math formula]
-[IMAGE: min-max points/ rebounds]. 
-As we can see, scaling between 0 and 1 produces the same relative distribution, and this time the range IS the same across categories: The highest achiever in each can only see a maximum score of 1. This method seems to limit an outlier players’ advantage in any given category. A maximum of one point for one category seems like a fair system. 
-The SHAW-mm ranking is found by summing the normalized (0-1) categories, after SHAW transforming percentages. 
-[PYTHON CODE CHUNK]
+
+Similar to standardization, min-max scaling (transforming the range to 0 – 1) preserves the spread, and it also limits the range, so outlier values are reigned in. This means that if a player is an outlier in a category, their maximum value in a category is limited at 1, and all other players are scaled accordingly. This makes intuitive sense, because each category is only worth 1 point. If a fantasy team over-performs in a category, they don't get more than one point. 
+
+To scale between 0-1, take the difference from the minimum value and divide by the range: 
+
+x - min(X) / (max(X) - min(X))
+
+Because this approach is standard for many machine learning tasks, the conventional method in Python makes use of the ML SciKitLearn library. 
+
+```python
+
+from sklearn.preprocessing import MinMaxScaler
+
+# scaler = MinMaxScaler() # default range = 0-1
+# scaler.fit_tranform(x)
+
+```
+
+I create a SHAW-mm ranking by including my SHAW-tranformed percentages in the set of categories to be scaled between 0 and 1, taking the sum of those Min-Max scores, and returning a rank-order. 
+
+```python
+
+def minmax_rank(df, categories, metric_label):
+    scaler = MinMaxScaler() # default range = 0-1
+    df[metric_label] = scaler.fit_transform(df[categories]).sum(axis=1) # rank and add the categories 
+    df[metric_label + "_rank"] = df[metric_label].rank(ascending=False, method='min').reindex(df.index) # return rank order
+    return df
+
+pg_stats = minmax_rank(pg_stats, nine_cat, 'SHAW-mm')
+
+```
 
 ## Scarcity Ranking
 
-Scarcity is the basis of modern economics because scarce resources are worth more than abundant ones. In an NBA game, there are plenty of points scored and many players accumulate points. By contrast, blocked shots or steals might happen a handful of times in a game, and only a few players across the league tend to excel in those categories. 
-Although Blocks and Points count the same in terms of categories, having a player that excels in Blocks may be more valuable than a high point getter, because the shot blocker is harder to replace. There are fewer elite shot blockers in the league, and if you don’t have one, you’ll have a hard time competing in that category. 
+Scarcity is the basis of modern economics because value is a function of scarcity (c.f., David Ricardo, 1817). In an NBA game, there are plenty of points scored and many players accumulate points. By contrast, blocked shots or steals might happen a handful of times in a game, and only a few players across the league tend to excel in those categories. 
+
+Although Blocks and Points count the same in terms of categories, having a player that excels in Blocks may be more valuable than a high Points getter, because the Block star is harder to replace. There are fewer elite shot blockers in the league, and if your team doesn't have one, you may have a hard time competing in that category. 
+
 To test this hypothesis, I developed an index that weighs the relative scarcity of each of the seven cumulative categories (on a scale of 0-1, total scarcity = 1) by subtracting the skew from the inner-quartile range, and normalizing (min-max scaling) the results. Then, for the min-max transformed categories, I multiply the normalized category distributions by its scarcity score. Because both the scarcity index and normalized distributions range between 0-1, the resulting sum of scarcity weighted scores also range between 0 and 1. The result is a modest addition that boosts a player’s min-max score by a maximum of one point. That should be enough to redistribute the players to test whether rewarding scarcity actually improves the rankings. 
-IMAGE: SCARCITY MEASURE
-[PYTHON CODE CHUNK]
+
+''' python
+
+def scarcity_rank(df, categories, metric_label):
+    
+    # Calculate skewness and interquartile range for each category
+    skewness = df[categories].apply(skew)
+    iqr = df[categories].quantile(0.75) - df[categories].quantile(0.25)
+
+    # Compute scarcity index (skewness / IQR) and scale it to [0, 1]
+    scarcity_index = (skewness / iqr).sort_values(ascending=False)
+    scarcity_weights = (scarcity_index - scarcity_index.min()) / (scarcity_index.max() - scarcity_index.min())
+
+    scaler = MinMaxScaler() 
+    # Scale each category and apply scarcity weights
+    for stat in categories:
+        # Scale the category to a 0-1 range
+        df[f'{stat}_mm'] = scaler.fit_transform(df[[stat]])
+        
+        # Apply the scarcity weight to the scaled category
+        df[f'{stat}_mm_scarcity_weight'] = df[f'{stat}_mm'] * scarcity_weights[stat]
+
+    # Sum the scarcity-weighted stats
+    df[f'{metric_label}_scarcity_boost'] = df[[f'{stat}_mm_scarcity_weight' for stat in categories]].sum(axis=1)
+    
+    # Add the boost to the original min-max scaled metric
+    df[f'{metric_label}_mm_total'] = df[[f'{stat}_mm' for stat in categories]].sum(axis=1)
+    df[f'{metric_label}_scarcity_score'] = df[f'{metric_label}_mm_total'] + df[f'{metric_label}_scarcity_boost']
+
+    # Rank based on the final scarcity score
+    df[f'{metric_label}_scarcity_rank'] = df[f'{metric_label}_scarcity_score'].rank(ascending=False, method='min')
+
+    return df
+
+counting_stats = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'tov']
+
+pg_stats = scarcity_rank(pg_stats, counting_stats, '9_cat')
+
+```
+
+[TABLE:
+
+SAMPLE Players, traditional Z-score sum, Traditional Z-Score rank, SHAW-Z sum, SHAW-Z rank, SHAW-mm sum, SHAW-mm rank, SHAW-Scarce-mm, SHAW-scarce-mm-rank. 
+
+| **Player Name** | **Sum of Z-Scores (traditional)** | **Z-rank (traditional)** | **SHAW-Z sum** | **SHAW-Z rank** | **SHAW-mm sum** | **SHAW-mm rank** | **SHAW-Scarce-mm sum** | **SHAW-Scarce-mm rank** | 
+|-----------------|-----------------------------------|--------------------------|----------------|-----------------|-----------------|------------------|------------------------|-------------------------|
+| Nikola Jokic | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | 
+| Shai Gilgeous-Alexander | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 
+| Karl Anthony-Towns | 90.1 | 563 | 625 | 5.70 | 5.50 | 0.12 | 1.66 | 98.0 | 
+| James Harden | 87.4 | 515 | 450 | 5.70 | 3.51 | 0.09 | 1.56 | 92.5 | 
+| LeBron James | 76.8 | 289 | 222 | 2.63 | -0.23 | -0.01 | 1.27 | 76.4 | 
+| Giannis Antetokounmpo | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | 
+| Steph Curry | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 
+
 
 ## Other Ranking Methods
-Other plausible ranking methods use the SHAW transformed percentages but forgo additional transformations. 
+
+Other plausible ranking methods use the SHAW transformed percentages but forgo additional transformations and concerns with category variance. 
 
 ### Ranked Sum of Category Ranks
+
 The simplest method is to rank players in each category, add up those ranks, and reverse rank that sum. 
-[IMAGE: TABLE: 5 Notable players]
+
+```python
+
+def cat_rank_sum(df, categories, metric_label):
+    category_ranks = pd.DataFrame()
+    for stat in categories: 
+        cat_ranks[stat + "_rank"] = df[stat].rank(ascending=False, method='min')
+    df[metric_label] = cat_ranks.sum(axis=1)
+    df[metric_label + "_rank"] = df[metric_label].rank(ascending=True, method='min')
+    return df
+
+pg_stats = cat_rank_sum(pg_stats, nine_cat, 'SHAW_rank_sum')
+
+```
 This method does not preserve the relative spread, but instead distributes players uniformly in each category, while still accounting for the relative position of each player in each category. 
-And since we’re comparing all the players across all categories, this method would seem to be the most efficient. The results are somewhat surprising. Is Christian Braun is above average in most categories, but not elite in any. Is Braun really more valuable than a player that is elite in 4 or five categories, but only average in 5 others?  
+And since we’re comparing all the players across all categories, this method seems elegant. But results are somewhat surprising, as we'll see.
 
 ### Head to Head individual player comparisons
+
 Another approach to ranking involves observing how players match up head-to-head (H2H) against other players. After SHAW-transforming the percentages, players are compared against every other player in every category. This requires building a data frame with a row for each player combination. From there we can count the number of categories that each player wins versus each other, we can assign a matchup winner (for most categories won), and we can count the total categories, and total matchup wins against the field. 
-This takes considerable computing time, so it’s not a practical method to build into an ETL pipeline. But I do construct the rankings based on H2H matchup wins and H2H each category wins, and compare these to the other metrics. 
-For brevity, I include most of code for this simulation in my github repository, and for consistency, I construct the rankings below, but ONLY after transforming the percentage categories. 
-[PYTHON CODE BLOCK]
-[IMAGE: TABLE H2H CATEGORIES] 
 
-The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different. 
+This takes considerable computing time, so it’s not a practical method to build into an ETL pipeline. For the sake of comparison, I do construct the rankings based on H2H matchup wins and H2H each category wins, and compare these to the other metrics. 
 
-[TABLE – select players in different rank orders] 
+For brevity, the code for this can be found in my GitHub repository. 
 
+The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, and which can be compared to ESPN, Yahoo, and Basketball Monster.
+
+| **Player Name** | **SHAW-Z rank** | **SHAW-mm rank** | **SHAW-Scarce-mm rank** | **SHAW-rank-sum rank** | **SHAW_H2H_each rank** | **SHAW_H2H_most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
+|-----------------|-----------------|------------------|-------------------------|------------------------|------------------------|------------------------|----------|-----------|------------------------|
+| Nikola Jokic |  |  |  |  |  |  |  |  | 
+| Shai Gilgeous-Alexander |  |  |  |  |  |  |  |  | 
+| Karl Anthony-Towns |  |  |  |  |  |  |  |  | 
+| James Harden |  |  |  |  |  |  |  |  | |  |  |  |  |  |  |  | 
+| LeBron James |  |  |  |  |  |  |  |  | 
+| Giannis Antetokounmpo |  |  |  |  |  |  |  |  | 
+| Steph Curry |  |  |  |  |  |  |  |  | 
 
 
 ## The Competition
-In addition to comparing my own ranking metrics, I compare to the rankings of Yahoo, ESPN, and Basketball Monster. 
-I mentioned earlier that there is no transparency as to how these platforms compute rankings, and to be fair, Yahoo and ESPN’s fantasy player portals don’t actually include ‘rank’ numbers after the season begins. Nevertheless, they do provide an ostensibly rank-ordered list that can be sorted based on season totals, per-game averages, two week averages, etc. Because the order changes based on the parameter, and because the top players are congruent with other rankings, it is safe to assume there is a ranking algorithm working behind the scenes. 
+
+I mentioned earlier that there is no transparency as to how the major platforms compute rankings, and to be fair, Yahoo and ESPN’s fantasy player portals don’t actually include ‘rank’ numbers after the season begins. Nevertheless, they do provide an ostensibly rank-ordered list that can be sorted based on season totals, per-game averages, two week averages, etc. Because the order changes based on the parameter, and because the top players are congruent with other rankings, it is safe to assume there is a ranking algorithm working behind the scenes. 
+
 I copy/pasted the top 200 players for season averages (a.k.a. per-game) statistics on March 26, 2025 from both ESPN and Yahoo. I mention the date because this is a single point-in-time comparison. I refreshed my own rankings on March 26, so that I’m comparing player rankings using the same player statistics.
-ESPN provides a separate ‘updated category rankings’ list every week, but these are based on future projections – designed to help fantasy managers make replacement decisions  -and they are different from the lists provided in their fantasy player portal. Still, it does appear that ESPN uses some type of injury forecast, even for their “season averages” list. 
-Why Victor Wembanyama was listed by ESPN at the 111th position on their list, however, is beyond me. He should either be a top 10 player by season averages, or he should be completely removed (for forecasting purposes) because he suffered a season-ending blood condition.
+
+ESPN provides a separate ‘updated category rankings’ list every week, but these are based on future projections – designed to help fantasy managers make replacement decisions  -and they are different from the lists provided in their fantasy player portal. Still, it does appear that ESPN uses some type of *forecast* ranking system, that accounts for injuries, even for their “season averages” list. Why Victor Wembanyama was listed by ESPN at the 111th position on their list, however, is beyond me. He should either be a top 10 player by season averages, or he should be completely removed (for forecasting purposes) because he suffered a season-ending blood condition mid-way through the seaon
+
 Nevertheless, to make the comparisons fair, I removed all the currently injured players in ESPN’s top 130 from the pool of eligible players. That injury list includes: 
 
 [INJURY LIST]
-
-Note that I kept both Nikola Jokic and Anthony Davis, two top players that were scheduled to return from injuries that very day. 
 
 With those indiscrepancies out of the way, there were also a few players in Yahoo’s and ESPN’s average rankings that were filtered out of my own player pool because they did not meet my minimum games threshold. These include Joel Embiid, who has only played X games this season, and [X] a player whose playing time increased only towards the end of the season. Although these players had ranks elsewhere, they were not in the eligible player pool and thus were removed from rank comparisons. 
 
