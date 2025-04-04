@@ -374,7 +374,7 @@ Although Blocks and Points count the same in terms of categories, having a playe
 
 To test this hypothesis, I developed an index that weighs the relative scarcity of each of the seven cumulative categories (on a scale of 0-1, total scarcity = 1) by subtracting the skew from the inner-quartile range, and normalizing (min-max scaling) the results. Then, for the min-max transformed categories, I multiply the normalized category distributions by its scarcity score. Because both the scarcity index and normalized distributions range between 0-1, the resulting sum of scarcity weighted scores also range between 0 and 1. The result is a modest addition that boosts a player’s min-max score by a maximum of one point. That should be enough to redistribute the players to test whether rewarding scarcity actually improves the rankings. 
 
-''' python
+``` python
 
 def scarcity_rank(df, categories, metric_label):
     
@@ -449,6 +449,7 @@ def cat_rank_sum(df, categories, metric_label):
 pg_stats = cat_rank_sum(pg_stats, nine_cat, 'SHAW_rank_sum')
 
 ```
+
 This method does not preserve the relative spread, but instead distributes players uniformly in each category, while still accounting for the relative position of each player in each category. 
 And since we’re comparing all the players across all categories, this method seems elegant. But results are somewhat surprising, as we'll see.
 
@@ -462,20 +463,22 @@ For brevity, the code for this can be found in my GitHub repository.
 
 The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, and which can be compared to ESPN, Yahoo, and Basketball Monster.
 
-| **Player Name** | **SHAW-Z rank** | **SHAW-mm rank** | **SHAW-Scarce-mm rank** | **SHAW-rank-sum rank** | **SHAW_H2H_each rank** | **SHAW_H2H_most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
-|-----------------|-----------------|------------------|-------------------------|------------------------|------------------------|------------------------|----------|-----------|------------------------|
-| Nikola Jokic |  |  |  |  |  |  |  |  | 
-| Shai Gilgeous-Alexander |  |  |  |  |  |  |  |  | 
-| Karl Anthony-Towns |  |  |  |  |  |  |  |  | 
-| James Harden |  |  |  |  |  |  |  |  | |  |  |  |  |  |  |  | 
-| LeBron James |  |  |  |  |  |  |  |  | 
-| Giannis Antetokounmpo |  |  |  |  |  |  |  |  | 
-| Steph Curry |  |  |  |  |  |  |  |  | 
+| **Player Name** | **Traditional Z-rank** | **SHAW-Z rank** | **SHAW-mm rank** | **SHAW-Scarce-mm rank** | **SHAW-rank-sum rank** | **SHAW_H2H_each rank** | **SHAW_H2H_most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Nikola Jokic | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 5 | 1 | 1 |
+| Shai Gilgeous-Alexander | 1 | 3 | 3 | 3 | 1 | 1 | 2 | 1 | 3 | 2 |
+| Victor Wembanyama | 3 | 1 | 2 | 1 | 3 | 3 | 3 | 111 | 2 | 3 |
+| Karl Anthony-Towns | 5 | 7 | 7 | 8 | 4 | 4 | 4 | 6 | 4 | 6 |
+| Steph Curry | 10 | 10 | 8 | 9 | 21 | 20 | 34 | 16 | 12 | 13 |
+| James Harden | 16 | 17 | 17 | 15 | 14 | 15 | 10 | 12 | 27 | 19 |
+| LeBron James | 21 | 23 | 22 | 19 | 19 | 19 | 13 | 17 | 14 | 21 |
+| Giannis Antetokounmpo | 81 | 26 | 43 | 28 | 90 | 89 | 75 | 3 | 23 | 76 |
+| Dyson Daniels | 31 | 30 | 72 | 47 | 92 | 92 | 76 | 51 | 31 | 15 | 
 
 
 ## The Competition
 
-I mentioned earlier that there is no transparency as to how the major platforms compute rankings, and to be fair, Yahoo and ESPN’s fantasy player portals don’t actually include ‘rank’ numbers after the season begins. Nevertheless, they do provide an ostensibly rank-ordered list that can be sorted based on season totals, per-game averages, two week averages, etc. Because the order changes based on the parameter, and because the top players are congruent with other rankings, it is safe to assume there is a ranking algorithm working behind the scenes. 
+I mentioned earlier that there is no transparency as to how the major platforms compute rankings, and to be fair, Yahoo and ESPN’s fantasy player portals don’t actually include rank numbers after the season begins. Nevertheless, they do provide an ostensibly rank-ordered list that can be sorted based on season totals, per-game averages, two week averages, etc. Because the order changes based on the parameter, and because the top players are congruent with other rankings, it is reasonable to assume there is a ranking algorithm working behind the scenes. 
 
 I copy/pasted the top 200 players for season averages (a.k.a. per-game) statistics on March 26, 2025 from both ESPN and Yahoo. I mention the date because this is a single point-in-time comparison. I refreshed my own rankings on March 26, so that I’m comparing player rankings using the same player statistics.
 
@@ -507,31 +510,9 @@ A second method of comparing rankings is to simulate 10 teams from each, which s
 [IMAGE: Top and bottom 10 teams]. 
 Given the results of the top-n teams, we might expect that the SHAW-Z and SHAW-Scarcity-Boosted-mm ranked teams would rise to the top. Indeed these metrics take the top to matchup-wins spots, but the Basketball Monster rankings get the most total category wins. Perhaps more interestingly, the differences among the top performers appear insignificant. Shaw-Z wins only 1% more than the next. 
 
-Table Ranking Tournament Matchup and Category Wins vs. ESPN & YAHOO 3/26
-print(aggregated_wins)
-                     Matchup_Wins  Category_Wins
-Metric                                          
-9_cat_z_rank                  423           3636
-9_cat_scarcity_rank           414           3641
-ESPN Rank                     407           3549
-9_cat_mm_rank                 405           3574
-Yahoo Rank                    401           3605
-9_cat_rank_sum_rank           395           3589
-H2H_9_most_rank               374           3444
-H2H_9_each_rank               341           3402
 
-Table Ranking Tournament Matchup and Category Wins vs. BBM 3/28
 
-print(aggregated_wins)
-                     Matchup_Wins  Category_Wins
-Metric                                          
-9_cat_scarcity_rank           368           3184
-bbm_ranks                     364           3196
-9_cat_z_rank                  361           3175
-H2H_9_each_rank               359           3130
-9_cat_mm_rank                 353           3139
-9_cat_rank_sum_rank           317           2988
-H2H_9_most_rank               293           2923
+
 
 Unpacking the team team-level standings further, we see that same ranking systems perform across the range of wins and losses. In fact, the H2H rankings are among the top winners (and losers) when they did not perform well at all in top-n teams matchups. This experiment leads me to think that – all other things being equal – the luck of the draw – in this case the draft order given slightly different combinations of players – matters the more than rankings themselves. 
 
