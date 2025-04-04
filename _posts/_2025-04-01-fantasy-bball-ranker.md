@@ -413,21 +413,6 @@ pg_stats = scarcity_rank(pg_stats, counting_stats, '9_cat')
 
 ```
 
-[TABLE:
-
-SAMPLE Players, traditional Z-score sum, Traditional Z-Score rank, SHAW-Z sum, SHAW-Z rank, SHAW-mm sum, SHAW-mm rank, SHAW-Scarce-mm, SHAW-scarce-mm-rank. 
-
-| **Player Name** | **Sum of Z-Scores (traditional)** | **Z-rank (traditional)** | **SHAW-Z sum** | **SHAW-Z rank** | **SHAW-mm sum** | **SHAW-mm rank** | **SHAW-Scarce-mm sum** | **SHAW-Scarce-mm rank** | 
-|-----------------|-----------------------------------|--------------------------|----------------|-----------------|-----------------|------------------|------------------------|-------------------------|
-| Nikola Jokic | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | 
-| Shai Gilgeous-Alexander | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 
-| Karl Anthony-Towns | 90.1 | 563 | 625 | 5.70 | 5.50 | 0.12 | 1.66 | 98.0 | 
-| James Harden | 87.4 | 515 | 450 | 5.70 | 3.51 | 0.09 | 1.56 | 92.5 | 
-| LeBron James | 76.8 | 289 | 222 | 2.63 | -0.23 | -0.01 | 1.27 | 76.4 | 
-| Giannis Antetokounmpo | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | 
-| Steph Curry | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 
-
-
 ## Other Ranking Methods
 
 Other plausible ranking methods use the SHAW transformed percentages but forgo additional transformations and concerns with category variance. 
