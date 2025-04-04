@@ -189,7 +189,7 @@ At first glance this would seem fair, a player’s percentage impacts a team’s
 The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league average is 78.2%), but he is also a league-leader in attempts (as an elite scorer otherwise, he gets fouled a lot). Giannis's Free Throw Z-Score is -8. 
 
 
-| **Player Name** | **FT%** | **FTM** | **FTA** | **FT_Impact_Z_Score** |
+| **Player Name** | **FT%** | **FTM** | **FTA** | **FT Impact Z-Score** |
 |-----------------|---------|---------|---------|-----------------------|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | -8.12 | 
 | Steph Curry | 92.9 | 252 | 234 | 2.73 | 
@@ -295,7 +295,7 @@ The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, wh
 SHAW-transformed percentages thus follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, note that the extremes that are produced in the tails (Giannis vs. Shai G-A for example) using Impact scores are muted by SHAW-tranformations. This method thus undervalues SGA and overvalues Giannis relative to existing rankings. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
 
 
-| **Player Name** | **FT%** | **FTM** | **FTA** | **X: atts/avg** | **FT_Impact_Z_Score** | **Deficit** | **Sig-weight** | **SHAW-percentage** | **SHAW-Z-Score** | 
+| **Player Name** | **FT %** | **FTM** | **FTA** | **X:atts/avg** | **FT Impact Z_Score** | **Deficit** | **Sig-weight** | **SHAW %** | **SHAW-Z-Score** | 
 |-----------------|---------|---------|---------|-----------------|-----------------------|-------------|----------------|---------------------|------------------|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | -3.55 | 
 | Steph Curry | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 2.30 | 
@@ -448,7 +448,7 @@ For brevity, the code for this can be found in my GitHub repository.
 
 The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, and which can be compared to ESPN, Yahoo, and Basketball Monster.
 
-| **Player Name** | **Traditional Z-rank** | **SHAW-Z rank** | **SHAW-mm rank** | **SHAW-Scarce-mm rank** | **SHAW-rank-sum rank** | **SHAW_H2H_each rank** | **SHAW_H2H_most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
+| **Player Name** | **Traditional Z-rank** | **SHAW Z rank** | **SHAW mm rank** | **SHAW Scarce mm rank** | **SHAW rank-sum rank** | **SHAW H2H each rank** | **SHAW H2H most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Nikola Jokic | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 5 | 1 | 1 |
 | Shai Gilgeous-Alexander | 1 | 3 | 3 | 3 | 1 | 1 | 2 | 1 | 3 | 2 |
