@@ -5,7 +5,7 @@ image: "/posts/PLACEHOLDER.png"
 tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 ---
 
-In this project I adresses the percentage distribution problem in fantasy basketball ranking algorithms. Existing ranking systems weight percentage performances linearly by attempts. Because percentages are bound between 0 and 1, however, the actual affect of attempts on percentages is asymptotic, not linear. I develop a Sigmoid-Harmonic-Attempt-Weighting (SHAW) transformation tied to the statistical properties (CoV & Skewness) of attempt distributions. I then use the SHAW percentage transformations to create six unique fantasy basketball ranking algorithms which I then systematically compare to the current leading fantasy platform rankings: ESPN, Yahoo.com, and Basketball Monster. In top-100 player head-to-head matchups, two of my ranking systems beat Basketball Monster, three beat Yahoo, and all six beat ESPN. I extract, transform, and load data for my own fantasy basketball player ranking app. [URL]. 
+In this project I extract, transform, and load data for my own fantasy basketball player ranking app [URL]. I construct a series of ranking algorithms premised on the hypothesis that percentage category scores are scaled erroneously. Existing ranking systems weight percentage performances linearly by attempts. Because percentages are bound between 0 and 1, however, the actual affect of attempts on percentages is asymptotic, not linear. I develop a Sigmoid-Harmonic-Attempt-Weighting (SHAW) transformation based on the statistical properties (CoV & Skewness) of attempt distributions. I then create six unique fantasy basketball ranking algorithms using SHAW- percentage transformations, which I then systematically compare to each other and to the current leading fantasy platform rankings: ESPN, Yahoo, and Basketball Monster. In head-to-head matchups using top-*n* players from each ranking set, I find some limited support for my hypothesis. 
 
 ## Contents
 
@@ -40,13 +40,13 @@ Fantasy sports are a popular past time with over 62.5 million participants in th
 
 ### Literature Review
 
-I’m not the only one to question the platform rankings and there are some interesting contributions out there concerning the best way to construct them. The consensus in these discussions is that the existing (Yahoo and ESPN) rankings are made by standardizing the categories and then ranking the sum of the players’ *Z*-Scores (with caveats for percentage categories). But standardization is criticized for over- or under-valuing outliers if distributions are skewed (which they are in the NBA). Victor Wembanyama’s *Z*-score of 8 in the Blocks category, for example, statistically represents a nearly impossible occurrence when assuming normal distributions, and therefore, the criticism goes, the ranking logic must be inaccurate. 
+I’m not the only one to question the platform rankings and there are some interesting ideas circulating concerning the best way to construct them. The consensus in these discussions is that existing (Yahoo and ESPN) rankings involve standardizing the categories and then ranking the sum of the players’ *Z*-Scores (with caveats for percentage categories). But standardization is criticized for over- or under-valuing outliers if distributions are skewed (which they are in the NBA). Victor Wembanyama’s *Z*-score of 8 in the Blocks category, for example, statistically represents a nearly impossible occurrence when assuming normal distributions, and therefore, the criticism goes, the ranking logic must be inaccurate. 
 
-In a recent Medium article, Giora Omer offers an alternative min-max normalization approach, which would preserve the relative distribution of each category, without over- or under-valuing the outliers. But while the general approach is discussed, rankings are neither demonstrated nor compared. Josh Lloyd at Basketball Monster recently promised an improvement using his DURANT method (Dynamic Unbiased Results Applying Normalized Transformations), which, although inspiring comments like, “Josh Lloyd is trying to crack the fantasy Da Vinci code!”, remains opaque. Lloyd points out that percentage stats seem to vary differently than other, 'counting stats,' but does not offer a reasons nor a method to approach it any differently. A Reddit user recently offered a so-called CARUSO method, which promises to use ML for custom category transformations, but how so remains a mystery, and as some readers note, the method does not seem to deliver. The only ranking method that I have seen fully described is Zach Rosenof’s *G*-Score method, which improves on *Z*-Score rankings by accounting for period-level (i.e., week-to-week) variance in category accumulation; because some categories are more volatile, investing in them is risky. Rosenof’s is also the only paper to compare different metrics, finding empirical support for his *G*-Score rankings method in simulated head-to-head matchups against hypothetical teams using *Z*-Score rankings.
+In a recent Medium article, Giora Omer offers an alternative min-max normalization approach, which would preserve the relative distribution of each category, without over- or under-valuing the outliers. But while the general approach is discussed, 0-1 scaled rankings are neither demonstrated nor compared. Josh Lloyd at Basketball Monster recently promised an improvement using his DURANT method (Dynamic Unbiased Results Applying Normalized Transformations), which, although inspiring comments like, “Josh Lloyd is trying to crack the fantasy Da Vinci code!”, remains opaque. Lloyd points out that percentage stats seem to vary differently than other, 'counting stats,' but does not offer a reason nor a method to approach it any differently. A Reddit user recently offered a so-called CARUSO method, which promises to use ML for custom category transformations, but how so remains a mystery, and as some readers note, the method does not seem to deliver. The only ranking method that I have seen fully described is Zach Rosenof’s *G*-Score method, which improves on *Z*-Score rankings by accounting for period-level (i.e., week-to-week) variance in category accumulation; because some categories are more volatile, investing in them is risky. Rosenof’s is also the only paper to compare different metrics, finding empirical support for his *G*-Score rankings method in simulated head-to-head matchups against hypothetical teams using *Z*-Score rankings.
 
 ### Actions
 
-Here, I develop and describe six different ranking algorithms of my own, and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a Sigmoid Harmonic Weight to shot-Attempts for percentage category transformations (hence SHAW: Sigmoid-Harmonic Attempts-Weighted - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, while the sensitivity is a function of attempt variance, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
+Here, I develop and describe six different ranking algorithms of my own, and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a Sigmoid Harmonic Weight to shot-Attempts for percentage category transformations (hence SHAW: Sigmoid-Harmonic Attempts-Weighted - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across categories that are unfairly punished or rewarded for percentages. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, and sensitivity is a function of attempt variance, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** |
 |-----------------------|-----------------|---------------|----------------|
@@ -56,18 +56,19 @@ Here, I develop and describe six different ranking algorithms of my own, and com
 | SHAW-rank-sum         | Reverse-ranked sum of each-category ranks (using sigmoid weighted percentages) | Simple math; preserves relative player *position* in each category | Does not account for category variance |
 | SHAW-H2H-each         | Ranked sum of individual-player categories won vs. the field (using sigmoid weighted percentages) | Rewards balance across categories | Does not account for category variance |
 | SHAW-H2H-most         | Ranked sum of individual-player matchups won vs. the field (using sigmoid weighted percentages) | Rewards consistency in top categories | Does not account for category variance |
+| SHAW-AVG              | Average of SHAW-Z and SHAW-Scarce-mm | Aims for robustness | Is difficult to interpret, if not convoluted |
 
-Rankings are then compared using two methods: 1. A top-*n* players 'super-team' for each ranking, comparing teams head-to-head across the nine, standard categories; 2. A head-to-head super-tournament of 10 simulated (snake-drafted) teams from each metric, counting the category and matchup wins for each team and for each metric that the team came from. 
+Rankings are then compared using a top-*n* players 'super-team' for each ranking, comparing teams head-to-head across the nine, standard categories.
 
 Along the way, I build an ETL (Extract, Transform, Load) pipeline that starts with up-to-date NBA player stats and ends with an interactive player-ranker dashboard. 
 
 ### Results
 
-All six SHAW-transformation algorithms beat ESPN’s rankings and three of the six beat Yahoo’s rankings when comparing the top 100 players from each. In a separate test, two of the six beat Basketball Monster when comparing the top 100 players. These results are robust at different depths - i.e., top 20, top 50, top 130. Surprisingly, the top performing algorithm was the SHAW-Z ranking, which is most like the oft-criticized method that the major platforms use. The fact that mine came out on top attests to the novel treatment of percentages. The second most successful algorithm was the SHAW-Scarce-mm ranking, a model based on min-max scaling that adds a modest bonus for players that outperform in scarce categories. Although I don’t compare my rankings to Rosenof’s G-Score ranking method, I note that we come to opposite conclusions regarding the value of high performers in scarce, volatile categories. 
+I find muted support for my SHAW percentage transformation idea. In a top-*n* 'league' that includes a Traditional *Z*-Score ranking with each of the SHAW-rankings, SHAW-*Z* rankings beat the Traditional *Z*-Score ranking. SHAW-*Z* rankings also beat Yahoo and ESPN rankings head to head. In a league that included Basketball Monster (BBM) rankings, however, SHAW rankings did as well, but not better than BBM and Traditional *Z* rankings. In fact, I find that across top *n* levels, rankings metrics are intransitive: in a top-50 matchup, for example, the winning ranking might be the same that finishes last in the top-60 matchup. Meanwhile, in any matchup at any level, because 9 categories are at stake, Team A might beat Team B and Team B might beat Team C, but Team C beats Team A. Further category wins and matchup wins do not neatly correspond. 
 
 ### Growth/Next Steps
 
-As a research and data science project, I could not be happier. My rankings beat the competition. I hope that by publishing the actual ranking methods AND their systematic comparisons that this project inspires further research and discussion. I also leave plenty of room for improvement and building in terms of metric construction, ranking comparison, and front-end dashboard development.
+As a research and data science project, I am happy with what this accomplishes. ... [FINISH LAST] 
 
 # Extraction
 
@@ -470,8 +471,16 @@ I copy/pasted the top 200 players for season averages (a.k.a. per-game) statisti
 ESPN provides a separate ‘updated category rankings’ list every week, but these are based on future projections – designed to help fantasy managers make replacement decisions  -and they are different from the lists provided in their fantasy player portal. Still, it does appear that ESPN uses some type of *forecast* ranking system, that accounts for injuries, even for their “season averages” list. Why Victor Wembanyama was listed by ESPN at the 111th position on their list, however, is beyond me. He should either be a top 10 player by season averages, or he should be completely removed (for forecasting purposes) because he suffered a season-ending blood condition mid-way through the seaon
 
 Nevertheless, to make the comparisons fair, I removed all the currently injured players in ESPN’s top 130 from the pool of eligible players. That injury list includes: 
-
-[INJURY LIST]
+- Victor Wembanyama
+- Damian Lillard
+- Kyrie Irving
+- Jalen Johnson
+- John Collins
+- Trey Murphy III
+- Deandre Ayton
+- Dejounte Murry
+- Brandon Miller
+- Derek Lively Jr.
 
 With those indiscrepancies out of the way, there were also a few players in Yahoo’s and ESPN’s average rankings that were filtered out of my own player pool because they did not meet my minimum games threshold. These include Joel Embiid, who has only played X games this season, and [X] a player whose playing time increased only towards the end of the season. Although these players had ranks elsewhere, they were not in the eligible player pool and thus were removed from rank comparisons. 
 
@@ -484,22 +493,15 @@ First, I simulate head-to-head, 9-category matchups using the top n players in e
 
 There is of course overlap between the metrics, but there is enough difference to put the algorithms to the test. For example, a punishing -6 (standard attempt weighted) Z-score in the free throw percentage category would put Giannis out of the top 20, while a modest -3 (SHAW weighted) Z-score might ensure that he remains. If Giannis were excluded from the upper lists, he would likely be reincluded by the time we reach top 100 and top 130 players. As n gets larger, however, we should expect there to be more variation between ranking systems.
 
-IMAGE Results table. 
+IMAGE 1.  SHAW rankings vs. Traditional Z
+
+IMAGE 2. SHAW rankings vs. Others. 
+
+IMAGE 3 & 4 demonstrating intransitivity.
 
 The results of this experiment seem clear, if not conclusive. The top performing ranking system is…. X, 
 Yahoo, and Basketball Monster also offer competitive rankings. ESPN’s rankings don’t match up well, and this is likely due to the confusion (and lack of transparency) about what ESPN’s rankings actually mean. They appear to give extraordinary weight to a player’s short-term statistics, which is GREAT if you are looking for a replacement player at any point in time. Still, when toggling ‘all players’ and ‘season averages’ this is the ordered list that they provide. 
 
-## Snake-Draft Tournament
-A second method of comparing rankings is to simulate 10 teams from each, which should provide an approximately average team from that ranking metric. But the results of head-to-head matchups among the scores of teams using this method offer a drastically different picture. 
-
-[IMAGE: Top and bottom 10 teams]. 
-Given the results of the top-n teams, we might expect that the SHAW-Z and SHAW-Scarcity-Boosted-mm ranked teams would rise to the top. Indeed these metrics take the top to matchup-wins spots, but the Basketball Monster rankings get the most total category wins. Perhaps more interestingly, the differences among the top performers appear insignificant. Shaw-Z wins only 1% more than the next. 
-
-
-
-
-
-Unpacking the team team-level standings further, we see that same ranking systems perform across the range of wins and losses. In fact, the H2H rankings are among the top winners (and losers) when they did not perform well at all in top-n teams matchups. This experiment leads me to think that – all other things being equal – the luck of the draw – in this case the draft order given slightly different combinations of players – matters the more than rankings themselves. 
 
 ## Ranking Matchup Summary:
 I am proud to say that many of my rankings outperformed the competition in head-to-head matchups. Specifically, if my Z-ranking beat other rankings that are based on standardization (specifically Yahoo and BBM), the difference can be found in the novel way that I treat percentage transformations. 
