@@ -453,7 +453,7 @@ For brevity, the code for this can be found in my GitHub repository.
 The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, and which can be compared to ESPN, Yahoo, and Basketball Monster.
 
 | **Player Name** | **Traditional Z-rank** | **SHAW Z rank** | **SHAW mm rank** | **SHAW Scarce mm rank** | **SHAW rank-sum rank** | **SHAW H2H each rank** | **SHAW H2H most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
-|---|---|---|---|---|---|---|---|---|---|---|
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Nikola Jokic | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 5 | 1 | 1 |
 | Shai Gilgeous-Alexander | 1 | 3 | 3 | 3 | 1 | 1 | 2 | 1 | 3 | 2 |
 | Victor Wembanyama | 3 | 1 | 2 | 1 | 3 | 3 | 3 | 111 | 2 | 3 |
