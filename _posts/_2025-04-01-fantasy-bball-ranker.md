@@ -143,9 +143,9 @@ Most NBA stat categories are positively skewed. Few players get the most points,
 
 ![alt text](/img/posts/PTS_REB_raw.png "Raw Distributions, Points & Rebounds")
 
-At the same time, a large number of players accumulate very little, if any, stats at all. THIS fact is important, although it is hardly considered among the experts. When we start to transform distributions, there is a huge difference in comparing the fantasy-relevant players vs. the entirety of the league. That is, the relative value of a player for fantasy purposes should be considered only in relation to other plausible options, and NOT in relation to the bulk of players that get little or no playing time. 
+At the same time, a large number of players accumulate very little, if any, stats at all. This fact is important, although it is rarely considered among the experts, and the resulting distributions can change dramatically depending on how we handle it. That is, there is a huge difference in comparing within the pool of fantasy-relevant players vs. the entirety of the league. Ideally, the relative value of a player for fantasy purposes should be considered only in relation to other plausible options, and not in relation to the bulk of players that get little or no playing time. 
 
-Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. Granted, this number is arbitrary, but it is a useful starting point that has the effect of eliminating most ‘garbage time’ players as well as those with season defining injuries (e.g., Embiid in 24-25). Then, I scale raw category accumulations by games played. Most fantasy relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
+Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. Granted, this number is arbitrary, but it is a useful starting point that has the effect of eliminating most ‘garbage time’ players as well as those with season defining injuries (e.g., Joel Embiid in 24-25). Then, I scale raw category accumulations by games played. Most fantasy relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
 
 ```python
 
@@ -194,7 +194,7 @@ The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league
 
 
 | **Player Name** | **FT%** | **FTM** | **FTA** | **FT Impact Z-Score** |
-|-----------------|---------|---------|---------|-----------------------|
+|----------------:|--------:|--------:|--------:|----------------------:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | -8.12 | 
 | Steph Curry | 92.9 | 252 | 234 | 2.73 | 
 | Shae Gilgeous-Alexander | 90.1 | 563 | 625 | 5.50 | 
@@ -206,7 +206,7 @@ A critical question for fantasy category valuations is thus, does Giannis hurt y
 
 For other, counting statistics, I will argue later that skewed distributions are meaningful and useful, but a percentage statistic is bound between 0 and 1, so positive and negative constributions to it are limited: they are asymptotic, not linear! 
 
-[IMAGE HYPOTHETICAL distribution of attempts in relation to percentage] 
+![alt text](/img/posts/AsymptoticImpacts.png "Impact on Team Percentage")
 
 ## SHAW Percentage Transformation
 
@@ -226,7 +226,7 @@ Where:
 
 Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one, which theoretically approaches zero for players with zero attempts.
 
-[IMAGE: My sigmoid curve vs. linear attempts/average] 
+![alt text](/img/posts/Linear_v_SHAWweights.png "Linear vs. SHAW")
 
 I then apply the weight directly to the percentage *deficit*, or difference from the mean, which I cap at 3 standard deviations from the mean, effectively limiting the impact that a few terrible shooters have on the rest of the distribution. 
 
