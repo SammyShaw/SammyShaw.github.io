@@ -48,6 +48,7 @@ In a [recent Medium article, Giora Omer](https://medium.com/@gioraomer/fantasy-n
 
 Here, I develop and describe six different ranking algorithms of my own and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a sigmoid weight to shot-attempts for percentage category transformations (hence SHAW: Sigmoid-Heurisitc Attempt-Weight - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across counting categories, but whom are unfairly punished or rewarded in percentage categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, and its sensitivity is a function of attempt CoV, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
+
 **Sigmoid-Heuristic Attempt Weighted Ranking Algorithms**
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** |
 |-----------------------|-----------------|---------------|----------------|
@@ -127,6 +128,7 @@ A select sample of the raw data, showing three superstars and one lesser-known p
 | Victor Wembanyama | 46 | 857 | 408 | 506 | 168 | 149 | 52 | 176 | 1116 |
 | Jordan Goodwin | 20 | 104 | 50 | 77 | 29 | 16 | 23 | 11 | 130 |
 
+<br>
 
 # Transformations
 
@@ -145,13 +147,12 @@ From there, category leagues can keep score one of two ways: a weekly ‘head-to
 
 ```python
 
-nba_subset = nba_24_25[['PLAYER_NAME', 'GP', 'FGA', 'FGM', 'FTA', 'FTM','FG3A', 'FG3M', 
-             'REB', 'AST', 'TOV', 'STL', 'BLK', 'PTS', 'DD2', 
-             'FG_PCT', 'FG3_PCT', 'FT_PCT']].copy()
+nba_subset = nba_24_25[['PLAYER_NAME', 'GP', 'FGA', 'FGM', 'FTA', 'FTM', 'FG3M', 
+             'REB', 'AST', 'TOV', 'STL', 'BLK', 'PTS', 'FG_PCT', 'FG3_PCT', 'FT_PCT']].copy()
 
 ```
 
-The goal is to turn raw NBA statistics from the relevant categories into a single player ranking metric that will help team managers understand a single player’s relative fantasy value. It would be easy if there was one statistical category to keep track of – players would be ranked by the number of points they get, for example. (In fact, *Points* leagues are an alternative scoring format that assigns every statistical category a uniform ‘point’ value, which is too easy to be any fun.) But category leagues require comparisons across 9 different measures. How can you value a player that gets a lot of points and few rebounds vs. one that gets a lot of rebounds and few assists? How do you compare a player that shoots an average free throw percentage on high volume, to a player that shoots above average on low volume? 
+The goal is to turn raw NBA statistics into a single player ranking metric that will help team managers understand a single player’s relative fantasy value. It would be easy if there was one statistical category to keep track of – players would be ranked by the number of points they get, for example. (In fact, *Points* leagues are an alternative scoring format that assigns every statistical category a uniform ‘point’ value, which is too easy to be any fun.) But *category* leagues require comparisons across 9 different measures. How can you value a player that gets a lot of points and few rebounds vs. one that gets a lot of rebounds and few assists? How do you compare a player that shoots an average free throw percentage on high volume, to a player that shoots above average on low volume? 
 
 Before we get into that, it is important to understand the distributions. 
 
@@ -161,9 +162,9 @@ Most NBA stat categories are positively skewed. Few players get the most points,
 
 ![alt text](/img/posts/PTS_REB_raw.png "Raw Distributions, Points & Rebounds")
 
-At the same time, a large number of players accumulate very little, if any, stats at all. This fact is important, although it is rarely considered among the experts, and the resulting distributions can change dramatically depending on how we handle it. That is, there is a huge difference in comparing within the pool of fantasy-relevant players vs. the entirety of the league. Ideally, the relative value of a player for fantasy purposes should be considered only in relation to other plausible options, and not in relation to the bulk of players that get little or no playing time. 
+At the same time, a large number of players accumulate very little, if any, stats at all. This fact is important, although it is rarely considered among the experts, and the resulting distributions can change dramatically depending on how we handle it. Ideally, the relative value of a player for fantasy purposes should be considered only in relation to other plausible options, and not in relation to the bulk of players that get little or no playing time. Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. Granted, this number is arbitrary, but it is a useful starting point that has the effect of eliminating most ‘garbage time’ players as well as those with season defining injuries (e.g., Joel Embiid in 24-25). 
 
-Before making any transformations, thus, a cut-off should be levied, and I define mine at the 25th percentile of games played. Granted, this number is arbitrary, but it is a useful starting point that has the effect of eliminating most ‘garbage time’ players as well as those with season defining injuries (e.g., Joel Embiid in 24-25). Then, I scale raw category accumulations by games played. Most fantasy relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
+Then, I scale raw category accumulations by games played. Most fantasy relevant players will miss some time during a season due to minor injuries, so using per-game statistics (which is standard) helps to level the field. 
 
 ```python
 
@@ -184,18 +185,20 @@ for cat in raw_categories:
 
 ```
 
-The result is a more modest 400 + player pool, with the large number of zeros eliminated. 
+The result is a more modest 400 + player pool, with the large number of zeros eliminated. Distributions are still positively skewed, but there is now some semblance of a tail on the negative end. 
 
 ![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
 
+Typically, then the categories are standardized (which I will do in a later section): a players' *Z*-score in a category is their difference from the average divided by the standard deviation. Thus, we can compare Points and Rebounds here in like terms. A player that scores 2 standard deviations above the average in points, is comparable to a player that scores 2 standard deviations above the average in Rebounds. 
 
-## Percentages
+
+### Percentages
 
 Percentage categories deserve special treatment because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score for each weekly matchup. 
 
 ![alt text](/img/posts/FT_PCT_vs_A.png "Free Throw Distributions")
 
-A player that shoots an average percentage on high volume of attempts, has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. The recieved method for doing this is to measure a player's *impact* by finding the difference between their number of makes and what is expected given their number of attempts and league percentage averages. Standardizing the impact thus gives a comparable value score for that category. For example: 
+A player that shoots an average percentage on high volume of attempts has a larger impact on a fantasy matchup than an above average shooter that rarely shoots. To evaluate a player’s value in a percentage category, thus, shot volume needs to be considered alongside percent made. The recieved method for doing this is to measure a player's *impact* by finding the difference between their number of makes and what is expected given their number of attempts and league percentage averages. Standardizing the impact thus gives a comparable value for that category. For example: 
 
 ```python
 
@@ -210,7 +213,7 @@ At first glance this would seem fair, a player’s percentage impacts a team’s
 
 The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league average is 78.2%), but he is also a league-leader in attempts (as an elite scorer otherwise, he gets fouled a lot). Giannis's Free Throw Z-Score is -8. 
 
-
+**Select Players' Free Throw Percentages, Attempts and standardized *Impact* score**
 | **Player Name** | **FT%** | **FTM** | **FTA** | **FT Impact Z-Score** |
 |----------------:|--------:|--------:|--------:|----------------------:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | -8.12 | 
@@ -219,16 +222,18 @@ The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league
 | James Harden | 87.4 | 515 | 450 | 3.51 | 
 | LeBron James | 76.8 | 289 | 222 | -0.23 | 
 
+Giannis is an outlier. We can see from the FT Impact Z scores distribution that his -8 is far out in the tail, almost twice as far as the next lowest data point. Imagine now that when we sum a player's category *Z*-scores and rank them, Giannis would have a -8.12 in one of the categories, and so his overall score, and therefore his rank, is greatly reduced. To put this -8 in perspective, the average sum of *Z*-scores for a player in the top 150 is about 7. A critical question for fantasy category valuations is thus, does Giannis hurt you THAT much? On the other side of the distribution, does Shae Gilgeous Alexander's 90% on high volume *help* you that much? 
 
-A critical question for fantasy category valuations is thus, does Giannis hurt you THAT much? Does Shae Gilgeous Alexander *help* you that much? 
-
-For other, counting statistics, I will argue later that skewed distributions are meaningful and useful, but a percentage statistic is bound between 0 and 1, so positive and negative constributions to it are limited: they are asymptotic, not linear! 
+For other, counting statistics, I will argue later that skewed distributions are meaningful and useful, but because a percentage statistic is bound between 0 and 1, any positive and negative constributions to it are limited: they are asymptotic, not linear! The graph below visualizes this relationship. Here we can see the league average (78.2), SGA's (90.1) and Giannis's (60.2) Free Throw Percentages. The solid lines represent the real impact of each on a hypothetical, average fantasy team for one fantasy week (i.e., the duration of a matchup) when contributing 15 to 150 shots for the team. As their number of attempts increases, we can begin to seem the limit of their overall team impact.  
 
 ![alt text](/img/posts/AsymptoticImpacts.png "Impact on Team Percentage")
 
-## SHAW Percentage Transformation
+Realistically, these high volume shooters will take 30-50 free-throw attempts during a week of NBA matchups, but a team also has 13 players, each of whom only impacts their team's overall percentage in the same, limited way. When compared to the linear assumption, we begin to answer the questions above paragraph: No, Giannis and Shae don't help or hurt as much as they're given credit for.
 
-It seems reasonable, then, that percentage categories should be treated with this observation in mind. Attempts should be weighted within limits (defined by its distribution) to reflect the non-linearity of their effect on percentages. 
+
+### SHAW Percentage Transformation
+
+It seems reasonable, then, that percentage transformations for fantasy rankings should be treated with this observation in mind. Attempts should be weighted within limits (defined by its distribution) to reflect the non-linearity of their effect on percentages. 
 
 I apply a Sigmoid-transformation to attempts to get a weight value. The **Sigmoid transformation** is defined as follows:
 
@@ -242,11 +247,11 @@ Where:
 - S = 1 + CoV (Coefficient of Variation)
 - k = 1 / (1 + |Skewness|)
 
-Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one, which theoretically approaches zero for players with zero attempts.
+Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one.
 
 ![alt text](/img/posts/Linear_v_SHAWweights.png "Linear vs. SHAW")
 
-I then apply the weight directly to the percentage *deficit*, or difference from the mean, which I cap at 3 standard deviations from the mean, effectively limiting the impact that a few terrible shooters have on the rest of the distribution. 
+I then apply the weight directly to the percentage *deficit*, or difference from the mean, which I cap at 3 standard deviations from the mean, effectively limiting the impact that a few terrible shooters have on the rest of the distribution (Giannis is well within 3 standard deviations of the mean of simple percentage). 
 
 ```python
 # Define Sigmoid Weight for Attempts
@@ -310,14 +315,14 @@ for col in SHAW_percentages:
 
 ```
 
-The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, which could be added back to a player's raw percentage, or left alone, because the resulting dispersion will be the same. 
+The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, which could be added back to a player's raw percentage, or left alone, because the resulting dispersion is the same. 
 
 ![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
 
-SHAW-transformed percentages thus follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, note that the extremes that are produced in the tails (Giannis vs. Shai G-A for example) using Impact scores are muted by SHAW-tranformations. This method thus undervalues SGA and overvalues Giannis relative to existing rankings. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
+SHAW-transformed percentages appear to follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, the extreme values that were produced in the tails (Giannis vs. SGA for example) using *Impact* scores are now muted by SHAW-tranformations. Compared to existing methods, this method thus undervalues SGA and overvalues Giannis. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
 
-
-| **Player Name** | **FT %** | **FTM** | **FTA** | **X:atts/avg** | **FT Impact Z_Score** | **Deficit** | **Sig-weight** | **SHAW %** | **SHAW-Z-Score** | 
+**Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage**
+| **Player Name** | **FT %** | **FTM** | **FTA** | **Attempt/Average** | **FT Impact *Z*-Score** | **Deficit** | **Sig-weight** | **SHAW %** | **SHAW-*Z*-Score** | 
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | -3.55 | 
 | Steph Curry | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 2.30 | 
@@ -325,10 +330,13 @@ SHAW-transformed percentages thus follow a reasonably normal distribution that c
 | James Harden | 87.4 | 515 | 450 | 5.70 | 3.51 | 0.09 | 1.56 | 92.5 | 1.85 |  
 | LeBron James | 76.8 | 289 | 222 | 2.63 | -0.23 | -0.01 | 1.27 | 76.4 | -0.13 | 
 
+The empirical question is: Does the resulting difference (*Impact* vs. SHAW scaling) in overall rankings produce a more or less competitive team? Next I construct a series of unique ranking algorithms using the SHAW scaling method, to compare to traditional and industry rankings. 
+
+<br>
 
 ## Standardization
 
-Standardization is the dominant method because is works. It transforms unique distributions to the same theoretical range so that they can be easily compared. A player’s standardized-, or *Z*-score is their relative difference (above or below average), divided by the standard deviation of the distribution.
+Standardization works by transforming unique distributions to the same theoretical range (mean = 0 and standard deviation = 1) so that they can be easily compared. Again, a *Z*-score is found by taking a player's difference from teh mean and dividing by the standard deviation. 
 
 In Python: 
 
@@ -353,15 +361,16 @@ def Z_rank(df, categories, metric_label):
 pg_stats = Z_rank(pg_stats, nine_cat, 'SHAW-Z')
 
 ```
+The only difference between my SHAW *Z*-ranking and Traditional *Z*-ranking is the way that the percentage categories are scaled. Seven of the nine comparable categories would have the same exact standardized values before summing. 
 
 
 ## Min-Max Scaling
 
-Similar to standardization, min-max scaling (transforming the range to 0 – 1) preserves the spread, and it also limits the range, so outlier values are reigned in. This means that if a player is an outlier in a category, their maximum value in a category is limited at 1, and all other players are scaled accordingly. This makes intuitive sense, because each category is only worth 1 point. If a fantasy team over-performs in a category, they don't get more than one point. 
+Similar to standardization, Min-Max scaling (transforming the range to 0 – 1) preserves the spread, but it also limits the range, so outlier values are reigned in. This means that if a player is an outlier in a category, their maximum value in a category is limited at 1, and all other players are scaled accordingly. This makes intuitive sense, because each category is only worth 1 point. If a fantasy team over-performs in a category, they don't get more than one point, so it may make some sense to limit a players' overall contributions. 
 
 To scale between 0-1, take the difference from the minimum value and divide by the range: 
 
-x - min(X) / (max(X) - min(X))
+x' - min(X) / (max(X) - min(X))
 
 Because this approach is standard for many machine learning tasks, the conventional method in Python makes use of the ML SciKitLearn library. 
 
@@ -370,7 +379,7 @@ Because this approach is standard for many machine learning tasks, the conventio
 from sklearn.preprocessing import MinMaxScaler
 
 # scaler = MinMaxScaler() # default range = 0-1
-# scaler.fit_tranform(x)
+x' = scaler.fit_tranform(x)
 
 ```
 
@@ -390,11 +399,11 @@ pg_stats = minmax_rank(pg_stats, nine_cat, 'SHAW-mm')
 
 ## Scarcity Ranking
 
-Scarcity is the basis of modern economics because value is a function of scarcity (c.f., David Ricardo, 1817). In an NBA game, there are plenty of points scored and many players accumulate points. By contrast, blocked shots or steals might happen a handful of times in a game, and only a few players across the league tend to excel in those categories. 
+Scarcity is the basis of modern economics because scarce resources are more valuable than abundant ones (c.f., David Ricardo, 1817). In an NBA game, there are plenty of points scored and many players accumulate points. By contrast, blocked shots or steals might happen a handful of times in a game, and only a few players across the league tend to excel in those categories. 
 
-Although Blocks and Points count the same in terms of categories, having a player that excels in Blocks may be more valuable than a high Points getter, because the Block star is harder to replace. There are fewer elite shot blockers in the league, and if your team doesn't have one, you may have a hard time competing in that category. 
+Although Blocks and Points count the same in terms of weekly scoring, having a player that excels in Blocks may be more valuable than a high Points-getter, because the Block star is harder to replace. There are fewer elite shot blockers in the league, and if your team doesn't have one, you may have a hard time competing in that category. 
 
-To test this hypothesis, I developed an index that weighs the relative scarcity of each of the seven cumulative categories (on a scale of 0-1, total scarcity = 1) by subtracting the skew from the inner-quartile range, and normalizing (min-max scaling) the results. Then, for the min-max transformed categories, I multiply the normalized category distributions by its scarcity score. Because both the scarcity index and normalized distributions range between 0-1, the resulting sum of scarcity weighted scores also range between 0 and 1. The result is a modest addition that boosts a player’s min-max score by a maximum of one point. That should be enough to redistribute the players to test whether rewarding scarcity actually improves the rankings. 
+To test this hypothesis, I developed an index that weighs the relative scarcity of each of the seven cumulative categories (on a scale of 0-1, total scarcity = 1) by subtracting the skew from the inner-quartile range, and normalizing (Min-Max scaling) the results. Then, for the Min-Max transformed categories, I multiply by its scarcity score. The result is a modest addition that boosts a player’s min-max score: the more proficient a player is in the more scarce categories, the bigger the boost. Although the boost is modest (the maximum boost is < 2 points (in a 9 x 1 category field of possibles)), it should be enough to empirically observe whether scarce category producers prove more valuable. 
 
 ``` python
 
@@ -458,7 +467,7 @@ pg_stats = cat_rank_sum(pg_stats, nine_cat, 'SHAW_rank_sum')
 ```
 
 This method does not preserve the relative spread, but instead distributes players uniformly in each category, while still accounting for the relative position of each player in each category. 
-And since we’re comparing all the players across all categories, this method seems elegant. But results are somewhat surprising, as we'll see.
+And since we’re comparing all the players across all categories, this method seems elegant. As we'll see, however, it does not perform well. 
 
 ### Head to Head individual player comparisons
 
@@ -468,8 +477,9 @@ This takes considerable computing time, so it’s not a practical method to buil
 
 For brevity, the code for this can be found in my GitHub repository. 
 
-The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, and which can be compared to ESPN, Yahoo, and Basketball Monster.
+The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, so they can be compared to each other, and compared to ESPN, Yahoo, and Basketball Monster.
 
+**Select NBA players and their ranks across 10 ranking algorithms**
 | **Player Name** | **Traditional Z-rank** | **SHAW Z rank** | **SHAW mm rank** | **SHAW Scarce mm rank** | **SHAW rank-sum rank** | **SHAW H2H each rank** | **SHAW H2H most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Nikola Jokic | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 5 | 1 | 1 |
@@ -485,31 +495,18 @@ The six different ranking methods produce a lot of similar rankings, but enough 
 
 ## The Competition
 
-I mentioned earlier that there is no transparency as to how the major platforms compute rankings, and to be fair, Yahoo and ESPN’s fantasy player portals don’t actually include rank numbers after the season begins. Nevertheless, they do provide an ostensibly rank-ordered list that can be sorted based on season totals, per-game averages, two week averages, etc. Because the order changes based on the parameter, and because the top players are congruent with other rankings, it is reasonable to assume there is a ranking algorithm working behind the scenes. 
+I mentioned earlier that there is no transparency as to how the major platforms compute rankings, and to be fair, Yahoo and ESPN’s fantasy player portals don’t actually include rank numbers after the season begins. Nevertheless, they do provide an ostensibly rank-ordered list that can be sorted based on season totals, per-game averages, two week averages, etc. Because the order changes based on the parameter, and because the top players are congruent with other rankings, it is reasonable to assume there is a ranking algorithm working behind the scenes. Still, it should probably be noted that the results that follow (which would be bad for ESPN and Yahoo) are attributable to lack of clarity around what their player lists actually represent. 
 
-I copy/pasted the top 200 players for season averages (a.k.a. per-game) statistics on March 26, 2025 from both ESPN and Yahoo. I mention the date because this is a single point-in-time comparison. I refreshed my own rankings on March 26, so that I’m comparing player rankings using the same player statistics.
+ESPN provides a separate ‘updated category rankings’ list every week, but these are based on future projections – designed to help fantasy managers make replacement decisions - and they are different from the lists provided in their fantasy player portal. Still, it does appear that ESPN uses some type of *forecast* ranking system that accounts for injuries, even for their “season averages” list. Why Victor Wembanyama was listed by ESPN at the 111th position on their list, however, is a mystery. I would think he should either be a top 10 player by "season averages" measures, or he should be completely removed (for forecasting purposes) because he suffered a season-ending blood condition mid-way through the seaon. I also compare Basketball Monster's rankings. BBM keeps a very clear ranking system that appears to be true to real “season averages”, and it does not deviate much from the traditional *Z*-Score rankings. 
 
-ESPN provides a separate ‘updated category rankings’ list every week, but these are based on future projections – designed to help fantasy managers make replacement decisions  -and they are different from the lists provided in their fantasy player portal. Still, it does appear that ESPN uses some type of *forecast* ranking system, that accounts for injuries, even for their “season averages” list. Why Victor Wembanyama was listed by ESPN at the 111th position on their list, however, is beyond me. He should either be a top 10 player by season averages, or he should be completely removed (for forecasting purposes) because he suffered a season-ending blood condition mid-way through the seaon
+I copy/pasted the top 200 players from each of the above statistics on March 26, 2025. I mention the date because the following are single point-in-time comparison. I refreshed my own rankings on March 26, so that I’m comparing player rankings using the same player statistics.
 
-Nevertheless, to make the comparisons fair, I removed all the currently injured players in ESPN’s top 130 from the pool of eligible players. That injury list includes: 
-- Victor Wembanyama
-- Damian Lillard
-- Kyrie Irving
-- Jalen Johnson
-- John Collins
-- Trey Murphy III
-- Deandre Ayton
-- Dejounte Murry
-- Brandon Miller
-- Derek Lively Jr.
-
-With those indiscrepancies out of the way, there were also a few players in Yahoo’s and ESPN’s average rankings that were filtered out of my own player pool because they did not meet my minimum games threshold. These include Joel Embiid, who has only played X games this season, and [X] a player whose playing time increased only towards the end of the season. Although these players had ranks elsewhere, they were not in the eligible player pool and thus were removed from rank comparisons. 
-
-I compared Basketball Monster rankings separately. Due to a mistake on my part, I did not scrape their rankings until 3/28/2025. Since two more days of NBA games had passed, I decided to compare these separately, and refreshed my own rankings on 3/28/2025 to compare them. Basketball Monster keeps a very clear ranking system that appears to be true to real “season averages”. I did not have to exclude any injured players, but players that did not meet the minimum games threshold were removed by default. 
+There were several players in Yahoo’s and ESPN’s season-average rankings that were filtered out of my own player pool because they did not meet my own minimum games threshold. These include Joel Embiid, who has only played 19 games this season, and Daeqwon Plowden - a player whose playing time increased only towards the end of the season, and whom Yahoo mysteriously had ranked #16. Although these players had ranks elsewhere, they were not in the eligible player pool and thus were removed from rank comparisons. 
 
 <br>
 
 ## Top N Players
+
 I compare rankings by simulating head-to-head, 9-category matchups using the top-*n* players in each ranking system. I start by comparing the top 20, top 50, top 100, and top 130 (the number of active players in a 10-team league) in separate matchups using real, up-to-date, per-game statistics. 
 
 ```python
