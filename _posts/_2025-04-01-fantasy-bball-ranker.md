@@ -654,77 +654,53 @@ Because Z-scores rankings reward high achievers in specific categories, and beca
 
 ```python
 
-# read in data
-pg_player_ranker = pd.read_csv("data/pg_player_ranker_df.csv")
+pg_player_ranker = pg_stats.copy()
 
-pg_9cat = pg_player_ranker[['PLAYER_NAME', '9_cat_mm_rank', '9_cat_z_rank', '9_cat_rank_sum_rank', 
-                             'H2H_9_each_rank', 'H2H_9_most_rank', '9_cat_scarcity_rank', 
-                             'GP', 'FG_PCT', 'FT_PCT', 'FG3_PCT', 'PTS', 
-                             'FG3M', 'REB', 'AST', 'TOV', 'STL', 'BLK', 'DD2', 
-                             'FGM', 'FGA', 'FTM', 'FTA', 'FG3A', 'tov'] + SHAW_percentages].copy()
+app_metrics = ['Traditional_Z_rank', 'SHAW_AVG_rank', 'SHAW_Z_rank', 'SHAW_mm_rank', 
+               'SHAW_Scarce_mm_rank', 'SHAW_rank_sum_rank', 
+               'SHAW_H2H_each_rank', 'SHAW_H2H_most_rank']
+
+app_df = pg_player_ranker[['PLAYER_NAME'] + app_metrics + ['GP', 'FG_PCT', 'FT_PCT', 
+                        'PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK',
+                        'FGM', 'FGA', 'FTM', 'FTA', 'TOV', 'tov'] + SHAW_percentages].copy()
 
 # Define Replacement Value
-
 nine_cats = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 
-             'tov', 'FT_PCT_def_w', 'FG_PCT_def_w']
+             'tov', 'SHAW_FT_PCT', 'SHAW_FG_PCT']
 
-replacement_pool = pg_9cat.sort_values('9_cat_mm_rank').iloc[100:150]
+replacement_pool = app_df.sort_values('SHAW_AVG_rank').iloc[100:150]
 replacement_avg = replacement_pool[nine_cats].mean()
 
-# Step 1: Calculate raw deltas for each player vs replacement
-# --------------------------
-# Step 1: Raw deltas vs replacement
-# --------------------------
+# Calculate deltas for each player vs replacement
 for cat in nine_cats:
-    pg_9cat[f'delta_{cat}'] = pg_9cat[cat] - replacement_avg[cat]
+    app_df[f'delta_{cat}'] = app_df[cat] - replacement_avg[cat]
 
-# --------------------------
-# Step 2: Min-Max Normalize
-# --------------------------
-mm_norm_cols = []
+# Z-Score Normalize Using SHAW-percentage transformations
+SHAW_Z_cols = []
 for cat in nine_cats:
     delta_col = f'delta_{cat}'
-    mm_col = f'norm_mm_{cat}'
+    z_col = f'z_{cat}'
 
-    min_val = pg_9cat[delta_col].min()
-    max_val = pg_9cat[delta_col].max()
-    pg_9cat[mm_col] = (pg_9cat[delta_col] - min_val) / (max_val - min_val)
+    mean = app_df[delta_col].mean()
+    std = app_df[delta_col].std()
+    app_df[z_col] = (app_df[delta_col] - mean) / std
 
-    mm_norm_cols.append(mm_col)
+    SHAW_Z_cols.append(z_col)
 
-pg_9cat['replacement_value_mm'] = pg_9cat[mm_norm_cols].sum(axis=1)
+app_df['SHAW_VORP'] = app_df[SHAW_Z_cols].sum(axis=1)
 
-# --------------------------
-# Step 3: Z-Score Normalize
-# --------------------------
-z_norm_cols = []
-for cat in nine_cats:
-    delta_col = f'delta_{cat}'
-    z_col = f'norm_z_{cat}'
-
-    mean = pg_9cat[delta_col].mean()
-    std = pg_9cat[delta_col].std()
-    pg_9cat[z_col] = (pg_9cat[delta_col] - mean) / std
-
-    z_norm_cols.append(z_col)
-
-pg_9cat['replacement_value_z'] = pg_9cat[z_norm_cols].sum(axis=1)
-
-# --------------------------
-# Step 4: Output Summary
-# --------------------------
-replacement_summary = pg_9cat[['PLAYER_NAME', '9_cat_mm_rank', 
-                               'replacement_value_mm', 'replacement_value_z']] \
-    .sort_values('replacement_value_mm', ascending=False)
+# Summary 
+replacement_summary = app_df[['PLAYER_NAME', 'SHAW_Z_rank', 'SHAW_VORP']] \
+    .sort_values('SHAW_VORP', ascending=False)
 
 print(replacement_summary.head(20))
 
 ```
 
-
 <br>
 
 # Load: Streamlit User Enpoint App
+
 Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The app allows the user to select among my top ranking metrics (except the H2H ones that take computing time). 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
 
