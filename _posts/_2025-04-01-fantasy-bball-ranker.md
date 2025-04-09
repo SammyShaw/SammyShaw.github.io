@@ -5,7 +5,7 @@ image: "/posts/GiannisStripe.png"
 tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 ---
 
-In this project I extract, transform, and load NBA player data for my own fantasy basketball ranking app. I construct a series of ranking algorithms premised on the hypothesis that standard ranking systems scale percentage category scores incorrectly. Existing algorithms typically weight percentage categories linearly by attempts. However, because percentages are bound between 0 and 1, the actual affect of attempts on a player's percentage is asymptotic - not linear. I develop a Sigmoid-Heuristic-Attempt-Weighting (SHAW) transformation that adjusts for this non-linearity using the statistical properties of attempt distributions, specifically their coefficient of variantion (CoV) and skewness. I then apply this transformation to create six unique fantasy basketball ranking algorithms, which I then systematically compare to each other and to leading platform rankings: ESPN, Yahoo, and Basketball Monster. In head-to-head matchups using top-*n* players from each ranking system, my rankings consistently outperform Yahoo and ESPN. When comparing to traditional Z-scores and Basketball Monster rankings, however, performance in comparable - suggesting that SHAW tranformations offer a theoretically grounded alternative without sacrificing accuracy.
+In this project I extract, transform, and load NBA player data for my own fantasy basketball ranking app. I construct a series of ranking algorithms premised on the hypothesis that standard ranking systems scale percentage category scores inaccurately. Existing algorithms typically weight percentage categories linearly by attempts. However, because percentages are bound between 0 and 1, the actual affect of attempts on a player's percentage is asymptotic - not linear. I develop a Sigmoid-Heuristic-Attempt-Weighting (SHAW) transformation that adjusts for this non-linearity using the statistical properties of attempt distributions, specifically their coefficient of variantion (CoV) and skewness. I then apply this transformation to create six unique fantasy basketball ranking algorithms, which I then systematically compare to each other and to leading platform rankings: ESPN, Yahoo, and Basketball Monster. In head-to-head matchups using top-*n* players from each ranking system, several of my rankings perform well, especially against Yahoo and ESPN. When comparing to traditional Z-scores and Basketball Monster rankings, however, my rankings are comparable - beating the competition at some ranking depths, but not others. I conclude that SHAW tranformations offer a theoretically grounded alternative without sacrificing accuracy.
 
 ## Contents
 
@@ -36,7 +36,7 @@ In this project I extract, transform, and load NBA player data for my own fantas
 
 ### Context
 
-Fantasy sports are a popular past time with over 62.5 million participants in the U.S. and Canada [FSGA.org], 20 million of whom play fantasy basketball. In a fantasy sports league, participants (or, team managers) create a fantasy team by competitively drafting from a pool of professional players, whose real game stats become their own fantasy stats for the season. Choosing a successful team requires knowing the players and understanding the league’s scoring format. In *9-category* fantasy basketball leagues (the standard competitive fantasy basketball format), teams are compared – and thus players must be evaluated - across nine different measures. To make this easier, the major platforms Yahoo.com and ESPN include player rankings to help managers make their choices. As some critics point out, however, Yahoo and ESPN often include questionable players in their top ranks, and unfortunately, neither platform is exactly transparent about how their rankings are calculated. As a regular fantasy basketballer and data science enthusiast, I join a small but growing literature offering alternatives for better ranking accuracy.
+Fantasy sports are a popular past time with over 62.5 million participants in the U.S. and Canada [FSGA.org], 20 million of whom regularly play fantasy basketball. In a fantasy sports league, participants (or, team managers) create a fantasy team by competitively drafting from a pool of professional players, whose real game stats become their own fantasy stats for the season. Choosing a successful team requires knowing the players and understanding the league’s scoring format. In *9-category* fantasy basketball leagues (the standard competitive fantasy basketball format), teams are compared – and thus players must be evaluated - across nine different measures. To make this easier, the major platforms Yahoo.com and ESPN include player rankings to help managers make their choices. As some critics point out, however, Yahoo and ESPN often include questionable players in their top ranks, and unfortunately, neither platform is exactly transparent about how their rankings are calculated. As a regular fantasy basketballer and data science enthusiast, I join a small but growing literature offering alternatives for better ranking accuracy.
 
 ### Literature Review
 
@@ -46,7 +46,7 @@ In a recent Medium article, Giora Omer offers an alternative min-max normalizati
 
 ### Actions
 
-Here, I develop and describe six different ranking algorithms of my own, and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a sigmoid  weight to shot-attempts for percentage category transformations (hence SHAW: Sigmoid-Heurisitc Attempt-Weight - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across counting categories, but that are unfairly punished or rewarded in percentage categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, and its sensitivity is a function of attempt CoV, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
+Here, I develop and describe six different ranking algorithms of my own and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a sigmoid weight to shot-attempts for percentage category transformations (hence SHAW: Sigmoid-Heurisitc Attempt-Weight - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across counting categories, but whom are unfairly punished or rewarded in percentage categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, and its sensitivity is a function of attempt CoV, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
 **Sigmoid-Heuristic Attempt Weighted Ranking Algorithms**
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** |
@@ -66,15 +66,29 @@ Along the way, I build an ETL (Extract, Transform, Load) pipeline that starts wi
 
 ### Results
 
-I find muted support for my SHAW-transformation rankings.
+I find muted support for my SHAW-transformation rankings. In a top-20 players 'league' that includes a Traditional *Z*-Score ranking with each of the SHAW-rankings, SHAW rankings performed very well against Traditional *Z*-Score, ESPN, and Yahoo rankings. 
 
 ![alt text](/img/posts/Top_20_vs_Traditional.png "Sample_Results")
 
-In a top-*n* 'league' that includes a Traditional *Z*-Score ranking with each of the SHAW-rankings, SHAW-*Z* rankings beat the Traditional *Z*-Score ranking. SHAW-*Z* rankings also beat Yahoo and ESPN rankings head to head. In a league that included Basketball Monster (BBM) rankings, however, SHAW rankings did as well, but not better than BBM and Traditional *Z* rankings. In fact, I find that across top *n* levels, rankings metrics are intransitive: in a top-50 matchup, for example, the winning ranking might be the same that finishes last in the top-60 matchup. Meanwhile, in any matchup at any level, because 9 categories are at stake, Team A might beat Team B and Team B might beat Team C, but Team C beats Team A. Further category wins and matchup wins do not neatly correspond. 
+As I'll demonstrate later, however, in a league that included Basketball Monster (BBM) rankings and further top-*n* depths (i.e., top 50, top-100 players, etc.), SHAW rankings continued to perform well, but not better than BBM and Traditional *Z* rankings. In fact, I find that across top *n* levels, rankings metrics are intransitive: in a top-50 matchup, for example, the winning ranking might be the same that finishes last in the top-60 matchup. Meanwhile, in any matchup at any level, because 9 categories are at stake, Team A might beat Team B and Team B might beat Team C, but Team C beats Team A. Further category wins and matchup wins do not neatly correspond. Nevertheless, the relatively strong performance of SHAW transformations should be a relevant contribution to the growing literature on this topic, and a site for further investigation. 
 
 ### Growth/Next Steps
 
-As a research and data science project, I am happy with what this accomplishes. ... [FINISH LAST] 
+Although my conclusions regarding the import of SHAW transformations are muted at this point, the project also demonstrates: 
+* Building and deploying a useful, marketable ETL pipeline
+* A solid grasp of statistical tools and transformations
+* An ability to think critically about and beyond existing data structures
+* A first-of-its-kind empirical ranking algorithms comparison
+
+As such, I am happy to have found a fun project to put my data and research skills together. However, this project can be taken much, much further, and I intend to keep building it out in the future, focusing on the following: 
+* Continuing empirical research
+  - Experimenting with weight adjustments in Percentage and Counting categories
+  - Simulating weekly matchup to observe short term category variances (c.f., Rosenof 2024) 
+* Scaling up the user endpoint
+  - Adding 8, 10, and 11 category rankings
+  - Adding Season Total stats
+
+<br>
 
 # Extraction
 
