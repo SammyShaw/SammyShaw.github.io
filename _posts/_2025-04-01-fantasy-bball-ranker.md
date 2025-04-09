@@ -507,19 +507,22 @@ There were several players in Yahoo’s and ESPN’s season-average rankings tha
 
 ## Top N Players
 
-I compare rankings by simulating head-to-head, 9-category matchups using the top-*n* players in each ranking system. I start by comparing the top 20, top 50, top 100, and top 130 (the number of active players in a 10-team league) in separate matchups using real, up-to-date, per-game statistics. 
+I compare rankings by simulating head-to-head, 9-category matchups using the top-*n* players in each ranking system. 
+
+The code below builds a set of summary dataframes: a dataframe for each top-n depth (e.g., top 20 players); with a row for each ranking metric (or team); and a column for each of the 9 comparable categories. 
+'League' participants (or 'teams') can include any number of ranking metrics, and any number and any depth of top-*n* teams. Matchups can include more or less categories, for those wanting to compare rankings for custom league settings. 
 
 ```python
 
-# 'League' participants
+# Variable 'League' participants
 all_metrics = ['Traditional_Z_rank', 'ESPN rank', 'Yahoo rank', 'BBM rank', 'SHAW_AVG_rank',
                'SHAW_Z_rank', 'SHAW_mm_rank', 'SHAW_Scarce_mm_rank', 'SHAW_rank_sum_rank', 
                'SHAW_H2H_each_rank', 'SHAW_H2H_most_rank']
 
-# 'Team' construction
+# Variable 'Team' construction
 top_n_list = [20, 50, 100, 130]
 
-# Scoring Format
+# Variable Scoring Format
 comp_stats = ['FG_PCT', 'FT_PCT', 'PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'tov']
 
 # Put per-game summary stats in a DataFrame, calculating percentages as total Makes/Attempts
@@ -626,46 +629,64 @@ matchups = compare_summary_dfs(
     categories=comp_stats
 )
 
+
+```
+
+From there, the matchups object can be analyzed to compare total matchup wins for each team, or total category wins. 
+
+```python
+
 for label, result in matchups.items():
     print(f"\n🏀 Head-to-head wins among metrics ({label}):")
     print(result)
 
 ```
 
-
-There is of course overlap between the metrics, but there is enough difference to put the algorithms to the test. For example, a punishing -6 (standard attempt weighted) Z-score in the free throw percentage category would put Giannis out of the top 20, while a modest -3 (SHAW weighted) Z-score might ensure that he remains. If Giannis were excluded from the upper lists, he would likely be reincluded by the time we reach top 100 and top 130 players. As n gets larger, however, we should expect there to be more variation between ranking systems.
-
-
+At the outset, I showed the total matchup wins from a top-20 players comparison across rankings (excluding BBM). The SHAW *Z* ranking scored impressively well against other metrics, including the Traditional *Z* rankings, winning 7 out of 8 total matchups, compared to only four for the Traditional *Z* ranking, 3 for ESPN and 1 for Yahoo. A closer analysis muddies that picture quite a bit, however. 
 
 ![alt text](/img/posts/ALL_v_ALL.png "All Metrics") 
 
+At deeper top-*n*'s, the results start to average out. Adding the results from across top 20, top 50, top 100, and top 130, in a 10 team league, for example, SHAW-*Z* rankings still win, but suddenly Traditional *Z* rankings perform much better than before, now beating rankings that beat it at the top 20 depth. This means that at the other levels - top 50, top 100, top 130 - Traditional *Z* rankings are actually winning more. 
 
+To illustrate this pattern with another example, when I put my six rankings in a league along with Basketball Monster rankings. Shaw *Z* rankings tie with BBM at the top 50 level, SHAW *Z* and SHAW-mm get the top two spots in the top 100 level, and BBM has the best overall top-130 player team in head to head matchups. 
 
+![alt text](/img/posts/bbm_top_50.png "vs BBM Top 100") 
 
 ![alt text](/img/posts/bbm_top_100.png "vs BBM Top 100") 
 
 ![alt text](/img/posts/bbm_top_130.png "vs BBM Top 130") 
 
+
+Three further complications:
+1. Different teams perform differently in relation to each other when league compositions change.
+2. There seems to be no stability in the depth that a particular ranking metric performs better or worse than others. 
+
+Watch what in a league that sums matchup wins for a.) the Top 10, 30, 50, 70, and 90 player teams, and compares those with the sum of matchup wins for b) the Top 20, 40, 60, 80, and top 100 teams. 
+
+![alt text](/img/posts/Top_rankings_10-90.png "Categories 10-90") 
+
+![alt text](/img/posts/top_rankings_20-100.png "Categories 20-100") 
+
+While SHAW *Z* wins most matchups for the first set, it places 4th in the next set. And overall, I have to admit, if adding all the matchup wins at each top-10 level for the first 100 players, Traditional *Z* scores wins more. When comparing the top 130 players (the number drafted in a 10 team league), the SHAW-AVG ranking narrowly beats all others. 
+
+Fortunately, there is some stability when comparing most *category* wins, as the results are roughly congruent with matchup wins for same teams in same leagues.
+
 ![alt text](/img/posts/CAT_wins_top10-90.png "Categories 10-90") 
 
 ![alt text](/img/posts/Cat_wins_top20-100.png "Categories 20-100") 
 
-The results of this experiment seem to favor SHAW transformation, but they are not conclusive. 
-
-Yahoo, and Basketball Monster also offer competitive rankings. ESPN’s rankings don’t match up well, and this is likely due to the confusion (and lack of transparency) about what ESPN’s rankings actually mean. They appear to give extraordinary weight to a player’s short-term statistics, which is GREAT if you are looking for a replacement player at any point in time. Still, when toggling ‘all players’ and ‘season averages’ this is the ordered list that they provide. 
-
+<br>
 
 ## Ranking Matchup Summary:
-Many of my rankings outperformed the competition in head-to-head matchups. Specifically, if my Z-ranking beat other rankings that are based on standardization (specifically Yahoo and BBM), the difference can be found in the novel way that I treat percentage transformations. 
-Additionally, the relative success of my ‘scarcity boosted’, min-max ranking should demonstrate that scarcity does matter, and this finding should inform future improvements. 
-It may also be worth noting the limitations of my experiments. The simulated tournament revealed the surprising finding that, when dividing any rank-based player pool into n teams, the variances that made the whole cohere become unstable, and draft order and team build might weigh more heavily. In fact, my snake-draft simulation did not include player position rules, which are an integral part of fantasy team building. It is likely that, for each ranking metric, the snake draft produced a set of teams where certain positions (and thus certain statistical contributions) were over or underrepresented. 
+Many of my rankings outperformed the competition in head-to-head matchups. Specifically, my *Z*-ranking beat other rankings that are based on standardization in many of the matchups, which attests to the novel way that I treat percentage transformations. 
+
+Additionally, the relative success of my ‘scarcity boosted’, Min-Max ranking should demonstrate that scarcity does matter, and this finding should inform future improvements. It may also be worth noting the limitations of my experiments. The simulated top-*n* tournaments reveals that when dividing any rank-based player pool into *n* teams, the variances that made the whole cohere become unstable, and draft order and team build might weigh more heavily. Practically speaking, a league manager that is paying attention on draft day should beat a computer that is only picking the next top 'ranked' player. 
 
 <br>
 
 ## Value over Replacement
 
-I construct one final metric for my player-ranker dashboard, a VORP score – which I construct in two forms – and which is simply a player’s SHAW-Z score or SHAW-mm score in relation to the average of the 100-130 ranked players. 
-Because Z-scores rankings reward high achievers in specific categories, and because Min-Max scores reflect balance across categories (i.e., no one category over shadows another), I rebrand these “Impact Value” and “Balance Value”, respectively, and give the user a change to evaluate players in those terms for their unique team needs. 
+I construct one final metric for my player-ranker dashboard, a VORP score – which I construct as the difference between a players SHAW *Z* score and the average SHAW *Z* score among players in the 100-150 range of the SHAW-AVG ranking list. This metric is essentially the same as a players SHAW *Z* score, minus a typical replacement's average. Such a metric is useful for draft considerations when and if a manager needs to deviate from rank order for team-strategy or league position requirements - a potential player's relative value difference from each other can be assessed. 
 
 ```python
 
@@ -790,19 +811,26 @@ st.dataframe(df_display, use_container_width=True, height=800)
 ![alt text](/img/posts/Streamlit_Snip.png "Streamlit App Snip") 
 
 
-# Conclusion/Growth
+# Conclusions
 
-think it is safe to conclude that rankings only make up a small part fantasy success. Even when using the most competitive method (z scores), there is still intransitivity among players, and then the draft order generates noise that rankings may not be able to overcome. 
+There is empirical support for my SHAW transformations here, although they do not conclusively beat other ranking algorithms. I believe I've demonstrated the case that fantasy team percentages do not scale linearly, even if my SHAW transformation is only a heuristic. That said, there is plenty of opportunity to experiment further to optimize the weights that are applied to fantasy percentages. 
+
+The criticism that Z-scores over-value outliers in skewed distributions turns out to be wrong. My standardized rankings beat all the other SHAW rankings most of the time, but WHY? It turns out that standardization, like my scarcity boost formula, rewards scarcity. When a distribution is highly skewed, that is likely because the statistical event is relatively scarce, or because elite producers in that category are scarce. In fact, eliteness produces skew, and thus scarcity. Victor Wembanyama pushes out the tail of the distribution because he IS a unique talent; the skew results from the fact that there is no one else out there with him. Wemby’s Z-score of 8 in Blocks, or Dyson Daniel’s Z-score of 6 in Steals not only reflect those player’s ability in relation to those categories, but *they reflect their scarcity in relation to other players* as well. 
+
+To say that standardization assumes a normal distribution may be like saying wearing running shoes assumes that I am running (Yes I am, and no I'm not). The misconception comes from the statistical concept of the central limit theorem, which allows us to assign probabilities to independent events occurring because of the fact that *sample distributions* ARE normally distributed when numbers are large. Then, standard deviations have real probabilities attatched. But we know that NBA stats aren’t normal, and we are not trying to test whether or not Wemby’s 3.5 blocks per game comes from the same distribution as LeBron Jame’s 0.9 Blocks. We already know they do. I am however, interested in knowing how Wembanyama’s 3.5 blocks per game compares to Sabonis’ 14 rebounds, or Trae Young’s 10+ assists. Standardization simply gives us a like metric to compare categories that otherwise might have radically different ranges. The fact that it produces some astounding numbers at the tails in NBA stats is actually a benefit for comparing cumulative fantasy categories when the few players that can achieve those results can only be picked once. 
+
+Regarding metric comparisons, while I believe that I am the first to offer any kind of systematic comparison, top *n* player comparisons might not be the best approach to evaluate ranking systems for several reasons. One reason is because there is inevitable overlap of players. For example, the top 40 *Z*-ranked players and the top 40 Min-Max ranked players, might differ by 10 players, but it could be that the top 100 of the same algorithms differ by the same players, who alternately find themselves in and out at various top-n-levels. In a 12-team fantasy league, 156 players will be drafted, which is actually more than the number of starting players in the NBA, so the top 156 by any ranking should either have tremendous overlap, and it is probably safe to say that replacement players at the bottom of these distributions have a marginal impact anyway. 
+
+A second reason that my top *n* matchups might fail is that here I am using season, per-game averages to compare the players, whereas real fantasy matchups are won and lost in the week-to-week variations in category accumulations. I nod again to Zach Rosenof's *G*-Score method, which ...
+
+
+
 Even more confounding would be the actual position requirements in fantasy leagues, which my simulated matchups do not account for. Savvy fantasy managers know as well that building a team is equally art and science. Knowing that you only need 5 of 9 categories to win, for example, you can elect to ‘punt’ or exclude one or more categories from your ideal team build. Knowing which categories to punt depends on what players are available at what order during draft day. A ranking system that accounted for every punt scenario in real time during a player draft would be overwhelming to say the least. 
 And finally, I have not addressed factor that all fantasy managers know to be the one the real difference maker basketball – injuries. This year, perennial MVP favorite Nikola Jokic missed 5 straight games during fantasy playoff weeks. If you had him on your team, you were likely in the playoffs, and then you likely lost because he was injured. 
 
-### PERCENTAGES DO NOT SCALE LINEARLY
 
-### COMMENTS ON STANDARDIZATION and its CRITICS
 
-The criticism that Z-scores over-value outliers in skewed distributions turns out to be wrong. My standardized rankings beat all the other rankings, but WHY? It turns out that standardization, like my scarcity boost formula, rewards scarcity. When a distribution is highly skewed, that may be because the event is scarce, or because elite producers in that category are scarce. In fact, eliteness produces skew, and thus scarcity. Victor Wembanyama pushes out the tail of the distribution because he is a unique talent; the skew results from the fact that there is no one else out there with him. Wemby’s Z-score of 8 in Blocks, or Dyson Daniel’s Z-score of 6 in Steals not only reflect those player’s ability in relation to those categories, but they reflect their scarcity in relation to other players as well. 
 
-To say that standardization assumes a normal distribution, may be like saying wearing running shoes assumes that I am running. The misconception comes from the statistical concept of the central limit theorem, which allows us to assign probabilities to independent events occurring because of the fact that sample distributions ARE normally distributed when numbers are large. Then, standard deviations have real probabilities attatched. But we know that NBA stats aren’t normal, and we are not trying to test whether or not Wemby’s 3.5 blocks per game comes from the same distribution as LeBron Jame’s [X] Blocks. We already know they do. I am however, interested in knowing how Wembanyama’s 3.5 blocks per game compares to Sabonis’ 14 rebounds, or Trae Young’s 10+ assists. Standardization simply gives us a like metric to compare categories that otherwise have radically different ranges. The fact that it produces some astounding numbers at the tails is actually a benefit for comparing cumulative fantasy categories when the few players that can achieve those results can only be picked once. 
 
 
 
