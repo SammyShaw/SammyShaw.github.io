@@ -620,12 +620,12 @@ for label, result in matchups.items():
 
 There is of course overlap between the metrics, but there is enough difference to put the algorithms to the test. For example, a punishing -6 (standard attempt weighted) Z-score in the free throw percentage category would put Giannis out of the top 20, while a modest -3 (SHAW weighted) Z-score might ensure that he remains. If Giannis were excluded from the upper lists, he would likely be reincluded by the time we reach top 100 and top 130 players. As n gets larger, however, we should expect there to be more variation between ranking systems.
 
-IMAGE 1.  SHAW rankings vs. Traditional Z
+
 
 ![alt text](/img/posts/ALL_v_ALL.png "All Metrics") 
 
 
-IMAGE 3 & 4 demonstrating intransitivity.
+
 
 ![alt text](/img/posts/bbm_top_100.png "vs BBM Top 100") 
 
@@ -635,25 +635,197 @@ IMAGE 3 & 4 demonstrating intransitivity.
 
 ![alt text](/img/posts/Cat_wins_top20-100.png "Categories 20-100") 
 
-The results of this experiment seem clear, if not conclusive. The top performing ranking system is…. X, 
+The results of this experiment seem to favor SHAW transformation, but they are not conclusive. 
+
 Yahoo, and Basketball Monster also offer competitive rankings. ESPN’s rankings don’t match up well, and this is likely due to the confusion (and lack of transparency) about what ESPN’s rankings actually mean. They appear to give extraordinary weight to a player’s short-term statistics, which is GREAT if you are looking for a replacement player at any point in time. Still, when toggling ‘all players’ and ‘season averages’ this is the ordered list that they provide. 
 
 
 ## Ranking Matchup Summary:
-I am proud to say that many of my rankings outperformed the competition in head-to-head matchups. Specifically, if my Z-ranking beat other rankings that are based on standardization (specifically Yahoo and BBM), the difference can be found in the novel way that I treat percentage transformations. 
+Many of my rankings outperformed the competition in head-to-head matchups. Specifically, if my Z-ranking beat other rankings that are based on standardization (specifically Yahoo and BBM), the difference can be found in the novel way that I treat percentage transformations. 
 Additionally, the relative success of my ‘scarcity boosted’, min-max ranking should demonstrate that scarcity does matter, and this finding should inform future improvements. 
 It may also be worth noting the limitations of my experiments. The simulated tournament revealed the surprising finding that, when dividing any rank-based player pool into n teams, the variances that made the whole cohere become unstable, and draft order and team build might weigh more heavily. In fact, my snake-draft simulation did not include player position rules, which are an integral part of fantasy team building. It is likely that, for each ranking metric, the snake draft produced a set of teams where certain positions (and thus certain statistical contributions) were over or underrepresented. 
 
+<br>
+
 ## Value over Replacement
+
 I construct one final metric for my player-ranker dashboard, a VORP score – which I construct in two forms – and which is simply a player’s SHAW-Z score or SHAW-mm score in relation to the average of the 100-130 ranked players. 
 Because Z-scores rankings reward high achievers in specific categories, and because Min-Max scores reflect balance across categories (i.e., no one category over shadows another), I rebrand these “Impact Value” and “Balance Value”, respectively, and give the user a change to evaluate players in those terms for their unique team needs. 
 
-[PYTHON CODE CHUNK]
+```python
 
-# Load / Endpoint / Streamlit App
+# read in data
+pg_player_ranker = pd.read_csv("data/pg_player_ranker_df.csv")
+
+pg_9cat = pg_player_ranker[['PLAYER_NAME', '9_cat_mm_rank', '9_cat_z_rank', '9_cat_rank_sum_rank', 
+                             'H2H_9_each_rank', 'H2H_9_most_rank', '9_cat_scarcity_rank', 
+                             'GP', 'FG_PCT', 'FT_PCT', 'FG3_PCT', 'PTS', 
+                             'FG3M', 'REB', 'AST', 'TOV', 'STL', 'BLK', 'DD2', 
+                             'FGM', 'FGA', 'FTM', 'FTA', 'FG3A', 'tov'] + SHAW_percentages].copy()
+
+# Define Replacement Value
+
+nine_cats = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 
+             'tov', 'FT_PCT_def_w', 'FG_PCT_def_w']
+
+replacement_pool = pg_9cat.sort_values('9_cat_mm_rank').iloc[100:150]
+replacement_avg = replacement_pool[nine_cats].mean()
+
+# Step 1: Calculate raw deltas for each player vs replacement
+# --------------------------
+# Step 1: Raw deltas vs replacement
+# --------------------------
+for cat in nine_cats:
+    pg_9cat[f'delta_{cat}'] = pg_9cat[cat] - replacement_avg[cat]
+
+# --------------------------
+# Step 2: Min-Max Normalize
+# --------------------------
+mm_norm_cols = []
+for cat in nine_cats:
+    delta_col = f'delta_{cat}'
+    mm_col = f'norm_mm_{cat}'
+
+    min_val = pg_9cat[delta_col].min()
+    max_val = pg_9cat[delta_col].max()
+    pg_9cat[mm_col] = (pg_9cat[delta_col] - min_val) / (max_val - min_val)
+
+    mm_norm_cols.append(mm_col)
+
+pg_9cat['replacement_value_mm'] = pg_9cat[mm_norm_cols].sum(axis=1)
+
+# --------------------------
+# Step 3: Z-Score Normalize
+# --------------------------
+z_norm_cols = []
+for cat in nine_cats:
+    delta_col = f'delta_{cat}'
+    z_col = f'norm_z_{cat}'
+
+    mean = pg_9cat[delta_col].mean()
+    std = pg_9cat[delta_col].std()
+    pg_9cat[z_col] = (pg_9cat[delta_col] - mean) / std
+
+    z_norm_cols.append(z_col)
+
+pg_9cat['replacement_value_z'] = pg_9cat[z_norm_cols].sum(axis=1)
+
+# --------------------------
+# Step 4: Output Summary
+# --------------------------
+replacement_summary = pg_9cat[['PLAYER_NAME', '9_cat_mm_rank', 
+                               'replacement_value_mm', 'replacement_value_z']] \
+    .sort_values('replacement_value_mm', ascending=False)
+
+print(replacement_summary.head(20))
+
+```
+
+
+<br>
+
+# Load: Streamlit User Enpoint App
 Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The app allows the user to select among my top ranking metrics (except the H2H ones that take computing time). 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
 
+```python
+
+import streamlit as st
+import pandas as pd
+
+# -----------------------------------
+st.set_page_config(
+    page_title="Fantasy Basketball Dashboard",
+    layout="wide",  # 👈 This is key!
+    initial_sidebar_state="expanded"
+)
+
+
+# ------------------------------
+# Load Data
+# ------------------------------
+df = pd.read_csv("data/final_player_table.csv")
+
+# ------------------------------
+# Sidebar - User Inputs
+# ------------------------------
+st.sidebar.title("Fantasy Basketball Explorer")
+
+# Ranking metric selector
+metric_options = ['mm_rank', 'z_rank', 'rank_sum_rank', 'scarcity_rank', 'H2H_each_rank', 'H2H_most_rank']
+selected_metric = st.sidebar.selectbox("Choose a Ranking Metric", metric_options)
+
+# Category format (9-cat vs 11-cat)
+cat_format = st.sidebar.radio("Category Format", ["9-cat", "11-cat"])
+
+# Stat type (Per-Game vs Season-Total)
+stat_type = st.sidebar.radio("Stat Type", ["per_game", "season_total"])
+
+# ------------------------------
+# Map selected metric to column name
+# ------------------------------
+rank_col_map = {
+    "mm_rank": {"9-cat": "9_cat_mm_rank", "11-cat": "11_cat_mm_rank"},
+    "z_rank": {"9-cat": "9_cat_z_rank", "11-cat": "11_cat_z_rank"},
+    "rank_sum_rank": {"9-cat": "9_cat_rank_sum_rank", "11-cat": "11_cat_rank_sum_rank"},
+    "scarcity_rank": {"9-cat": "9_cat_scarcity_rank", "11-cat": "11_cat_scarcity_rank"},
+    "H2H_each_rank": {"9-cat": "H2H_9_each_rank", "11-cat": "H2H_11_each_rank"},
+    "H2H_most_rank": {"9-cat": "H2H_9_most_rank", "11-cat": "H2H_11_most_rank"}
+}
+selected_rank_col = rank_col_map[selected_metric][cat_format]
+
+# ------------------------------
+# Filter Data
+# ------------------------------
+df_filtered = df[
+    (df["CATEGORY_FORMAT"] == cat_format) &
+    (df["STAT_TYPE"] == stat_type)
+].copy()
+
+# ------------------------------
+# Select stat columns
+# ------------------------------
+if cat_format == "9-cat":
+    stat_cols = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'TOV', 
+                 'FT_PCT', 'FG_PCT']
+else:
+    stat_cols = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'DD2',
+                 'FT_PCT', 'FG_PCT', 'FG3_PCT']
+
+# ------------------------------
+# Columns to show
+# ------------------------------
+columns_to_show = ['PLAYER_NAME', selected_rank_col, 'value_balance_score', 'value_impact_score', 'GP'] + stat_cols
+
+rename_dict = {
+    selected_rank_col: selected_metric.replace("_", " ").upper() + " (" + cat_format + ")",
+    'value_balance_score': "Balance Value Added",
+    'value_impact_score': "Impact Value Added",
+}
+
+
+# ------------------------------
+# Final Table Display
+# ------------------------------
+# Sort BEFORE renaming
+df_display = df_filtered[columns_to_show].sort_values(selected_rank_col).reset_index(drop=True)
+
+# Then rename columns for display
+df_display = df_display.rename(columns=rename_dict)
+
+# Round numbers
+df_display = df_display.round(1)
+
+
+
+st.title("🏀 NBA Fantasy Player Ranker")
+st.dataframe(df_display, use_container_width=True, height=1000)
+
+```
+
+[VORP TABLE] 
+
+[IMAGE of STREAMLIT ENDPOINT] 
 
 # Conclusion/Growth
 
