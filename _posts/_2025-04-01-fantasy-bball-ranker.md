@@ -694,7 +694,27 @@ replacement_summary = app_df[['PLAYER_NAME', 'SHAW_Z_rank', 'SHAW_VORP']] \
     .sort_values('SHAW_VORP', ascending=False)
 
 print(replacement_summary.head(20))
-
+                 PLAYER_NAME  SHAW_Z_rank  SHAW_VORP
+410        Victor Wembanyama          1.0  15.176913
+317             Nikola Jokić          2.0  14.495543
+370  Shai Gilgeous-Alexander          3.0  12.474555
+22             Anthony Davis          4.0  10.513017
+405        Tyrese Haliburton          5.0   9.453085
+278              Luka Dončić          6.0   9.321440
+238       Karl-Anthony Towns          7.0   8.589270
+195             Jayson Tatum          8.0   8.145027
+407             Tyrese Maxey          9.0   8.024980
+374            Stephen Curry         10.0   7.873836
+87            Damian Lillard         11.0   7.736125
+252             Kevin Durant         12.0   7.654458
+268             Kyrie Irving         13.0   7.556756
+263       Kristaps Porziņģis         14.0   7.358173
+177             Jamal Murray         15.0   7.175387
+23           Anthony Edwards         16.0   6.903803
+179             James Harden         17.0   6.795028
+127              Evan Mobley         18.0   6.777128
+170            Jalen Johnson         19.0   6.706076
+184        Jaren Jackson Jr.         20.0   6.622107
 ```
 
 <br>
@@ -707,101 +727,53 @@ It is not yet deployed outside of my local drive, but my near-future goal is to 
 ```python
 
 import streamlit as st
-import pandas as pd
 
-# -----------------------------------
+# Set directory to where the script & CSV live
+os.chdir("C:/Dat_Sci/Data Projects/NBA/Streamlit App")
+
+# Page config
 st.set_page_config(
     page_title="Fantasy Basketball Dashboard",
-    layout="wide",  # 👈 This is key!
+    layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Load data
+app_df = pd.read_csv("ranking_app_df.csv")
 
-# ------------------------------
-# Load Data
-# ------------------------------
-df = pd.read_csv("data/final_player_table.csv")
-
-# ------------------------------
-# Sidebar - User Inputs
-# ------------------------------
+# Sidebar setup
 st.sidebar.title("Fantasy Basketball Explorer")
 
-# Ranking metric selector
-metric_options = ['mm_rank', 'z_rank', 'rank_sum_rank', 'scarcity_rank', 'H2H_each_rank', 'H2H_most_rank']
+metric_options = ['SHAW_Z_rank', 'SHAW_mm_rank', 'SHAW_Scarce_mm_rank',
+                  'SHAW_AVG_rank', 'SHAW_rank_sum', 'H2H_each_rank', 'H2H_most_rank']
 selected_metric = st.sidebar.selectbox("Choose a Ranking Metric", metric_options)
 
-# Category format (9-cat vs 11-cat)
-cat_format = st.sidebar.radio("Category Format", ["9-cat", "11-cat"])
+# Stat columns to show
+stat_columns = ["FT_PCT", "FTA", "FTM", "FG_PCT", "FGA", "FGM", "PTS",
+                "FG3M", "REB", "AST", "STL", "BLK", "TOV"]
+columns_to_show = ['PLAYER_NAME', selected_metric, 'SHAW_VORP', 'GP'] + stat_columns
 
-# Stat type (Per-Game vs Season-Total)
-stat_type = st.sidebar.radio("Stat Type", ["per_game", "season_total"])
-
-# ------------------------------
-# Map selected metric to column name
-# ------------------------------
-rank_col_map = {
-    "mm_rank": {"9-cat": "9_cat_mm_rank", "11-cat": "11_cat_mm_rank"},
-    "z_rank": {"9-cat": "9_cat_z_rank", "11-cat": "11_cat_z_rank"},
-    "rank_sum_rank": {"9-cat": "9_cat_rank_sum_rank", "11-cat": "11_cat_rank_sum_rank"},
-    "scarcity_rank": {"9-cat": "9_cat_scarcity_rank", "11-cat": "11_cat_scarcity_rank"},
-    "H2H_each_rank": {"9-cat": "H2H_9_each_rank", "11-cat": "H2H_11_each_rank"},
-    "H2H_most_rank": {"9-cat": "H2H_9_most_rank", "11-cat": "H2H_11_most_rank"}
-}
-selected_rank_col = rank_col_map[selected_metric][cat_format]
-
-# ------------------------------
-# Filter Data
-# ------------------------------
-df_filtered = df[
-    (df["CATEGORY_FORMAT"] == cat_format) &
-    (df["STAT_TYPE"] == stat_type)
-].copy()
-
-# ------------------------------
-# Select stat columns
-# ------------------------------
-if cat_format == "9-cat":
-    stat_cols = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'TOV', 
-                 'FT_PCT', 'FG_PCT']
-else:
-    stat_cols = ['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'DD2',
-                 'FT_PCT', 'FG_PCT', 'FG3_PCT']
-
-# ------------------------------
-# Columns to show
-# ------------------------------
-columns_to_show = ['PLAYER_NAME', selected_rank_col, 'value_balance_score', 'value_impact_score', 'GP'] + stat_cols
-
-rename_dict = {
-    selected_rank_col: selected_metric.replace("_", " ").upper() + " (" + cat_format + ")",
-    'value_balance_score': "Balance Value Added",
-    'value_impact_score': "Impact Value Added",
-}
+# Sort and filter
+df_display = app_df[columns_to_show].sort_values(selected_metric).reset_index(drop=True)
 
 
-# ------------------------------
-# Final Table Display
-# ------------------------------
-# Sort BEFORE renaming
-df_display = df_filtered[columns_to_show].sort_values(selected_rank_col).reset_index(drop=True)
+# Add player search bar
+player_filter = st.sidebar.text_input("Search by Player Name")
+if player_filter:
+    df_display = df_display[df_display['PLAYER_NAME'].str.contains(player_filter, case=False)]
 
-# Then rename columns for display
-df_display = df_display.rename(columns=rename_dict)
-
-# Round numbers
+# Round
 df_display = df_display.round(1)
 
+# Title and display
+st.title("NBA Fantasy Player Ranker")
 
-
-st.title("🏀 NBA Fantasy Player Ranker")
-st.dataframe(df_display, use_container_width=True, height=1000)
+st.dataframe(df_display, use_container_width=True, height=800)
 
 ```
 
-[VORP TABLE] 
+![alt text](/img/posts/Streamlit_Snip.png "Streamlit App Snip") 
 
-[IMAGE of STREAMLIT ENDPOINT] 
 
 # Conclusion/Growth
 
