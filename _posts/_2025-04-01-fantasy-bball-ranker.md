@@ -489,18 +489,151 @@ With those indiscrepancies out of the way, there were also a few players in Yaho
 
 I compared Basketball Monster rankings separately. Due to a mistake on my part, I did not scrape their rankings until 3/28/2025. Since two more days of NBA games had passed, I decided to compare these separately, and refreshed my own rankings on 3/28/2025 to compare them. Basketball Monster keeps a very clear ranking system that appears to be true to real “season averages”. I did not have to exclude any injured players, but players that did not meet the minimum games threshold were removed by default. 
 
-## Top N Players
-First, I simulate head-to-head, 9-category matchups using the top n players in each ranking system. I compare the top 20, top 50, top 100, and top 130 (the number of active players in a 10-team league) in separate matchups using real, up-to-date, per-game statistics. 
+<br>
 
-[PYTHON CODE CHUNK]
+## Top N Players
+I compare rankings by simulating head-to-head, 9-category matchups using the top-*n* players in each ranking system. I start by comparing the top 20, top 50, top 100, and top 130 (the number of active players in a 10-team league) in separate matchups using real, up-to-date, per-game statistics. 
+
+```python
+
+# 'League' participants
+all_metrics = ['Traditional_Z_rank', 'ESPN rank', 'Yahoo rank', 'BBM rank', 'SHAW_AVG_rank',
+               'SHAW_Z_rank', 'SHAW_mm_rank', 'SHAW_Scarce_mm_rank', 'SHAW_rank_sum_rank', 
+               'SHAW_H2H_each_rank', 'SHAW_H2H_most_rank']
+
+# 'Team' construction
+top_n_list = [20, 50, 100, 130]
+
+# Scoring Format
+comp_stats = ['FG_PCT', 'FT_PCT', 'PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'tov']
+
+# Put per-game summary stats in a DataFrame, calculating percentages as total Makes/Attempts
+def generate_summary_dfs(df, rank_metrics, top_n_list, categories):
+    """
+    For each top-N value and ranking metric:
+        - Select top N players
+        - Sum team stats, compute shooting percentages
+
+    Returns:
+        - summary_dfs: dict of DataFrames with cumulative raw stats per metric per top-N
+    """
+    summary_dfs = {}
+
+    for n in top_n_list:
+        summary_stats = {}
+
+        for metric in rank_metrics:
+            top_players = df.sort_values(by=metric).head(n)
+
+            # Sum makes and attempts
+            FGM = top_players['FGM'].sum()
+            FGA = top_players['FGA'].sum()
+            FTM = top_players['FTM'].sum()
+            FTA = top_players['FTA'].sum()
+
+            # Calculate percentages
+            FG_PCT = FGM / FGA if FGA > 0 else 0
+            FT_PCT = FTM / FTA if FTA > 0 else 0
+
+            # Sum counting stats
+            total_stats = top_players[['PTS', 'FG3M', 'REB', 'AST', 'STL', 'BLK', 'tov']].sum()
+
+            # Add derived stats
+            total_stats['FG_PCT'] = FG_PCT
+            total_stats['FT_PCT'] = FT_PCT
+
+            summary_stats[metric] = total_stats
+
+        # Convert to DataFrame
+        summary_df = pd.DataFrame(summary_stats).T
+        summary_dfs[f'top_{n}'] = summary_df
+
+    return summary_dfs
+
+# Compare stats in a separate function
+def compare_summary_dfs(summary_dfs, categories):
+    """
+    Takes in summary_dfs and performs head-to-head matchups.
+    Returns matchup results as a dictionary of Series showing win counts per metric.
+    """
+    matchup_results_by_top_n = {}
+
+    for label, summary_df in summary_dfs.items():
+        metrics = summary_df.index.tolist()
+        
+        # Add columns for storing results
+        summary_df['Total_Category_Wins'] = 0
+        summary_df['Total_Matchup_Wins'] = 0
+
+        # Compare each metric against all others for Total_Category_Wins and Total_Matchup_Wins
+        for i, m1 in enumerate(metrics):
+            for m2 in metrics[i+1:]:
+                team1 = summary_df.loc[m1]
+                team2 = summary_df.loc[m2]
+
+                m1_wins = 0
+                m2_wins = 0
+
+                for cat in categories:
+                    if cat in summary_df.columns:
+                        if team1[cat] > team2[cat]:
+                            m1_wins += 1
+                        elif team1[cat] < team2[cat]:
+                            m2_wins += 1
+
+                # Update total category wins
+                summary_df.loc[m1, 'Total_Category_Wins'] += m1_wins
+                summary_df.loc[m2, 'Total_Category_Wins'] += m2_wins
+
+                # Update total matchup wins
+                if m1_wins > m2_wins:
+                    summary_df.loc[m1, 'Total_Matchup_Wins'] += 1
+                elif m2_wins > m1_wins:
+                    summary_df.loc[m2, 'Total_Matchup_Wins'] += 1
+                else:
+                    summary_df.loc[m1, 'Total_Matchup_Wins'] += 0.5
+                    summary_df.loc[m2, 'Total_Matchup_Wins'] += 0.5
+
+        matchup_results_by_top_n[label] = summary_df[['Total_Matchup_Wins', 'Total_Category_Wins']]
+
+    return matchup_results_by_top_n
+
+
+summary_dfs = generate_summary_dfs(
+    df=pg_player_ranker,
+    rank_metrics=all_metrics, # Variable League Composition
+    top_n_list=top_n_list, # Variable Team Construction
+    categories=comp_stats # Variable League Scoring Format
+)
+
+matchups = compare_summary_dfs(
+    summary_dfs=summary_dfs,
+    categories=comp_stats
+)
+
+for label, result in matchups.items():
+    print(f"\n🏀 Head-to-head wins among metrics ({label}):")
+    print(result)
+
+```
+
 
 There is of course overlap between the metrics, but there is enough difference to put the algorithms to the test. For example, a punishing -6 (standard attempt weighted) Z-score in the free throw percentage category would put Giannis out of the top 20, while a modest -3 (SHAW weighted) Z-score might ensure that he remains. If Giannis were excluded from the upper lists, he would likely be reincluded by the time we reach top 100 and top 130 players. As n gets larger, however, we should expect there to be more variation between ranking systems.
 
 IMAGE 1.  SHAW rankings vs. Traditional Z
 
-IMAGE 2. SHAW rankings vs. Others. 
+![alt text](/img/posts/ALL_v_ALL.png "All Metrics") 
+
 
 IMAGE 3 & 4 demonstrating intransitivity.
+
+![alt text](/img/posts/bbm_top_100.png "vs BBM Top 100") 
+
+![alt text](/img/posts/bbm_top_130.png "vs BBM Top 130") 
+
+![alt text](/img/posts/CAT_wins_top10-90.png "Categories 10-90") 
+
+![alt text](/img/posts/Cat_wins_top20-100.png "Categories 20-100") 
 
 The results of this experiment seem clear, if not conclusive. The top performing ranking system is…. X, 
 Yahoo, and Basketball Monster also offer competitive rankings. ESPN’s rankings don’t match up well, and this is likely due to the confusion (and lack of transparency) about what ESPN’s rankings actually mean. They appear to give extraordinary weight to a player’s short-term statistics, which is GREAT if you are looking for a replacement player at any point in time. Still, when toggling ‘all players’ and ‘season averages’ this is the ordered list that they provide. 
