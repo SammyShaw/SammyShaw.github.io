@@ -821,12 +821,7 @@ To say that standardization assumes a normal distribution may be like saying wea
 
 Regarding metric comparisons, while I believe that I am the first to offer any kind of systematic comparison, top *n* player comparisons might not be the best approach to evaluate ranking systems for several reasons. One reason is because there is inevitable overlap of players. For example, the top 40 *Z*-ranked players and the top 40 Min-Max ranked players, might differ by 10 players, but it could be that the top 100 of the same algorithms differ by the same players, who alternately find themselves in and out at various top-n-levels. In a 12-team fantasy league, 156 players will be drafted, which is actually more than the number of starting players in the NBA, so the top 156 by any ranking should either have tremendous overlap, and it is probably safe to say that replacement players at the bottom of these distributions have a marginal impact anyway. 
 
-A second reason that my top *n* matchups might fail is that here I am using season, per-game averages to compare the players, whereas real fantasy matchups are won and lost in the week-to-week variations in category accumulations. I nod again to Zach Rosenof's *G*-Score method, which ...
 
-
-
-Even more confounding would be the actual position requirements in fantasy leagues, which my simulated matchups do not account for. Savvy fantasy managers know as well that building a team is equally art and science. Knowing that you only need 5 of 9 categories to win, for example, you can elect to ‘punt’ or exclude one or more categories from your ideal team build. Knowing which categories to punt depends on what players are available at what order during draft day. A ranking system that accounted for every punt scenario in real time during a player draft would be overwhelming to say the least. 
-And finally, I have not addressed factor that all fantasy managers know to be the one the real difference maker basketball – injuries. This year, perennial MVP favorite Nikola Jokic missed 5 straight games during fantasy playoff weeks. If you had him on your team, you were likely in the playoffs, and then you likely lost because he was injured. 
 
 
 
