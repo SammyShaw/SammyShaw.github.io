@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Fantasy BBall Ranking using SHAW-Transformation
-image: "/posts/PLACEHOLDER.png"
+image: "/posts/GiannisStripe.png"
 tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 ---
 
