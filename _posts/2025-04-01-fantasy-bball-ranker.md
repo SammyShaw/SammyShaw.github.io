@@ -24,7 +24,7 @@ In this project I extract, transform, and load NBA player data for my own fantas
 - [02. Transformation](#transformations)
     - [Distributions](#distributions)
     - [Percentages](#percentages)
-    - [SHAW-Percentage Transformation](#shaw-percentage-tranformation)
+    - [SHAW Percentage Transformation](#shaw-percentage-tranformation)
     - [Standardization](#standardization)
     - [Min-Max Scaling](#min-max-scaling)
     - [Scarcity Ranking](#scarcity-ranking)
