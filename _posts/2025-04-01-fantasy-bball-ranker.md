@@ -5,6 +5,11 @@ image: "/posts/GiannisStripe.png"
 tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 ---
 
+<!-- Load MathJax -->
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
 In this project I extract, transform, and load NBA player data for my own fantasy basketball ranking app. I construct a series of ranking algorithms premised on the hypothesis that standard ranking systems scale percentage category scores inaccurately. Existing algorithms typically weight percentage categories linearly by attempts. However, because percentages are bound between 0 and 1, the actual affect of attempts on a player's percentage is asymptotic - not linear. I develop a Sigmoid-Heuristic-Attempt-Weighting (SHAW) transformation that adjusts for this non-linearity using the statistical properties of attempt distributions, specifically their coefficient of variantion (CoV) and skewness. I then apply this transformation to create six unique fantasy basketball ranking algorithms, which I then systematically compare to each other and to leading platform rankings: ESPN, Yahoo, and Basketball Monster. In head-to-head matchups using top-*n* players from each ranking system, several of my rankings perform well, especially against Yahoo and ESPN. When comparing to traditional Z-scores and Basketball Monster rankings, however, my rankings are comparable - beating the competition at some ranking depths, but not others. I conclude that SHAW tranformations offer a theoretically grounded alternative without sacrificing accuracy.
 
 ## Contents
@@ -244,9 +249,9 @@ $$
 
 Where:
 
-- x = Attempts / Average Attempts
-- S = 1 + CoV (Coefficient of Variation)
-- k = 1 / (1 + Skewness)
+- \( x = \frac{\text{Attempts}}{\text{Average Attempts}} \)
+- \( S = 1 + \text{CoV} \)
+- \( k = \frac{1}{1 + \text{Skewness}} \)
 
 Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one.
 
