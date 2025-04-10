@@ -213,7 +213,8 @@ At first glance this would seem fair, a player’s percentage impacts a team’s
 
 The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league average is 78.2%), but he is also a league-leader in attempts (as an elite scorer otherwise, he gets fouled a lot). Giannis's Free Throw Z-Score is -8. 
 
-**Select Players' Free Throw Percentages, Attempts and standardized *Impact* score**
+#### Select Players' Free Throw Percentages, Attempts and standardized *Impact* score
+
 | **Player Name** | **FT%** | **FTM** | **FTA** | **FT Impact Z-Score** |
 |----------------:|--------:|--------:|--------:|----------------------:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | -8.12 | 
@@ -245,7 +246,7 @@ Where:
 
 - x = Attempts / Average Attempts
 - S = 1 + CoV (Coefficient of Variation)
-- k = 1 / (1 + |Skewness|)
+- k = 1 / (1 + Skewness)
 
 Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one.
 
@@ -321,7 +322,8 @@ The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, wh
 
 SHAW-transformed percentages appear to follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, the extreme values that were produced in the tails (Giannis vs. SGA for example) using *Impact* scores are now muted by SHAW-tranformations. Compared to existing methods, this method thus undervalues SGA and overvalues Giannis. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
 
-**Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage**
+#### Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage
+
 | **Player Name** | **FT %** | **FTM** | **FTA** | **Attempt/Average** | **FT Impact *Z*-Score** | **Deficit** | **Sig-weight** | **SHAW %** | **SHAW-*Z*-Score** | 
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | -3.55 | 
@@ -479,7 +481,8 @@ For brevity, the code for this can be found in my GitHub repository.
 
 The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, so they can be compared to each other, and compared to ESPN, Yahoo, and Basketball Monster.
 
-**Select NBA players and their ranks across 10 ranking algorithms**
+#### Select NBA players and their ranks across 10 ranking algorithms
+
 | **Player Name** | **Traditional Z-rank** | **SHAW Z rank** | **SHAW mm rank** | **SHAW Scarce mm rank** | **SHAW rank-sum rank** | **SHAW H2H each rank** | **SHAW H2H most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Nikola Jokic | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 5 | 1 | 1 |
