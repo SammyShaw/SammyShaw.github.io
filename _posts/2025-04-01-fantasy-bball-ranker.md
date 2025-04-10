@@ -62,12 +62,12 @@ Here, I develop and describe six different ranking algorithms of my own and comp
 
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** |
 |---|---|---|---|
-| SHAW-Z                | Sum of standardized counting stats and sigmoid weighted percentages | Preserves category dispersion while setting category distributions to like terms | May over-value outliers |
-| SHAW-mm               | Sum of Min-Max (0-1) scaled counting stats and sigmoid weighted percentages | Preserves category dispersion without overvaluing outliers | May under-value real differences |
-| SHAW-Scarce-mm        | SHAW-mm ranking with weights applied to scarce categories | Rewards scarce category producers | Scarce categories might also vary unstably from week to week |
-| SHAW-rank-sum         | Reverse-ranked sum of each-category ranks (using sigmoid weighted percentages) | Simple math; preserves relative player *position* in each category | Does not account for category variance |
-| SHAW-H2H-each         | Ranked sum of individual-player categories won vs. the field (using sigmoid weighted percentages) | Rewards balance across categories | Does not account for category variance |
-| SHAW-H2H-most         | Ranked sum of individual-player matchups won vs. the field (using sigmoid weighted percentages) | Rewards consistency in top categories | Does not account for category variance |
+| SHAW-*Z*              | Sum of standardized counting stats and sigmoid weighted percentages | Preserves category dispersion while setting category distributions to like terms | May over-value outliers |
+| SHAW-*mm*             | Sum of Min-Max (0-1) scaled counting stats and sigmoid weighted percentages | Preserves category dispersion without overvaluing outliers | May under-value real differences |
+| SHAW-*Scarce-mm*      | SHAW-mm ranking with weights applied to scarce categories | Rewards scarce category producers | Scarce categories might also vary unstably from week to week |
+| SHAW-*rank-sum*       | Reverse-ranked sum of each-category ranks (using sigmoid weighted percentages) | Simple math; preserves relative player *position* in each category | Does not account for category variance |
+| SHAW-*H2H-each*       | Ranked sum of individual-player categories won vs. the field (using sigmoid weighted percentages) | Rewards balance across categories | Does not account for category variance |
+| SHAW-*H2H-most*       | Ranked sum of individual-player matchups won vs. the field (using sigmoid weighted percentages) | Rewards consistency in top categories | Does not account for category variance |
 | SHAW-AVG              | Average of SHAW-Z and SHAW-Scarce-mm rankings | Aims for robustness | Is difficult to interpret, if not convoluted |
 
 
@@ -513,7 +513,7 @@ pg_stats = scarcity_rank(pg_stats, counting_stats, '9_cat')
 
 Other plausible ranking methods use the SHAW transformed percentages but forgo additional transformations and concerns with category variance. 
 
-<b>
+<br>
   
 ### Ranked Sum of Category Ranks
 
