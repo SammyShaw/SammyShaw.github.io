@@ -213,7 +213,7 @@ for cat in raw_categories:
 The result is a more modest 400 + player pool, with the large number of zeros eliminated. Distributions are still positively skewed, but there is now some semblance of a tail on the negative end. 
 
 
-![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
+![alt text](/img/posts/pg_distributions_top400.png "Per-Game Points & Rebounds")
 
 
 Typically, then the categories are standardized (which I will do in a later section): a players' *Z*-score in a category is their difference from the average divided by the standard deviation. Thus, we can compare Points and Rebounds here in like terms. A player that scores 2 standard deviations above the average in points, is comparable to a player that scores 2 standard deviations above the average in Rebounds. 
