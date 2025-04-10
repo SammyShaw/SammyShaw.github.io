@@ -11,12 +11,12 @@ tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 </script>
 
 In this project I extract, transform, and load NBA player data for my own fantasy basketball ranking app. I construct a series of ranking algorithms premised on the hypothesis that standard ranking systems scale percentage category scores inaccurately. Existing algorithms typically weight percentage categories linearly by attempts. However, because percentages are bound between 0 and 1, the actual affect of attempts on a player's percentage is asymptotic - not linear. I develop a Sigmoid-Heuristic-Attempt-Weighting (SHAW) transformation that adjusts for this non-linearity using the statistical properties of attempt distributions, specifically their coefficient of variantion (CoV) and skewness. I then apply this transformation to create six unique fantasy basketball ranking algorithms, which I then systematically compare to each other and to leading platform rankings: ESPN, Yahoo, and Basketball Monster. In head-to-head matchups using top-*n* players from each ranking system, several of my rankings perform well, especially against Yahoo and ESPN. When comparing to traditional Z-scores and Basketball Monster rankings, however, my rankings are comparable - beating the competition at some ranking depths, but not others. I conclude that SHAW tranformations offer a theoretically grounded alternative without sacrificing accuracy.
+
 <br>
 
 ## Contents
 
 - [00. Project Overview](#overview-main)
-    - [Context](#overview-context)
     - [Literature Review](#literature-review)
     - [Actions](#overview-actions)
     - [Results & Discussion](#overview-results)
@@ -36,12 +36,10 @@ In this project I extract, transform, and load NBA player data for my own fantas
 - [04. VORP](#value-over-replacement)
 - [05. Load: Streamlit App](#streamlit-app)
 - [06. Discussion & Conclusion](#discussion)
+
 <br>
 
 # Project Overview
-
-
-### Context
 
 Fantasy sports are a popular past time with over 62.5 million participants in the U.S. and Canada ([FSGA.org](https://thefsga.org/industry-demographics/)), 20 million of whom regularly play fantasy basketball. In a fantasy sports league, participants (or, team managers) create a fantasy team by competitively drafting from a pool of professional players, whose real game stats become their own fantasy stats for the season. Choosing a successful team requires knowing the players and understanding the league’s scoring format. In *9-category* fantasy basketball leagues (the standard competitive fantasy basketball format), teams are compared – and thus players must be evaluated - across nine different measures. To make this easier, the major platforms Yahoo.com and ESPN include player rankings to help managers make their choices. As some critics point out, however, Yahoo and ESPN often include questionable players in their top ranks, and unfortunately, neither platform is exactly transparent about how their rankings are calculated. As a regular fantasy basketballer and data science enthusiast, I join a small but growing literature offering alternatives for better ranking accuracy.
 
