@@ -373,7 +373,7 @@ SHAW-transformed percentages appear to follow a reasonably normal distribution t
 
 ##### Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage
 
-| **Player Name** | **FT %** | **FTM** | **FTA** | **Attempts / Average** | **FT Impact *Z* Score** | **Deficit** | **Sig weight** | **SHAW %** | **SHAW *Z* Score** | 
+| **Player Name** | **FT%** | **FTM** | **FTA** | **Attempts / Average** | **FT Impact *Z* Score** | **Deficit** | **Sig-weight** | **SHAW%** | **SHAW *Z* Score** | 
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | 5.59 | -8.12 | -0.18 | 1.65 | 48.6 | -3.55 | 
 | Steph Curry | 92.9 | 252 | 234 | 2.30 | 2.73 | 0.15 | 1.21 | 96.1 | 2.30 | 
