@@ -32,8 +32,8 @@ In this project I extract, transform, and load NBA player data for my own fantas
     - [H2H Player Matchup](#head-to-head-individual-player-comparisons)
 - [03. Comparing Rankings with Top-*N* Player Matchups](#comparing-rankings-using-top-n-player-matchups)
 - [04. VORP](#value-over-replacement)
-- [05. Load: Streamlit User Endpoint](#Load:-Streamlit-User-Endpoint)
-- [06. Discussion & Conclusion](#discussion)
+- [05. Load: Streamlit User Endpoint](#load:-streamlit-user-endpoint)
+- [06. Discussion & Conclusion](#conclusions)
 
 <br>
 
