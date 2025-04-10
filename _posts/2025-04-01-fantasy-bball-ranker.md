@@ -117,7 +117,6 @@ nba_24_25.to_csv("data/nba_2024_25.csv", index=False)
 
 The code above returns a dataframe of 66 statistical columns and 550+ rows (players), which get added every time a new players sees the court in the season. 
 
-A select sample of the raw data, showing three superstars and one lesser-known player. 
 
 #### Sample of raw NBA player data
 
