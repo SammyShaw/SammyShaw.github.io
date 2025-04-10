@@ -364,6 +364,7 @@ pg_stats = Z_rank(pg_stats, nine_cat, 'SHAW-Z')
 ```
 The only difference between my SHAW *Z*-ranking and Traditional *Z*-ranking is the way that the percentage categories are scaled. Seven of the nine comparable categories would have the same exact standardized values before summing. 
 
+<br>
 
 ## Min-Max Scaling
 
@@ -397,6 +398,8 @@ def minmax_rank(df, categories, metric_label):
 pg_stats = minmax_rank(pg_stats, nine_cat, 'SHAW-mm')
 
 ```
+
+<br>
 
 ## Scarcity Ranking
 
@@ -445,9 +448,12 @@ pg_stats = scarcity_rank(pg_stats, counting_stats, '9_cat')
 
 ```
 
+<br>
+
 ## Other Ranking Methods
 
 Other plausible ranking methods use the SHAW transformed percentages but forgo additional transformations and concerns with category variance. 
+
 
 ### Ranked Sum of Category Ranks
 
@@ -470,7 +476,8 @@ pg_stats = cat_rank_sum(pg_stats, nine_cat, 'SHAW_rank_sum')
 This method does not preserve the relative spread, but instead distributes players uniformly in each category, while still accounting for the relative position of each player in each category. 
 And since we’re comparing all the players across all categories, this method seems elegant. As we'll see, however, it does not perform well. 
 
-### Head to Head individual player comparisons
+
+### Head to Head Individual Player Comparisons
 
 Another approach to ranking involves observing how players match up head-to-head (H2H) against other players. After SHAW-transforming the percentages, players are compared against every other player in every category. This requires building a data frame with a row for each player combination. From there we can count the number of categories that each player wins versus each other, we can assign a matchup winner (for most categories won), and we can count the total categories, and total matchup wins against the field. 
 
@@ -507,7 +514,7 @@ There were several players in Yahoo’s and ESPN’s season-average rankings tha
 
 <br>
 
-## Top N Players
+## Comparing Rankings Using Top-*n* Player Matchups
 
 I compare rankings by simulating head-to-head, 9-category matchups using the top-*n* players in each ranking system. 
 
@@ -812,6 +819,7 @@ st.dataframe(df_display, use_container_width=True, height=800)
 
 ![alt text](/img/posts/Streamlit_Snip.png "Streamlit App Snip") 
 
+<br>
 
 # Conclusions
 
