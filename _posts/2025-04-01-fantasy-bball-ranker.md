@@ -360,7 +360,7 @@ for col in SHAW_percentages:
 ```
 
 
-The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, which could be added back to a player's raw percentage, or left alone, because the resulting dispersion is the same. 
+The resulting distribution is the sigmoid-heuristic attempts-weighted deficit, which could be added back to a player's raw percentage, or left alone, because the resulting dispersion is the same. 
 
 
 ![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
