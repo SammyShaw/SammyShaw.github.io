@@ -16,25 +16,23 @@ In this project I extract, transform, and load NBA player data for my own fantas
 
 ## Contents
 
-- [00. Project Overview](#overview-main)
+- [00. Project Overview](#project-overview)
     - [Literature Review](#literature-review)
-    - [Actions](#overview-actions)
-    - [Results & Discussion](#overview-results)
-- [01. Extract: Data Overview](#extract)
-- [02. Transform: Goals](#transformation-overview)
-    - [Distributions & Redistributions](#distributions)
+    - [Actions](#actions)
+    - [Results](#results)
+- [01. Extract Data](#extract)
+- [02. Transformation](#transformations)
+    - [Distributions](#distributions)
     - [Percentages](#percentages)
     - [SHAW-Percentage Transformation](#shaw-percentage-tranformation)
     - [Standardization](#standardization)
-    - [Min-Max Normalization](#min-max)
-    - [Scarcity Index](#scarcity)
-    - [Sum of Category Ranks](#sum-category-ranks)
-    - [H2H Player Matchup](#H2H-matchups)
-- [03. Compare: Ranking Matchups](#ranking-matchups)
-    - [Top-N players](#top-n)
-    - [Snake-Draft Ranking Tournament](#tournament)
+    - [Min-Max Scaling](#min-max-scaling)
+    - [Scarcity Ranking](#scarcity-ranking)
+    - [Sum of Category Ranks](#ranked-sum-of-category-ranks)
+    - [H2H Player Matchup](#head-to-head-individual-player-comparisons)
+- [03. Comparing Rankings with Top-*N* Player Matchups](#comparing-rankings-using-top-n-player-matchups)
 - [04. VORP](#value-over-replacement)
-- [05. Load: Streamlit App](#streamlit-app)
+- [05. Load: Streamlit User Endpoint](#Load:-Streamlit-User-Endpoint)
 - [06. Discussion & Conclusion](#discussion)
 
 <br>
@@ -107,7 +105,7 @@ As such, I am happy to have found a fun project to put my data and research skil
 
 <br>
 
-# Extraction
+# Extract
 
 I use the [NBA API](https://github.com/swar/nba_api/blob/master/README.md?utm_source=chatgpt.com). An unofficial but widely used source for up-to-date NBA statistics.
 
@@ -844,7 +842,7 @@ print(replacement_summary.head(20))
 
 <br>
 
-# Load: Streamlit User Enpoint App
+# Load: Streamlit User Enpdoint
 
 Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The app allows the user to select among my top ranking metrics (except the H2H ones that take computing time). 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
