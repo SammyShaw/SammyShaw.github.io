@@ -230,8 +230,9 @@ For other, counting statistics, I will argue later that skewed distributions are
 
 Realistically, these high volume shooters will take 30-50 free-throw attempts during a week of NBA matchups, but a team also has 13 players, each of whom only impacts their team's overall percentage in the same, limited way. When compared to the linear assumption, we begin to answer the questions above paragraph: No, Giannis and Shae don't help or hurt as much as they're given credit for.
 
+<br>
 
-### SHAW Percentage Transformation
+## SHAW Percentage Transformation
 
 It seems reasonable, then, that percentage transformations for fantasy rankings should be treated with this observation in mind. Attempts should be weighted within limits (defined by its distribution) to reflect the non-linearity of their effect on percentages. 
 
