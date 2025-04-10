@@ -58,7 +58,7 @@ In a [recent Medium article, Giora Omer](https://medium.com/@gioraomer/fantasy-n
 Here, I develop and describe six different ranking algorithms of my own and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a sigmoid weight to shot-attempts for percentage category transformations (hence SHAW: Sigmoid-Heurisitc Attempt-Weight - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across counting categories, but whom are unfairly punished or rewarded in percentage categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, and its sensitivity is a function of attempt CoV, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
 
-##### Summary of SHAW ranking algorithms
+##### Table 1. Summary of SHAW ranking algorithms
 
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** |
 |---|---|---|---|
@@ -82,6 +82,7 @@ Along the way, I build an ETL (Extract, Transform, Load) pipeline that starts wi
 I find muted support for my SHAW-transformation rankings. In a top-20 players 'league' that includes a Traditional *Z*-Score ranking with each of the SHAW-rankings, SHAW rankings performed very well against Traditional *Z*-Score, ESPN, and Yahoo rankings. 
 
 
+##### Figure 1
 ![alt text](/img/posts/Top_20_vs_Traditional.png "Sample_Results")
 
 
@@ -137,7 +138,7 @@ nba_24_25.to_csv("data/nba_2024_25.csv", index=False)
 The code above returns a dataframe of 66 statistical columns and 550+ rows (players), which get added every time a new players sees the court in the season. 
 
 
-##### Sample of raw NBA player data
+##### Table 2.1: Sample of raw NBA player data
 
 | **Player Name** | **GP** | **FGA** | **FGM** | **REB** | **AST** | **TOV** | **STL** | **BLK** | **PTS** |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
@@ -184,6 +185,8 @@ Before we get into that, it is important to understand the distributions.
 Most NBA stat categories are positively skewed. Few players get the most points, rebounds, assists, etc. 
 
 
+##### Figure 2.1
+
 ![alt text](/img/posts/PTS_REB_raw.png "Raw Distributions, Points & Rebounds")
 
 
@@ -215,6 +218,8 @@ for cat in raw_categories:
 The result is a more modest 400 + player pool, with the large number of zeros eliminated. Distributions are still positively skewed, but there is now some semblance of a tail on the negative end. 
 
 
+##### Figure 2.2
+
 ![alt text](/img/posts/PTS_REB_PG.png "Per-Game Points & Rebounds")
 
 
@@ -226,6 +231,8 @@ Typically, then the categories are standardized (which I will do in a later sect
 
 Percentage categories deserve special treatment because they are a function of two distributions: makes and attempts. We don’t simply add percentages like we do the other categories: we divide total team makes by total team attempts to get a final percentage score for each weekly matchup. 
 
+
+##### Figure 2.3
 
 ![alt text](/img/posts/FT_PCT_vs_A.png "Free Throw Distributions")
 
@@ -250,7 +257,7 @@ At first glance this would seem fair, a player’s percentage impacts a team’s
 The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league average is 78.2%), but he is also a league-leader in attempts (as an elite scorer otherwise, he gets fouled a lot). Giannis's Free Throw Z-Score is -8. 
 
 
-##### Select Players' Free Throw Percentages, Attempts and standardized *Impact* score
+##### Table 2.2. Select Players' Free Throw Percentages, Attempts and standardized *Impact* score
 
 | **Player Name** | **FT %** | **FTM** | **FTA** | **FT Impact *Z* Score** |
 |--:|--:|--:|--:|--:|
@@ -265,6 +272,7 @@ Giannis is an outlier. We can see from the FT Impact Z scores distribution that 
 
 For other, counting statistics, I will argue later that skewed distributions are meaningful and useful, but because a percentage statistic is bound between 0 and 1, any positive and negative constributions to it are limited: they are asymptotic, not linear! The graph below visualizes this relationship. Here we can see the league average (78.2), SGA's (90.1) and Giannis's (60.2) Free Throw Percentages. The solid lines represent the real impact of each on a hypothetical, average fantasy team for one fantasy week (i.e., the duration of a matchup) when contributing 15 to 150 shots for the team. As their number of attempts increases, we can begin to seem the limit of their overall team impact.  
 
+##### Figure 2.4
 
 ![alt text](/img/posts/AsymptoticImpacts.png "Impact on Team Percentage")
 
@@ -292,6 +300,8 @@ Where:
 
 Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one.
 
+
+##### Figure 2.5
 
 ![alt text](/img/posts/Linear_v_SHAWweights.png "Linear vs. SHAW")
 
@@ -365,13 +375,15 @@ for col in SHAW_percentages:
 The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, which could be added back to a player's raw percentage, or left alone, because the resulting dispersion is the same. 
 
 
+##### Figure 2.6 
+
 ![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
 
 
 SHAW-transformed percentages appear to follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, the extreme values that were produced in the tails (Giannis vs. SGA for example) using *Impact* scores are now muted by SHAW-tranformations. Compared to existing methods, this method thus undervalues SGA and overvalues Giannis. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
 
 
-##### Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage
+##### Table 2.3. Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage
 
 | **Player Name** | **FT%** | **FTM** | **FTA** | **Attempts / Average** | **FT Impact *Z* Score** | **Deficit** | **Sig-weight** | **SHAW%** | **SHAW *Z* Score** | 
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
