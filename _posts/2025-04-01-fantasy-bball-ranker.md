@@ -249,9 +249,9 @@ $$
 
 Where:
 
-- \( x = \frac{\text{Attempts}}{\text{Average Attempts}} \)
-- \( S = 1 + \text{CoV} \)
-- \( k = \frac{1}{1 + \text{Skewness}} \)
+- x = Attempts / Average Attempts  
+- S = 1 + CoV (Coefficient of Variation)  
+- k = 1 / (1 + Skewness)
 
 
 Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one.
