@@ -43,6 +43,7 @@ In this project I extract, transform, and load NBA player data for my own fantas
 
 Fantasy sports are a popular past time with over 62.5 million participants in the U.S. and Canada ([FSGA.org](https://thefsga.org/industry-demographics/)), 20 million of whom regularly play fantasy basketball. In a fantasy sports league, participants (or, team managers) create a fantasy team by competitively drafting from a pool of professional players, whose real game stats become their own fantasy stats for the season. Choosing a successful team requires knowing the players and understanding the league’s scoring format. In *9-category* fantasy basketball leagues (the standard competitive fantasy basketball format), teams are compared – and thus players must be evaluated - across nine different measures. To make this easier, the major platforms Yahoo.com and ESPN include player rankings to help managers make their choices. As some critics point out, however, Yahoo and ESPN often include questionable players in their top ranks, and unfortunately, neither platform is exactly transparent about how their rankings are calculated. As a regular fantasy basketballer and data science enthusiast, I join a small but growing literature offering alternatives for better ranking accuracy.
 
+<br>
 
 ### Literature Review
 
@@ -50,6 +51,7 @@ The standard approach to ranking players involves standardizing the scoring cate
 
 In a [recent Medium article, Giora Omer](https://medium.com/@gioraomer/fantasy-nba-player-valuation-f66da694ab28) offers an alternative Min-Max normalization approach, which would preserve the relative distribution of each category, without over- or under-valuing the outliers. But while the general approach is discussed, 0-1 scaled rankings are neither demonstrated nor compared. [Josh Lloyd at Basketball Monster](https://www.youtube.com/watch?v=aOT2csO579A#:~:text=Join%20Josh%20Lloyd%20as%20he%20dissects%20the,you're%20skeptical%20about%20the%20traditional%20methods%20or) recently promised an improvement using his DURANT method (Dynamic Unbiased Results Applying Normalized Transformations), which, although inspiring comments like, “Josh Lloyd is trying to crack the fantasy Da Vinci code!”, remains opaque. Lloyd points out that percentage stats seem to vary differently than other, 'counting stats,' but does not explicitly offer a method to approach them differently. A Reddit user recently offered a so-called [CARUSO](https://www.reddit.com/r/fantasybball/comments/16shwc9/introducing_caruso_metric_a_gamechanger_in_nba/) method, which promises to use ML for custom category transformations, but how so remains a mystery, and as some readers note, the resulting rankings are not face-valid. The only ranking method that I have seen fully described is [Zach Rosenof’s *G*-Score method](https://arxiv.org/pdf/2307.02188), which improves on *Z*-Score rankings by accounting for period-level (i.e., week-to-week) variance in category accumulation; because some categories are more volatile, investing in them presents risks. Rosenof’s is also the only paper to compare different metrics, finding empirical support for his *G*-Score rankings method in simulated head-to-head matchups against hypothetical teams using *Z*-Score rankings.
 
+<br>
 
 ### Actions
 
@@ -71,6 +73,7 @@ Rankings are then compared using a top-*n* players 'super-team' for each ranking
 
 Along the way, I build an ETL (Extract, Transform, Load) pipeline that starts with up-to-date NBA player stats and ends with an interactive player-ranker dashboard. 
 
+<br>
 
 ### Results
 
@@ -82,6 +85,7 @@ I find muted support for my SHAW-transformation rankings. In a top-20 players 'l
 
 As I'll demonstrate later, however, in a league that included Basketball Monster (BBM) rankings and further top-*n* depths (i.e., top 50, top-100 players, etc.), SHAW rankings continued to perform well, but not better than BBM and Traditional *Z* rankings. In fact, I find that across top *n* levels, rankings metrics are intransitive: in a top-50 matchup, for example, the winning ranking might be the same that finishes last in the top-60 matchup. Meanwhile, in any matchup at any level, because 9 categories are at stake, Team A might beat Team B and Team B might beat Team C, but Team C beats Team A. Further category wins and matchup wins do not neatly correspond. Nevertheless, the relatively strong performance of SHAW transformations should be a relevant contribution to the growing literature on this topic, and a site for further investigation. 
 
+<br>
 
 ### Growth/Next Steps
 
@@ -171,7 +175,7 @@ The goal is to turn raw NBA statistics into a single player ranking metric that 
 
 Before we get into that, it is important to understand the distributions. 
 
-
+<br>
 
 ### Distributions
 
@@ -286,9 +290,12 @@ Where:
 
 Applying to attempts in a percentage category, this yields weight values of 1 when a player's attempts are at the league average, and a maximum of 1 + CoV (which for Free Throws is 2.17). For attempts below average, the player is assigned a weight value below one.
 
+
 ![alt text](/img/posts/Linear_v_SHAWweights.png "Linear vs. SHAW")
 
+
 I then apply the weight directly to the percentage *deficit*, or difference from the mean, which I cap at 3 standard deviations from the mean, effectively limiting the impact that a few terrible shooters have on the rest of the distribution (Giannis is well within 3 standard deviations of the mean of simple percentage). 
+
 
 ```python
 # Define Sigmoid Weight for Attempts
@@ -352,11 +359,15 @@ for col in SHAW_percentages:
 
 ```
 
+
 The resulting distribution is the sigmoid-harmonic attempts-weighted deficit, which could be added back to a player's raw percentage, or left alone, because the resulting dispersion is the same. 
+
 
 ![alt text](/img/posts/SHAW_FT_deficits.png "Free Throw Distributions")
 
+
 SHAW-transformed percentages appear to follow a reasonably normal distribution that can be appropriately scaled to compare to other cumulative categories. If standardizing, for example, the extreme values that were produced in the tails (Giannis vs. SGA for example) using *Impact* scores are now muted by SHAW-tranformations. Compared to existing methods, this method thus undervalues SGA and overvalues Giannis. It ammounts to a -2.2 point swing for SGA and + 4.6 point swing for Giannis in *Z*-score ranking systems, which is plenty enough to change their positions (except for the fact that SGA is a top 5 player anyway, he hardly moves). 
+
 
 #### Standardized Free Throw Impact vs. Standardized SHAW-tranformed Free Throw Percentage
 
@@ -378,6 +389,7 @@ Standardization works by transforming unique distributions to the same theoretic
 
 In Python: 
 
+
 ```python
 
 def Z(stat):
@@ -385,7 +397,9 @@ def Z(stat):
 
 ```
 
+
 I create a SHAW-Z ranking by including my SHAW-tranformed percentages in the set of categories to be standardized, taking the sum of those Z-Scores, and returning a rank-order. 
+
 
 ```python
 
@@ -399,6 +413,8 @@ def Z_rank(df, categories, metric_label):
 pg_stats = Z_rank(pg_stats, nine_cat, 'SHAW-Z')
 
 ```
+
+
 The only difference between my SHAW *Z*-ranking and Traditional *Z*-ranking is the way that the percentage categories are scaled. Seven of the nine comparable categories would have the same exact standardized values before summing. 
 
 <br>
@@ -413,6 +429,7 @@ x' - min(X) / (max(X) - min(X))
 
 Because this approach is standard for many machine learning tasks, the conventional method in Python makes use of the ML SciKitLearn library. 
 
+
 ```python
 
 from sklearn.preprocessing import MinMaxScaler
@@ -422,7 +439,9 @@ x' = scaler.fit_tranform(x)
 
 ```
 
+
 I create a SHAW-mm ranking by including my SHAW-tranformed percentages in the set of categories to be scaled between 0 and 1, taking the sum of those Min-Max scores, and returning a rank-order. 
+
 
 ```python
 
@@ -445,6 +464,7 @@ Scarcity is the basis of modern economics because scarce resources are more valu
 Although Blocks and Points count the same in terms of weekly scoring, having a player that excels in Blocks may be more valuable than a high Points-getter, because the Block star is harder to replace. There are fewer elite shot blockers in the league, and if your team doesn't have one, you may have a hard time competing in that category. 
 
 To test this hypothesis, I developed an index that weighs the relative scarcity of each of the seven cumulative categories (on a scale of 0-1, total scarcity = 1) by subtracting the skew from the inner-quartile range, and normalizing (Min-Max scaling) the results. Then, for the Min-Max transformed categories, I multiply by its scarcity score. The result is a modest addition that boosts a player’s min-max score: the more proficient a player is in the more scarce categories, the bigger the boost. Although the boost is modest (the maximum boost is < 2 points (in a 9 x 1 category field of possibles)), it should be enough to empirically observe whether scarce category producers prove more valuable. 
+
 
 ``` python
 
@@ -491,7 +511,8 @@ pg_stats = scarcity_rank(pg_stats, counting_stats, '9_cat')
 
 Other plausible ranking methods use the SHAW transformed percentages but forgo additional transformations and concerns with category variance. 
 
-
+<b>
+  
 ### Ranked Sum of Category Ranks
 
 The simplest method is to rank players in each category, add up those ranks, and reverse rank that sum. 
@@ -510,9 +531,11 @@ pg_stats = cat_rank_sum(pg_stats, nine_cat, 'SHAW_rank_sum')
 
 ```
 
+
 This method does not preserve the relative spread, but instead distributes players uniformly in each category, while still accounting for the relative position of each player in each category. 
 And since we’re comparing all the players across all categories, this method seems elegant. As we'll see, however, it does not perform well. 
 
+<br>
 
 ### Head to Head Individual Player Comparisons
 
@@ -524,9 +547,10 @@ For brevity, the code for this can be found in my GitHub repository.
 
 The six different ranking methods produce a lot of similar rankings, but enough variation to be meaningfully different, so they can be compared to each other, and compared to ESPN, Yahoo, and Basketball Monster.
 
-#### Select NBA players and their ranks across 10 ranking algorithms
 
-| **Player Name** | **Traditional Z-rank** | **SHAW Z rank** | **SHAW mm rank** | **SHAW Scarce mm rank** | **SHAW rank-sum rank** | **SHAW H2H each rank** | **SHAW H2H most rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
+##### Select NBA players and their ranks across 10 ranking algorithms
+
+| **Player Name** | **Traditional *Z* rank** | **SHAW *Z* rank** | **SHAW *mm* rank** | **SHAW *Scarce mm* rank** | **SHAW *rank-sum* rank** | **SHAW *H2H each* rank** | **SHAW *H2H most* rank** | **ESPN** | **Yahoo** | **Basketball Monster** |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | Nikola Jokic | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 5 | 1 | 1 |
 | Shai Gilgeous-Alexander | 1 | 3 | 3 | 3 | 1 | 1 | 2 | 1 | 3 | 2 |
@@ -538,6 +562,7 @@ The six different ranking methods produce a lot of similar rankings, but enough 
 | Giannis Antetokounmpo | 81 | 26 | 43 | 28 | 90 | 89 | 75 | 3 | 23 | 76 |
 | Dyson Daniels | 31 | 30 | 72 | 47 | 92 | 92 | 76 | 51 | 31 | 15 | 
 
+<br>
 
 ## The Competition
 
@@ -557,6 +582,7 @@ I compare rankings by simulating head-to-head, 9-category matchups using the top
 
 The code below builds a set of summary dataframes: a dataframe for each top-n depth (e.g., top 20 players); with a row for each ranking metric (or team); and a column for each of the 9 comparable categories. 
 'League' participants (or 'teams') can include any number of ranking metrics, and any number and any depth of top-*n* teams. Matchups can include more or less categories, for those wanting to compare rankings for custom league settings. 
+
 
 ```python
 
@@ -678,7 +704,9 @@ matchups = compare_summary_dfs(
 
 ```
 
+
 From there, the matchups object can be analyzed to compare total matchup wins for each team, or total category wins. 
+
 
 ```python
 
@@ -688,17 +716,23 @@ for label, result in matchups.items():
 
 ```
 
+
 At the outset, I showed the total matchup wins from a top-20 players comparison across rankings (excluding BBM). The SHAW *Z* ranking scored impressively well against other metrics, including the Traditional *Z* rankings, winning 7 out of 8 total matchups, compared to only four for the Traditional *Z* ranking, 3 for ESPN and 1 for Yahoo. A closer analysis muddies that picture quite a bit, however. 
 
+
 ![alt text](/img/posts/ALL_v_ALL.png "All Metrics") 
+
 
 At deeper top-*n*'s, the results start to average out. Adding the results from across top 20, top 50, top 100, and top 130, in a 10 team league, for example, SHAW-*Z* rankings still win, but suddenly Traditional *Z* rankings perform much better than before, now beating rankings that beat it at the top 20 depth. This means that at the other levels - top 50, top 100, top 130 - Traditional *Z* rankings are actually winning more. 
 
 To illustrate this pattern with another example, when I put my six rankings in a league along with Basketball Monster rankings. Shaw *Z* rankings tie with BBM at the top 50 level, SHAW *Z* and SHAW-mm get the top two spots in the top 100 level, and BBM has the best overall top-130 player team in head to head matchups. 
 
+
 ![alt text](/img/posts/bbm_top_50.png "vs BBM Top 100") 
 
+
 ![alt text](/img/posts/bbm_top_100.png "vs BBM Top 100") 
+
 
 ![alt text](/img/posts/bbm_top_130.png "vs BBM Top 130") 
 
@@ -709,21 +743,27 @@ Three further complications:
 
 Watch what in a league that sums matchup wins for a.) the Top 10, 30, 50, 70, and 90 player teams, and compares those with the sum of matchup wins for b) the Top 20, 40, 60, 80, and top 100 teams. 
 
+
 ![alt text](/img/posts/Top_rankings_10-90.png "Categories 10-90") 
 
+
 ![alt text](/img/posts/top_rankings_20-100.png "Categories 20-100") 
+
 
 While SHAW *Z* wins most matchups for the first set, it places 4th in the next set. And overall, I have to admit, if adding all the matchup wins at each top-10 level for the first 100 players, Traditional *Z* scores wins more. When comparing the top 130 players (the number drafted in a 10 team league), the SHAW-AVG ranking narrowly beats all others. 
 
 Fortunately, there is some stability when comparing most *category* wins, as the results are roughly congruent with matchup wins for same teams in same leagues.
 
+
 ![alt text](/img/posts/CAT_wins_top10-90.png "Categories 10-90") 
+
 
 ![alt text](/img/posts/Cat_wins_top20-100.png "Categories 20-100") 
 
 <br>
 
-## Ranking Matchup Summary:
+## Ranking Matchup Summary
+
 Many of my rankings outperformed the competition in head-to-head matchups. Specifically, my *Z*-ranking beat other rankings that are based on standardization in many of the matchups, which attests to the novel way that I treat percentage transformations. 
 
 Additionally, the relative success of my ‘scarcity boosted’, Min-Max ranking should demonstrate that scarcity does matter, and this finding should inform future improvements. It may also be worth noting the limitations of my experiments. The simulated top-*n* tournaments reveals that when dividing any rank-based player pool into *n* teams, the variances that made the whole cohere become unstable, and draft order and team build might weigh more heavily. Practically speaking, a league manager that is paying attention on draft day should beat a computer that is only picking the next top 'ranked' player. 
@@ -733,6 +773,7 @@ Additionally, the relative success of my ‘scarcity boosted’, Min-Max ranking
 ## Value over Replacement
 
 I construct one final metric for my player-ranker dashboard, a VORP score – which I construct as the difference between a players SHAW *Z* score and the average SHAW *Z* score among players in the 100-150 range of the SHAW-AVG ranking list. This metric is essentially the same as a players SHAW *Z* score, minus a typical replacement's average. Such a metric is useful for draft considerations when and if a manager needs to deviate from rank order for team-strategy or league position requirements - a potential player's relative value difference from each other can be assessed. 
+
 
 ```python
 
@@ -806,6 +847,7 @@ print(replacement_summary.head(20))
 Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The app allows the user to select among my top ranking metrics (except the H2H ones that take computing time). 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
 
+
 ```python
 
 import streamlit as st
@@ -854,7 +896,9 @@ st.dataframe(df_display, use_container_width=True, height=800)
 
 ```
 
+
 ![alt text](/img/posts/Streamlit_Snip.png "Streamlit App Snip") 
+
 
 <br>
 
