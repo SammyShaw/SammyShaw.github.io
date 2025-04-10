@@ -49,7 +49,6 @@ In a [recent Medium article, Giora Omer](https://medium.com/@gioraomer/fantasy-n
 Here, I develop and describe six different ranking algorithms of my own and compare them head-to-head against ESPN, Yahoo.com, and Basketball Monster. Each of my ranking methods applies a sigmoid weight to shot-attempts for percentage category transformations (hence SHAW: Sigmoid-Heurisitc Attempt-Weight - transformations). This approach aims to reduce distortion from outliers and enhance the signal from players contributing efficiently across counting categories, but whom are unfairly punished or rewarded in percentage categories. The lambda parameter in the sigmoid function is dynamically tied to the skew of attempts, and its sensitivity is a function of attempt CoV, thus creating a context-sensitive weighting mechanism. From there, my algorithms follow some familiar and some novel ideas. 
 
 
-
 | **Ranking Algorithm** | **Description** | **Strengths** | **Weaknesses** |
 |-----------------------|-----------------|---------------|----------------|
 | SHAW-Z                | Sum of standardized counting stats and sigmoid weighted percentages | Preserves category dispersion while setting category distributions to like terms | May over-value outliers |
@@ -120,7 +119,8 @@ The code above returns a dataframe of 66 statistical columns and 550+ rows (play
 
 A select sample of the raw data, showing three superstars and one lesser-known player. 
 
-**Sample of raw NBA player data**
+#### Sample of raw NBA player data
+
 | **Player Name** | **GP** | **FGA** | **FGM** | **REB** | **AST** | **TOV** | **STL** | **BLK** | **PTS** |
 |----------------:|-------:|--------:|--------:|--------:|--------:|--------:|--------:|--------:|--------:|
 | LeBron James | 62 | 1139 | 583 | 506 | 525 | 238 | 58 | 35 | 1521 |
