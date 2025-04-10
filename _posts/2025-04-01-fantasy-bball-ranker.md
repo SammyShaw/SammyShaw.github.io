@@ -215,7 +215,7 @@ The test case here is Giannis Antetokounmpo. He shoots a sub-par 60% (the league
 #### Select Players' Free Throw Percentages, Attempts and standardized *Impact* score
 
 | **Player Name** | **FT%** | **FTM** | **FTA** | **FT Impact Z-Score** |
-|----------------:|--------:|--------:|--------:|----------------------:|
+|--:|--:|--:|--:|--:|
 | Giannis Antetokounmpo | 60.2 | 369 | 613 | -8.12 | 
 | Steph Curry | 92.9 | 252 | 234 | 2.73 | 
 | Shae Gilgeous-Alexander | 90.1 | 563 | 625 | 5.50 | 
