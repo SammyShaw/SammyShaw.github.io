@@ -11,7 +11,7 @@ tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 </script>
 
 In this project I extract, transform, and load NBA player data for my own fantasy basketball ranking app. I construct a series of ranking algorithms premised on the hypothesis that standard ranking systems scale percentage category scores inaccurately. Existing algorithms typically weight percentage categories linearly by attempts. However, because percentages are bound between 0 and 1, the actual affect of attempts on a player's percentage is asymptotic - not linear. I develop a Sigmoid-Heuristic-Attempt-Weighting (SHAW) transformation that adjusts for this non-linearity using the statistical properties of attempt distributions, specifically their coefficient of variantion (CoV) and skewness. I then apply this transformation to create six unique fantasy basketball ranking algorithms, which I then systematically compare to each other and to leading platform rankings: ESPN, Yahoo, and Basketball Monster. In head-to-head matchups using top-*n* players from each ranking system, several of my rankings perform well, especially against Yahoo and ESPN. When comparing to traditional Z-scores and Basketball Monster rankings, however, my rankings are comparable - beating the competition at some ranking depths, but not others. I conclude that SHAW tranformations offer a theoretically grounded alternative without sacrificing accuracy.
-
+<br>
 
 ## Contents
 
@@ -36,7 +36,7 @@ In this project I extract, transform, and load NBA player data for my own fantas
 - [04. VORP](#value-over-replacement)
 - [05. Load: Streamlit App](#streamlit-app)
 - [06. Discussion & Conclusion](#discussion)
-
+<br>
 
 # Project Overview
 
@@ -173,7 +173,7 @@ The goal is to turn raw NBA statistics into a single player ranking metric that 
 
 Before we get into that, it is important to understand the distributions. 
 
-<br>
+
 
 ### Distributions
 
