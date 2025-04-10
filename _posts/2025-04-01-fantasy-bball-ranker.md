@@ -842,7 +842,7 @@ print(replacement_summary.head(20))
 
 <br>
 
-# Load: Streamlit User Enpdoint
+# Load: Streamlit User Endpoint
 
 Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The app allows the user to select among my top ranking metrics (except the H2H ones that take computing time). 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
