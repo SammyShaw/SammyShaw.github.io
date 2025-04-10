@@ -32,7 +32,7 @@ In this project I extract, transform, and load NBA player data for my own fantas
     - [H2H Player Matchup](#head-to-head-individual-player-comparisons)
 - [03. Comparing Rankings with Top-*N* Player Matchups](#comparing-rankings-using-top-n-player-matchups)
 - [04. VORP](#value-over-replacement)
-- [05. Load: Streamlit User Endpoint](#load:-streamlit-user-endpoint)
+- [05. Streamlit User Endpoint](#streamlit-user-endpoint)
 - [06. Discussion & Conclusion](#conclusions)
 
 <br>
@@ -842,7 +842,7 @@ print(replacement_summary.head(20))
 
 <br>
 
-# Load: Streamlit User Endpoint
+# Streamlit User Endpoint
 
 Finally, as a proof of concept, I build a Streamlit App as a user endpoint. The app allows the user to select among my top ranking metrics (except the H2H ones that take computing time). 
 It is not yet deployed outside of my local drive, but my near-future goal is to make this publically accessible, executing the whole ETL pipeline described above. 
