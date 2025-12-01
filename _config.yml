@@ -10,7 +10,9 @@ plugins:
 # General Site Settings
 title: Sammy Shaw
 description: "Hi, I’m Sammy – Data Scientist and Researcher.
-My portfolio is a collection of recent data science projects - emphasis on data processing and analysis, machine learning, business problem solving, and programming. My statistics and research expertise comes from my PhD in Sociology, which also equips me with a unique perspective on social trends and patterns, crucial for interpreting social dynamics with data that are invaluable for predicting consumer behavior, identifying market trends, and addressing issues of equity and inclusion.  
+This portfolio contains a set of independently developed data science projects demonstrating my approach to analytical problem solving. Each project includes end-to-end data work — ingestion, cleaning, feature engineering, modeling, evaluation, and interpretation.
+
+My training as a sociologist deepens this work by grounding analysis in context and behavior: understanding not just what patterns exist, but why they matter. I am especially interested in roles where data science, human behavior, and practical decision making intersect.
 
 Check out my Linked In profile, Github, and download my resume below!
 
@@ -56,5 +58,6 @@ defaults:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
 
 
