@@ -2,7 +2,7 @@
 layout: post
 title: Fantasy BBall Ranking Optimization for Category Leagues
 image: "/posts/GiannisStripe.png"
-tags: [Statistics, System Ranking, Python, Fantasy Basketball]
+tags: [ETL Pipeline, Statistics, System Ranking, Python, Fantasy Basketball]
 ---
 
 In this project I use Principal Components Analysis to uncover the covariance structure of NBA stat production and apply it to fantasy basketball scoring categories through a system of Structured Hierarchically Adjusted Weights (SHAW). I evaluate my SHAW ranking metric against traditional *Z*-score rankings using *top-n* matchups and *draft-simulated leagues*, showing that SHAW rankings consistently and convincingly produce teams that win head-to-head matchups. The result is a game-theoretically informed ranking system optimized for how fantasy basketball actually determines winners. 
@@ -25,7 +25,8 @@ In this project I use Principal Components Analysis to uncover the covariance st
 - [06. Ranking Comparisons](#ranking-comparisons)
     - [Top-N Comparisons](#top-n-comparisons)
     - [Simulated Draft Comparisons](#simulated-draft-comparisons)
-- [08. Conclusion](#conclusion)
+    - [SHAW vs. Punt Strategies](#shaw-vs-punt-strategies)
+- [07. Conclusion](#conclusion)
 
 <br>
 
@@ -36,7 +37,6 @@ Fantasy basketball is a popular pastime with over 20 million participants in the
 For example:
 
 #### Table 1. Example Nine-Category League Matchup 
-
 | Team | Points | 3-pointers | Field-Goal % | Free-Throw % | Rebounds | Assists | Steals | Blocks | Turnovers | Total Categories | Matchup Winner |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A | 600 | 75 | 48.7 | 83.5 | 239 | 72 | 43 | 30 | 90 | 4 |   | 
@@ -84,7 +84,6 @@ When comparing the top players in each ranking - at each of the top 150 levels (
 In simulated league matchups (10-team snake drafts repeated ten times per season), one team drafts using SHAW rankings and the other nine teams draft using the standard Z-score rankings. This setup mirrors a realistic league environment where a single manager employs an optimized strategy while the rest follow conventional rankings. Across these simulations, SHAW-drafted teams win 64–100 percent of matchups against the nine standard-drafted opponents. SHAW teams also finish in the top 3 of the 10-team league 70–100 percent of the time.
 
 #### Table 2. SHAW rankings vs. Traditional Z-score rankings
-
 | Season | Top-N matchup win rate | Top-N category win rate | Simulated Draft - Matchup Win Rate | Simulated Draft - League Top 3
 | --- | --- | --- | --- | --- | 
 | 2020-21 | 96.7% | 55.1% | 93.3% | 100% | 
@@ -152,7 +151,6 @@ nba_subset = nba_raw[
 Thus, the relevant per-game data columns with player-names, games-played, and minutes-per-game included: 
 
 #### Table 3. 2024-25 per-game stats for a random sample of players
-
 |     | Player           |   GP |   mpg |   FG_PCT |   FT_PCT |   FGA |   FGM |   FTA |   FTM |   FG3M |   PTS |   REB |   AST |   STL |   BLK |   TOV |
 |----:|:-----------------|-----:|------:|---------:|---------:|------:|------:|------:|------:|-------:|------:|------:|------:|------:|------:|------:|
 | 310 | Jusuf Nurkić     |   51 | 20.84 |     0.48 |     0.66 |  6.9  |  3.29 |  2.51 |  1.67 |   0.63 |  8.88 |  7.8  |  2.25 |  0.78 |  0.67 |  1.9  |
@@ -173,7 +171,6 @@ Because turnovers count against a team, I reverse code them so that *Z*-scores c
 Thus, the scoring categories that will be standardized include:
 
 #### Table 4. 2024-25 'fantasy-scoring' per-game stats for a random sample of players
-
 |     | Player                  |   FT_impact |   FG_impact |   PTS |   FG3M |   REB |   AST |   STL |   BLK |   tov |
 |----:|:------------------------|------------:|------------:|------:|-------:|------:|------:|------:|------:|------:|
 | 322 | Kelly Olynyk            |       -0.04 |        0.2  |  8.73 |   0.75 |  4.68 |  2.91 |  0.75 |  0.43 | -1.73 |
@@ -217,16 +214,16 @@ z_df = pg_stats[scoring_cats].apply(Z)
 
 Thus, per-game stats, standardized, added, and ranked.
 
-#### Table 5. 2024-25 top 6 *Z*-ranked players
-
-|     | Player                 |   FT_impact_z |   FG_impact_z |   PTS_z |   FG3M_z |   REB_z |   AST_z |   STL_z |   BLK_z |   tov_z |   Z_sum |   Z_rank |
-|----:|:-----------------------|--------------:|--------------:|--------:|---------:|--------:|--------:|--------:|--------:|--------:|--------:|---------:|
-| 266 | nikola jokic           |         0.377 |         3.703 |   2.835 |    0.59  |   3.479 |   3.921 |   2.574 |   0.278 |  -2.231 |  15.525 |        1 |
-| 306 | shai gilgeousalexander |         3.957 |         1.976 |   3.342 |    0.781 |   0.13  |   1.881 |   2.326 |   1.125 |  -1.152 |  14.366 |        2 |
-| 336 | victor wembanyama      |         0.831 |         0.293 |   1.962 |    1.816 |   2.727 |   0.422 |   0.705 |   7.561 |  -2.174 |  14.143 |        3 |
-|  20 | anthony davis          |        -0.298 |         1.525 |   2.038 |   -0.821 |   2.972 |   0.368 |   0.777 |   3.742 |  -0.916 |   9.387 |        4 |
-| 331 | tyrese haliburton      |         0.797 |         0.145 |   1.038 |    1.705 |  -0.497 |   3.384 |   1.547 |   0.343 |  -0.214 |   8.247 |        5 |
-| 194 | karlanthony towns      |         0.99  |         1.736 |   1.99  |    0.591 |   3.494 |   0.12  |   0.311 |   0.396 |  -1.47  |   8.158 |        6 |
+#### Table 5. 2024-25 top 6 *Z*-ranked players & Giannis Antetokounmpo
+|     | Player                  |   FT_impact_z |   FG_impact_z |   PTS_z |    FG3M_z |     REB_z |    AST_z |      STL_z |    BLK_z |     tov_z |    Z_sum |   Z_rank |
+|----:|:------------------------|--------------:|--------------:|--------:|----------:|----------:|---------:|-----------:|---------:|----------:|---------:|---------:|
+| 423 | Nikola Jokić            |      0.377017 |      3.70272  | 2.83457 |  0.590496 |  3.47915  | 3.92079  |  2.57391   | 0.277659 | -2.23121  | 15.5251  |        1 |
+| 490 | Shai Gilgeous-Alexander |      3.95662  |      1.9759   | 3.34211 |  0.780825 |  0.130278 | 1.88137  |  2.32634   | 1.12494  | -1.15249  | 14.3659  |        2 |
+| 550 | Victor Wembanyama       |      0.830546 |      0.293326 | 1.96236 |  1.81558  |  2.72662  | 0.422462 |  0.70527   | 7.5612   | -2.17397  | 14.1434  |        3 |
+|  28 | Anthony Davis           |     -0.298244 |      1.52482  | 2.03846 | -0.820876 |  2.97214  | 0.367588 |  0.777485  | 3.74185  | -0.916293 |  9.38693 |        4 |
+| 543 | Tyrese Haliburton       |      0.796741 |      0.145011 | 1.03779 |  1.70504  | -0.49692  | 3.38384  |  1.54667   | 0.342585 | -0.213567 |  8.24719 |        5 |
+| 314 | Karl-Anthony Towns      |      0.989625 |      1.7362   | 1.99015 |  0.591367 |  3.49423  | 0.119866 |  0.310903  | 0.395696 | -1.47049  |  8.15754 |        6 |
+| 180 | Giannis Antetokounmpo   |     -7.08645  |      4.59862  | 2.966   | -1.34507  |  3.11973  | 1.91752  | -0.0182002 | 1.47049  | -1.97181  |  3.65082 |       58 |
 
 These values illustrate how total Z-score rankings emerge from category-level contributions and help motivate the critique discussed below. A seasoned fantasy manager may notice here that the top 6 *Z*-ranked players represent different player types: 
 
@@ -335,7 +332,6 @@ The PCA algorithm will produce:
 I focus on the first two components here, as together they explain over 90% of the total variance in the data.
 
 #### Table 6. PCA Output for Two Components
-
 | Category | PC1 | PC2 |
 | --- | --- | --- |
 | FT_impact | -0.336 | 0.275 |
@@ -402,9 +398,9 @@ plt.show()
 
 ```
 
-![alt text](/img/posts/PCA_biplot24_25.png)
+<img src="images/PCA_biplot24_25.png" width="600">
 
-![alt text](/img/posts/dendogram24_25.png)
+<img src="images/dendogram24_25.png" width="600">
 
 
 The biplot projects each category into the PC1–PC2 space. Categories that point in similar directions (and lie near each other) tend to move together; categories that point in opposite directions tend to trade off. The dendrogram then reclusters the correlation matrix, grouping categories into tight clusters based on their similarity.
@@ -489,7 +485,6 @@ I show the top 20 SHAW rankings, with the Traditional-*Z* BBM player ranks along
 
 
 #### Table 7. 2024-25 SHAW vs. Traditional *Z* and BBM Rankings Table 
-
 |     | Player                 |   SHAW_rank |   Traditional_Z_rank |   BBM_rank |
 |----:|:-----------------------|------------:|---------------------:|-----------:|
 | 266 | nikola jokic           |           1 |                    1 |          1 |
@@ -552,15 +547,29 @@ def compare_summary_dfs(...):
 
 #### Table 8. Top-N matchup and Category wins vs. Traditional & BBM rankings
 
+For every season and every ranking comparison, a cumulative head-to-head matchup summary shows how the rankings fare against each other. For example: 
+
+![alt text](/img/posts/Shaw_vs_Trad_24_25.png)
+
+In the 2024-25 season, my SHAW ranking outperforms the Traditional *Z*-ranking by 132 matchup wins to 18, and 728 category wins to 595.
+
+![alt text](/img/posts/Shaw_vs_Trad_20_21.png)
+
+In the 2020-21 season, my metric wins 145 matchups!
+
+![alt text](/img/posts/Shaw_vs_BBM_24_25.png)
+
+Against BBM rankings, SHAW rankings outperform by similar margins. 
+
+Shaw rankings dominate traditional Z rankings and BBM rankings by large margins in total matchup wins. This is true for every NBA season from 20-21 to 24-25. 
+
 | Season |    Shaw vs Traditional    |                |     Shaw vs BBM        |                |
 |        | Matchup Wins  | Win %  | Category Wins | Cat Win %  | Matchups Wins  | Win %  | Categories | Cat %  |
 | 2020-21 | 141-9 | 94.0 | 732-597 | 55.1 | 133-13 | 88.7 |   721-607 | 54.3 |
 | 2021-22 | 140-10 | 93.3 | 741-585  | 55.9 | 134-16 | 89.3 |  730-596 |  55.1  |
 | 2022-23 | 141-9 |  94.0 | 743-607 | 55.0 | 143-7 | 95.3 | 745-605 |  55.2 |
 | 2023-24 | 136-14 | 90.7 | 743-598 | 55.4 | 140-10 | 93.3 | 743-596 | 55.5 |
-| 2024-25 | 130-20 | 86.7  | 719-597 | 54.6 | 138-12| 92.0 | 727-596 | 55.0 |
-
-Shaw rankings dominate traditional Z rankings and BBM rankings by large margins. This is true for every NBA season from 20-21 to 24-25. 
+| 2024-25 | 132-18 | 87.7  | 728-595 | 55.0 | 138-12| 92.0 | 727-596 | 55.0 |
 
 Although SHAW rankings do not dramatically increase total category wins, it substantially increases matchup wins by concentrating value into category combinations that consistently beat opponents. In other words, SHAW wins efficiently, dominating the matchup wins even when total category margins are moderate. Traditional *Z*-scores distribute value across categories that do not reinforce each other, which leads to strong *Z* totals but weaker matchup performance. SHAW explicitly exploits covariance structure to avoid this inefficiency.
 
@@ -579,8 +588,6 @@ In each draft, one SHAW-drafted team competes against nine baseline-drafted team
 - The test team occupies draft positions 1–10 across simulations  
 - All resulting teams are compared across the nine categories
 
-#### Table 9. Simulated Draft Matchup Results
-
 | Season | Matchup Win Rate | League Top 3 |
 | --- | --- | --- | 
 | 2020-21 | 93.3% | 100% | 
@@ -590,32 +597,68 @@ In each draft, one SHAW-drafted team competes against nine baseline-drafted team
 | 2024-25 | 64.4% | 70% |
 | 2025-26 (Nov/26) | 87.8% | 100% | 
 
-
-All things being equal, SHAW rankings would expect to win matchups 50% of the time, and appear in the league Top 3 30% of the time. Across all seasons and draft slots, SHAW-drafted teams consistently outperform both baseline methods—typically finishing among the top few teams in aggregate category strength and simulated matchup wins. These draft simulations demonstrate that the covariance-aware weighting learned via PCA is not only mathematically coherent—it produces strategically superior fantasy teams under realistic drafting constraints.
+All things being equal, SHAW rankings would expect to win matchups 50% of the time, and appear in the league-Top-3 30% of the time. Across all seasons and draft slots, however, SHAW-drafted teams consistently outperform baseline rankings, typically finishing among the top few teams in aggregate category strength and simulated matchup wins. These draft simulations demonstrate that the covariance-aware weighting is not only mathematically coherent—it produces strategically superior fantasy teams under realistic drafting constraints.
 
 <br>
 
+### SHAW vs. Punt Strategies
+
+Thus far I have suggested that my metric is a 'game-theoretical' improvement because it eschews overall player strength to exploit the payoff structure of the 9-category format, which is that you only need to win 5 of 9 categories to win a matchup. But I am not the first to 'game' the fantasy rules. 
+
+**Punting** is a well-known fantasy strategy in which a manager gives up on one or more categories with the hopes of concentrating value in several others. This might happen spontaneously in draft scenarios, as a manager takes stock of their team build and makes decisions on the fly about what category strengths to focus on and which to 'give up.' Or, managers might pursue a punt strategy from the beggining, perhaps anticipating certain category strengths give their assigned draft order. 
+
+I argue, however, that punting is a sub-optimal gaming strategy, even when it alligns with the covariance structure discussed above. Punting may beat Traditional *Z*-score rankings for select categores, but no punt builds beat SHAW rankings. 
+
+Turnovers looks like an obvious candidate if one wants to punt. Because high turnover players tend to be high in several other categories, in fact, it might even seem like high turnovers are a signal for compound value. In fact, one well known fantasy basketball ranking metric, Hashtag Basketball, is known to construct their *Z*-score based ranking simply by weighting turnovers by 0.25. 
+
+Let us see what happens if we 'punt' turnovers, or construct a *Z*-ranking that omits turnovers completely from the sum of *Z*-scores. 
+
+![alt text](/img/posts/puntTOV_vs_Trad_24_25.png)
+
+Against the standard (9-cat) *Z*-score ranking, the punt ranking does not fare well in Top-N matchups. It appears to do equally as well up to about n=70, and then tails off. It does better in the simulated draft scenario, but not convincingly, winning only 52% of the time. 
+
+I constructed punt (8-cat) rankings for each of the nine categories (omitted), and found that only two of them fare better than full 9-category *Z*-score rankings. Not surprisingly, these are rebounds, and blocks, two 'big man' stats, that covary with the minority cluster. Punting both rebounds AND blocks in the same metric, also wins in Top-N matchups, but completely colapses in simulated draft leagues. 
+
+![alt text](/img/posts/puntREB_vs_Trad_24_25.png)
+
+The punt-rebound ranking even places in the top 3 in 90% of simulated draft leagues (although punting blocks does no better than average). Punting rebounds is the only category that seems to optimize rankings for matchup wins in both Top-N matchups, and simulated drafts because removing it alone does not interfere with the covariance structure of the dominant cluster. 
+
+That said, a better way to treat rebounds (and blocks, and turnovers) is not to remove them, but to weight them down, as I have done in my SHAW ranking system. As such, my metric should beat a punt team by winning the categories punted, in addtion the categories up-weighted. Or, the trade-off for losing some upweighted categories some of the time would be off-set by winning the punted categories most of the time. 
+
+![alt text](/img/posts/Shaw_vs_puntREB_24_25.png)
+
+In simulated draft leagues, SHAW rankings beat punt-rebound ranked teams 77% of the time, and finished in the league top-3 80% of the time. 
+
+<br>
+
+
 ## Conclusion
 
-Savvy observers might note that my method ranks players for teams that win particular categories and not others, that I've created a system that appears to "punt" 4 categories in favor of 5. As such, I haven't improved rankings, I've just "hacked" the game. 
+I developed a Structured Hieararchically Adjusted Weights (SHAW) ranking metric, based on the covariance structure of NBA stats production, and demonstrated clear improvements against Traditional *Z*-score rankings in nine-category head-to-head matchup leagues. Of the nine categories at stake in standard fantasy leagues, I find that six of them covary together, and in a different direction than the other three. Even though turnovers are a penalty, the balance (five to four) still favors one cluster over the other. To focus on the dominant cluster is to maximize compound value where it counts for fantasy scoring. 
 
-**The improvements are real and reproducible**
-Across five seasons, SHAW wins matchups at dominant rates.
+Critical observers might note that my method only ranks players for teams that win particular categories and not others, that I've created a system that appears to "punt" 4 categories in favor of 5. As such, I haven't improved player rankings, I've just "hacked" the game. 
+
+**The tests are reproducible**
+
+While I have used static, per-game season averages here to test my metric against the standard, the margins of improvement in Top-N comparisons and the consistent success in simulated drafts points to real findings. 
 
 **The method is mathematically grounded**
+
 Weights are derived from the PCA-discovered covariance structure:
 - A 6-category dominant cluster  
 - A 3-category subordinate cluster  
-- Reverse-coded turnover distribution  
 
 **SHAW is not punting**
-Punting *removes* a category from the calculus. SHAW includes all nine, even the categories it down-weights. In further analysis, I found that punting only works for select categories. In Top-N comparisons, for example, a ranking metric that 'punts' (i.e., removes) turnovers from its *Z*-score summation, for example, achieves fleeting success, winning early matchups, but then losing consistently at later tiers. The same is true for all categories except rebounds and blocks: punting seems to improve Top-N matchup wins when rebounds or blocks are punted. In a simulation that removes both rebounds & blocks from a *Z*score summed ranking, the punt metric outperformed traditional *Z*-scores as dramatically as my own SHAW ranking does. But then, SHAW beats that same punt models by the same dramatic margins, again (130-20), because SHAW still wins in those minority categories. Thus, my model should beat a 'punt' model all of the time. 
+
+Punting *removes* a category from the calculus. SHAW includes all nine, even the categories it down-weights. In further analysis, I found that punting only works for select categories. And then, SHAW beats that same punt models by the same dramatic margins, because SHAW now wins in those minority categories too. Thus, my model should beat a 'punt' model all of the time. 
 
 **Fantasy value is not real-basketball value**
-Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally.  
-But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
-A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype—such as guards—then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the strategic optimization problem it actually is—allocating value toward category combinations that maximize wins under the game’s payoff rules.
+Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
+
+A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
+
+
 
 
 
