@@ -49,11 +49,8 @@ I propose a game-theoretical improvement on existing fantasy basketball rankings
 For regular fantasy basketball managers, this idea is intuitive: NBA stats tend to bundle in a few player archetypes:
 
 1. **Guards/Playmakers:** assists, points, 3-pointers, FT%, turnovers
-
 2. **Bigs:** rebounds, blocks, FG%
-
 3. **Wings/3 & D players:** steals, 3-pointers
-
 
 Because conventional nine-category leagues disproportionately reward the guard/playmaker cluster of categories (see above, 5 categories vs. 3), a clear implication follows: weighting categories based on this covariance structure identifies players who offer compound value, even if they are not the most productive across all statistical categories.  
 
@@ -660,6 +657,7 @@ Punting *removes* a category from the calculus. SHAW includes all nine, even the
 Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
 A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
+
 
 
 
