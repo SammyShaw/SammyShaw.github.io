@@ -569,6 +569,7 @@ Shaw rankings dominate traditional Z rankings and BBM rankings by large margins 
 
 #### Table 9. Top-N matchup and Category wins vs. Traditional & BBM rankings
 
+
 | Season |    Shaw vs Traditional    |                |     Shaw vs BBM        |                |
 |        | Matchup Wins  | Win %  | Category Wins | Cat Win %  | Matchups Wins  | Win %  | Categories | Cat %  |
 | 2020-21 | 141-9 | 94.0 | 732-597 | 55.1 | 133-13 | 88.7 |   721-607 | 54.3 |
@@ -663,6 +664,7 @@ Punting *removes* a category from the calculus. SHAW includes all nine, even the
 Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
 A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
+
 
 
 
