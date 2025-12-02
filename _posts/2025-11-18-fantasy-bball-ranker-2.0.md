@@ -37,6 +37,7 @@ Fantasy basketball is a popular pastime with over 20 million participants in the
 For example:
 
 #### Table 1. Example Nine-Category League Matchup 
+
 | Team | Points | 3-pointers | Field-Goal % | Free-Throw % | Rebounds | Assists | Steals | Blocks | Turnovers | Total Categories | Matchup Winner |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A | 600 | 75 | 48.7 | 83.5 | 239 | 72 | 43 | 30 | 90 | 4 |   | 
@@ -82,6 +83,7 @@ When comparing the top players in each ranking - at each of the top 150 levels (
 In simulated league matchups (10-team snake drafts repeated ten times per season), one team drafts using SHAW rankings and the other nine teams draft using the standard Z-score rankings. This setup mirrors a realistic league environment where a single manager employs an optimized strategy while the rest follow conventional rankings. Across these simulations, SHAW-drafted teams win 64–100 percent of matchups against the nine standard-drafted opponents. SHAW teams also finish in the top 3 of the 10-team league 70–100 percent of the time.
 
 #### Table 2. SHAW rankings vs. Traditional Z-score rankings
+
 | Season | Top-N matchup win rate | Top-N category win rate | Simulated Draft - Matchup Win Rate | Simulated Draft - League Top 3
 | --- | --- | --- | --- | --- | 
 | 2020-21 | 96.7% | 55.1% | 93.3% | 100% | 
@@ -149,6 +151,7 @@ nba_subset = nba_raw[
 Thus, the relevant per-game data columns with player-names, games-played, and minutes-per-game included: 
 
 #### Table 3. 2024-25 per-game stats for a random sample of players
+
 |     | Player           |   GP |   mpg |   FG_PCT |   FT_PCT |   FGA |   FGM |   FTA |   FTM |   FG3M |   PTS |   REB |   AST |   STL |   BLK |   TOV |
 |----:|:-----------------|-----:|------:|---------:|---------:|------:|------:|------:|------:|-------:|------:|------:|------:|------:|------:|------:|
 | 310 | Jusuf Nurkić     |   51 | 20.84 |     0.48 |     0.66 |  6.9  |  3.29 |  2.51 |  1.67 |   0.63 |  8.88 |  7.8  |  2.25 |  0.78 |  0.67 |  1.9  |
@@ -169,6 +172,7 @@ Because turnovers count against a team, I reverse code them so that *Z*-scores c
 Thus, the scoring categories that will be standardized include:
 
 #### Table 4. 2024-25 'fantasy-scoring' per-game stats for a random sample of players
+
 |     | Player                  |   FT_impact |   FG_impact |   PTS |   FG3M |   REB |   AST |   STL |   BLK |   tov |
 |----:|:------------------------|------------:|------------:|------:|-------:|------:|------:|------:|------:|------:|
 | 322 | Kelly Olynyk            |       -0.04 |        0.2  |  8.73 |   0.75 |  4.68 |  2.91 |  0.75 |  0.43 | -1.73 |
@@ -213,6 +217,7 @@ z_df = pg_stats[scoring_cats].apply(Z)
 Thus, per-game stats, standardized, added, and ranked.
 
 #### Table 5. 2024-25 top 6 *Z*-ranked players & Giannis Antetokounmpo
+
 |     | Player                  |   FT_impact_z |   FG_impact_z |   PTS_z |    FG3M_z |     REB_z |    AST_z |      STL_z |    BLK_z |     tov_z |    Z_sum |   Z_rank |
 |----:|:------------------------|--------------:|--------------:|--------:|----------:|----------:|---------:|-----------:|---------:|----------:|---------:|---------:|
 | 423 | Nikola Jokić            |      0.377017 |      3.70272  | 2.83457 |  0.590496 |  3.47915  | 3.92079  |  2.57391   | 0.277659 | -2.23121  | 15.5251  |        1 |
@@ -280,6 +285,7 @@ R = pg_stats[scoring_cats].corr().round(3)
 
 Correlation coefficients tell us how strongly two numeric variables are associated, or how they vary together. A coefficient of 1 would indicate a perfect alignment (a 1-unit increase in x comes with a 1-unit increase in y). 
 
+#### Table 6. Covariance Matrix
 
 |           |   FT_impact |   FG_impact |    PTS |   FG3M |    REB |    AST |    STL |    BLK |    tov |
 |:----------|------------:|------------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|
@@ -328,7 +334,8 @@ The PCA algorithm will produce:
 
 I focus on the first two components here, as together they explain over 90% of the total variance in the data.
 
-#### Table 6. PCA Output for Two Components
+#### Table 7. PCA Output for Two Components
+
 | Category | PC1 | PC2 |
 | --- | --- | --- |
 | FT_impact | -0.336 | 0.275 |
@@ -482,7 +489,8 @@ I compare my ranking system to the traditional *Z*-rankings as well as Basketbal
 I show the top 20 SHAW rankings, with the Traditional-*Z* BBM player ranks alongside them for comparison. BBM rankings track with Traditional *Z*-scores for the most part, but SHAW rankings begin to differ dramatically after n=15. 
 
 
-#### Table 7. 2024-25 SHAW vs. Traditional *Z* and BBM Rankings Table 
+#### Table 8. 2024-25 SHAW vs. Traditional *Z* and BBM Rankings Table 
+
 |     | Player                 |   SHAW_rank |   Traditional_Z_rank |   BBM_rank |
 |----:|:-----------------------|------------:|---------------------:|-----------:|
 | 266 | nikola jokic           |           1 |                    1 |          1 |
@@ -543,8 +551,6 @@ def compare_summary_dfs(...):
 
 ```
 
-#### Table 8. Top-N matchup and Category wins vs. Traditional & BBM rankings
-
 For every season and every ranking comparison, a cumulative head-to-head matchup summary shows how the rankings fare against each other. For example: 
 
 ![alt text](/img/posts/Shaw_vs_Trad_24_25.png)
@@ -560,6 +566,8 @@ In the 2020-21 season, my metric wins 145 matchups!
 Against BBM rankings, SHAW rankings outperform by similar margins. 
 
 Shaw rankings dominate traditional Z rankings and BBM rankings by large margins in total matchup wins. This is true for every NBA season from 20-21 to 24-25. 
+
+#### Table 9. Top-N matchup and Category wins vs. Traditional & BBM rankings
 
 | Season |    Shaw vs Traditional    |                |     Shaw vs BBM        |                |
 |        | Matchup Wins  | Win %  | Category Wins | Cat Win %  | Matchups Wins  | Win %  | Categories | Cat %  |
@@ -585,6 +593,8 @@ In each draft, one SHAW-drafted team competes against nine baseline-drafted team
 - Nine teams drafted using the baseline metric  
 - The test team occupies draft positions 1–10 across simulations  
 - All resulting teams are compared across the nine categories
+
+#### Table 10. 
 
 | Season | Matchup Win Rate | League Top 3 |
 | --- | --- | --- | 
@@ -626,9 +636,7 @@ That said, a better way to treat rebounds (and blocks, and turnovers) is not to 
 ![alt text](/img/posts/Shaw_vs_puntREB_24_25.png)
 
 In simulated draft leagues, SHAW rankings beat punt-rebound ranked teams 77% of the time, and finished in the league top-3 80% of the time. 
-
 <br>
-
 
 ## Conclusion
 
@@ -655,6 +663,7 @@ Punting *removes* a category from the calculus. SHAW includes all nine, even the
 Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
 A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
+
 
 
 
