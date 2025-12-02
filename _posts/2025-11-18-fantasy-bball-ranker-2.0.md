@@ -63,12 +63,12 @@ For a literature review and discussion of my previous attempts to improve fantas
 
 The following is a simplified discussion and demonstration of:
 
-** **Standard *Z*-score** approach, reproduced here for a baseline comparison metric
-** **Covariation Analysis** to explore how fantasy categories relate to each other
-** **Principal Components Analysis** to identify statistical structures
-** **SHAW category weighting** to apply these structures to build a ranking metric
-** **Top-N evaluation** comparing head-to-head category value across ranking systems
-** **Simulated draft evaluation** assessing how ranking systems perform in draft-and-play scenarios
+**Standard *Z*-score** approach, reproduced here for a baseline comparison metric
+**Covariation Analysis** to explore how fantasy categories relate to each other
+**Principal Components Analysis** to identify statistical structures
+**SHAW category weighting** to apply these structures to build a ranking metric
+**Top-N evaluation** comparing head-to-head category value across ranking systems
+**Simulated draft evaluation** assessing how ranking systems perform in draft-and-play scenarios
 <br>
 
 ### Results
@@ -655,6 +655,7 @@ Punting *removes* a category from the calculus. SHAW includes all nine, even the
 Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
 A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
+
 
 
 
