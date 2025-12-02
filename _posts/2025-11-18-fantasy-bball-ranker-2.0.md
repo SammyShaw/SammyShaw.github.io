@@ -569,14 +569,14 @@ Shaw rankings dominate traditional Z rankings and BBM rankings by large margins 
 
 #### Table 9. Top-N matchup and Category wins vs. Traditional & BBM rankings
 
-
-| Season |    Shaw vs Traditional    |                |     Shaw vs BBM        |                |
-|        | Matchup Wins  | Win %  | Category Wins | Cat Win %  | Matchups Wins  | Win %  | Categories | Cat %  |
-| 2020-21 | 141-9 | 94.0 | 732-597 | 55.1 | 133-13 | 88.7 |   721-607 | 54.3 |
-| 2021-22 | 140-10 | 93.3 | 741-585  | 55.9 | 134-16 | 89.3 |  730-596 |  55.1  |
-| 2022-23 | 141-9 |  94.0 | 743-607 | 55.0 | 143-7 | 95.3 | 745-605 |  55.2 |
+| Season | Shaw vs Trad (Matchups) | Shaw vs Trad (%) | Shaw vs Trad (Cats) | Shaw vs Trad Cat (%) | Shaw vs BBM (Matchups) | Shaw vs BBM (%) | Shaw vs BBM (Cats) | Shaw vs BBM Cat (%) |
+|--------|--------------------------|-------------------|----------------------|------------------------|--------------------------|------------------|----------------------|-----------------------|
+| 2020-21 | 141-9  | 94.0 | 732-597 | 55.1 | 133-13 | 88.7 | 721-607 | 54.3 |
+| 2021-22 | 140-10 | 93.3 | 741-585 | 55.9 | 134-16 | 89.3 | 730-596 | 55.1 |
+| 2022-23 | 141-9  | 94.0 | 743-607 | 55.0 | 143-7  | 95.3 | 745-605 | 55.2 |
 | 2023-24 | 136-14 | 90.7 | 743-598 | 55.4 | 140-10 | 93.3 | 743-596 | 55.5 |
-| 2024-25 | 132-18 | 87.7  | 728-595 | 55.0 | 138-12| 92.0 | 727-596 | 55.0 |
+| 2024-25 | 132-18 | 87.7 | 728-595 | 55.0 | 138-12 | 92.0 | 727-596 | 55.0 |
+
 
 Although SHAW rankings do not dramatically increase total category wins, it substantially increases matchup wins by concentrating value into category combinations that consistently beat opponents. In other words, SHAW wins efficiently, dominating the matchup wins even when total category margins are moderate. Traditional *Z*-scores distribute value across categories that do not reinforce each other, which leads to strong *Z* totals but weaker matchup performance. SHAW explicitly exploits covariance structure to avoid this inefficiency.
 
@@ -664,6 +664,7 @@ Punting *removes* a category from the calculus. SHAW includes all nine, even the
 Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
 A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
+
 
 
 
