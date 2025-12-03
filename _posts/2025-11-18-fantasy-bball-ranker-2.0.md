@@ -557,10 +557,6 @@ For every season and every ranking comparison, a cumulative head-to-head matchup
 
 In the 2024-25 season, my SHAW ranking outperforms the Traditional *Z*-ranking by 132 matchup wins to 18, and 728 category wins to 595.
 
-![alt text](/img/posts/Shaw_vs_Trad_20_21.png)
-
-In the 2020-21 season, my metric wins 145 matchups!
-
 ![alt text](/img/posts/Shaw_vs_BBM_24_25.png)
 
 Against BBM rankings, SHAW rankings outperform by similar margins. 
@@ -645,32 +641,27 @@ I developed a Structured Hieararchically Adjusted Weights (SHAW) ranking metric,
 
 Critical observers might note that my method only ranks players for teams that win particular categories and not others, that I've created a system that appears to "punt" 4 categories in favor of 5. As such, I haven't improved player rankings, I've just "hacked" the game. 
 
-**The tests are reproducible**
-
+#### The tests are reproducible
 While I have used static, per-game season averages here to test my metric against the standard, the margins of improvement in Top-N comparisons and the consistent success in simulated drafts points to real findings. 
 
-**The method is mathematically grounded**
-
+#### The method is mathematically grounded
 Weights are derived from the PCA-discovered covariance structure:
 - A 6-category dominant cluster  
 - A 3-category subordinate cluster  
 
-**SHAW is not punting**
-
+#### SHAW is not punting
 Punting *removes* a category from the calculus. SHAW includes all nine, even the categories it down-weights. In further analysis, I found that punting only works for select categories. And then, SHAW beats that same punt models by the same dramatic margins, because SHAW now wins in those minority categories too. Thus, my model should beat a 'punt' model all of the time. 
 
-**Fantasy value is not real-basketball value**
-
+#### Fantasy value is not real-basketball value
 Traditional Z-score methods implicitly assume fantasy categories measure performance neutrally. But fantasy is a **game**, not unlike a *market*, with uneven payoff rules. The objective is not to estimate “true player performance.” It is to maximize expected wins under those rules. Like quantitative finance or the Moneyball model in baseball, the SHAW metric identifies and weighs sources of value that are mispriced by the current fantasy market. In this sense, fantasy basketball resembles quantitative trading more than player scouting: the winning strategy exploits structural inefficiencies in the scoring system.
 
 A nine-category league does not reward ‘the best player’; it rewards players whose statistical portfolios align with the payoff structure of those nine rules. If that payoff structure disproportionately tracks the statistical profiles of one player archetype, then ranking systems that treat all categories as independent or equally valuable systematically ignores the optimal strategy. SHAW works because it models fantasy basketball as the covariation puzzle that it actually is, allocating value toward category combinations that maximize wins under the game’s payoff rules.
 
+#### Application for K-category leagues
+Nine-category leauges represent the standard, or default option. ESPN and Yahoo allow league commissioners to customize settings, however, with many more statistical categories (Double-Doubles, Triple-Doubles, 3-PT%, Assist-to-turnover ratio, etc.) available to add complexity and fun. For custom league categories, my method can be applied in the same way: A. use PCA to uncover the covariance structure of all the categories, and B. weight up to the dominant statistical cluster, and down the subordinate. For scenarios in which statistical clusters are relatively balanced, users should experiment with team-builds that move in either direction, or experiement with overlapping categories. 
 
-
-
-
-
-
+#### User Beware
+Although my rankings beat the competition in head-to-head matchups, that does not mean that they would produce winning teams in real draft situations. They might, if other league members blindly subscribe to standard *Z*-rankings. 1. League rules still require managers to maintain players at each position, so any global ranking system alone will still require stategic choice about when to take a center vs. a gaurd, for example. 2. SHAW rankings represent a 'game-theoretical' improvement against a metric that does not know the scoring rules. Should every manager in a league adopt the same strategy implied by my ranking system, chances would be equal. If that is the case, 'gaming the game' would require adapting again, perhaps by adopting a strategy that focusses on the minority statistical cluster. 3. Finally, experienced managers should also know that draft day is only one variable in a fantasy season, as injuries, trades, and other events can change player output in ways that past per-game averages cannot predict. In conclusion, my rankings represent a strategic orientation towards optimal matchup performance, not a system that automatically wins. 
 
 
 
